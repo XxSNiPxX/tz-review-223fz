@@ -1,3 +1,4 @@
+Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 8559.19it/s]
 
 === lift_source.docx: 13 findings, kind=WORKS
   [OK ] must L1 CONTRADICTION          Тип лифта: таблица характеристик говорит «пассажирский», предмет закупки и специ  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
