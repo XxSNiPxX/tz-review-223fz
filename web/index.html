@@ -6,8 +6,20 @@
 <title>Проверка ТЗ 223-ФЗ</title>
 <style>
   :root { --bg:#f3f6fc; --card:#fff; --ink:#0b1b3a; --muted:#5b6b8c; --line:#d9e1f2; --err:#b42318; --errbg:#fee4e2; --risk:#b54708; --riskbg:#fef0c7; --note:#475467; --notebg:#e9edf6; --ok:#067647; --okbg:#d1fadf; --accent:#003092; --accent2:#0a46c0; --sel:#e6ecf9; --tint:#e6ecf9; }
-  :root[data-theme="dark"] { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#24345a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#84acff; --accent2:#a7c2ff; }
-  :root[data-theme="dark"] button { color:#0b1326 } :root[data-theme="dark"] header .brand img { filter:brightness(0) invert(1) }
+  :root[data-theme="dark"] { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#2a3d66; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#0a46c0; --accent2:#2565b2; --btn2:#84acff; }
+  :root[data-theme="dark"] header .brand img { filter:brightness(0) invert(1) }
+  :root[data-theme="dark"] button { background:var(--accent); border-color:var(--accent2); color:#fff }
+  :root[data-theme="dark"] button:hover { background:#1557d6 }
+  :root[data-theme="dark"] button.secondary { background:#1b2f5e; border-color:var(--btn2); color:#cfe0ff }
+  :root[data-theme="dark"] button.secondary:hover { background:#24407a }
+  :root[data-theme="dark"] button.ghost { background:#24345a; border-color:#3a4f80; color:#e8edf8 }
+  :root[data-theme="dark"] button.ghost:hover { background:#2f4470 }
+  :root[data-theme="dark"] .pill { background:#1b2744 }
+  :root[data-theme="dark"] .pill.ERROR { background:#4a1d1a } :root[data-theme="dark"] .pill.RISK { background:#4a3312 }
+  :root[data-theme="dark"] .finding .prop { background:#143d2b; color:#d1fadf }
+  :root[data-theme="dark"] .verdict .v { background:#143d2b; color:#d1fadf } :root[data-theme="dark"] .verdict .v.bad { background:#4a1d1a; color:#fee4e2 }
+  :root[data-theme="dark"] .drop { border-color:#3a4f80; background:#17264a }
+  :root[data-theme="dark"] input[type=text] { background:#0f1a33; border-color:#2a3d66 }
   * { box-sizing:border-box; min-width:0 }
   body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 "ALS Sirius","Golos Text","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow-wrap:anywhere }
   header { display:flex; gap:16px; align-items:center; padding:8px 18px; border-bottom:3px solid var(--accent); background:var(--card); position:sticky; top:0; z-index:5 }
@@ -101,7 +113,7 @@
 const $ = s => document.querySelector(s);
 function applyTheme(t){ if(t==='dark') document.documentElement.setAttribute('data-theme','dark'); else document.documentElement.removeAttribute('data-theme'); const b=document.getElementById('theme'); if(b) b.textContent = t==='dark'?'☀':'☾'; }
 function toggleTheme(){ const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('theme', t); }catch(e){} applyTheme(t); }
-try{ applyTheme(localStorage.getItem('theme')||'light'); }catch(e){ applyTheme('light'); }
+try{ applyTheme(localStorage.getItem('theme')||'dark'); }catch(e){ applyTheme('dark'); }
 const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const CATS = {CONTRADICTION:'Противоречие', INCORRECT_CHARACTERISTIC:'Некорректная характеристика', COMPLETENESS:'Комплектность / полнота', WRONG_OKPD2:'Код ОКПД 2',
   WARRANTY:'Гарантийные условия', STANDARDS:'Стандарты', COMPETITION_RESTRICTION:'Ограничение конкуренции', OUT_OF_SCOPE_PROVISION:'Не относится к ТЗ', FORM:'Оформление'};
@@ -118,7 +130,7 @@ async function procs(){ try{ const ps = await (await fetch('/api/procurements'))
 async function jobs(){ const js = await (await fetch('/api/reviews')).json();
   $('#jobs').innerHTML = js.slice(0,12).map(j=>`<tr><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status==='done'?'готово':j.status==='running'?'выполняется…':'ошибка'}${j.use_llm?' +LLM':''}</span></td>
     <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}${j.llm_status==='pending'?' · LLM: в очереди':j.llm_status==='running'?` · LLM: ${j.llm_done||0}/${j.llm_total}`:j.llm_status==='done'?' · LLM: готово':''}</td>
-    <td>${j.status==='done'?`<button class="secondary" onclick="open_('${j.review_id}')">открыть</button>`:''}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">пока нет проверок</td></tr>';
+    <td>${j.status==='done'?`<button class="secondary" onclick="open_('${j.review_id}')">открыть</button>${j.legacy?'<div class="muted" style="font-size:11px">старый формат: без текста документа</div>':''}`:''}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">пока нет проверок</td></tr>';
   if (js.some(j=>j.status==='running' || j.llm_status==='pending' || j.llm_status==='running')) setTimeout(jobs, 2500); }
 
 async function upload(file){ if(!file) return; const fd = new FormData(); fd.append('file', file); fd.append('use_llm', $('#llm').checked);

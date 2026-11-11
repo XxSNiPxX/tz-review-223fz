@@ -40,8 +40,7 @@ def _load_jobs():
         try:
             r = json.loads(p.read_text(encoding="utf-8"))
             up = r.get("upload_path")
-            if not r.get("document_view"): continue          # reports from before the document view existed: not shown in history
-            JOBS[r["review_id"]] = {"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
+            JOBS[r["review_id"]] = {"legacy": not r.get("document_view"),"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
                                     "started": r["reviewed_at"], "finished": r["reviewed_at"], "report_path": str(p), "summary": r["summary"],
                                     "llm_status": r.get("llm_status", "off"), "upload_path": up, "upload_is_docx": bool(up and up.lower().endswith(".docx"))}
         except Exception as ex:  # noqa
