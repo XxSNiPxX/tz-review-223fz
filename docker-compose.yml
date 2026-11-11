@@ -1,0 +1,18 @@
+services:
+  review:
+    build: .
+    image: tz-review:latest
+    container_name: tz-review
+    ports: ["8000:8000"]
+    environment:
+      - REVIEW_HOST=0.0.0.0
+      - REVIEW_PORT=8000
+      # set to 0 to disable the local LLM even if the model file is present
+      - REVIEW_USE_LLM=1
+    volumes:
+      - ./data:/app/data          # knowledge base (procurement.sqlite, index/), reviews/, uploads/
+      - ./models:/app/models      # multilingual-e5-small/ and Qwen2.5-7B-Instruct-Q4_K_M.gguf (optional)
+      - ./certs:/app/certs        # ru_bundle.pem, only needed by the collectors, not by the review server
+    restart: unless-stopped
+    # the server never makes outbound requests; uncomment to enforce it at the network level
+    # network_mode: "bridge"

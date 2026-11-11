@@ -1,0 +1,63 @@
+# All paths are relative to the project root unless absolute.
+data_dir: data
+db_path: data/procurement.sqlite
+
+eis:
+  # --- FTP (bulk XML). Reported broken by some users since Jan 2025: test with `lftp -u free,free ftp.zakupki.gov.ru`
+  ftp_host: ftp.zakupki.gov.ru
+  ftp_user: free
+  ftp_password: free
+  root: /out/published            # 223-ФЗ; 44-ФЗ is /fcs_regions (different schemas, not handled)
+  regions: [Moskva, Sankt-Peterburg, Tatarstan_Resp]
+  doc_type_prefixes: [purchaseNotice, purchaseProtocol, explanation, contract]
+  date_from: "2025-09-01"
+  date_to:   "2025-09-30"
+  max_archives_per_dir: 50
+  # --- HTML fallback (needs Russian IP). Used by `collect.py eis-html`.
+  html:
+    search_strings: ["ноутбук", "насос"]
+    max_pages: 2
+    publish_from: "01.09.2025"
+    publish_to: "30.09.2025"
+    delay_sec: 4
+  http_user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
+  attachment_delay_sec: 3
+
+fas:
+  base_url: https://br.fas.gov.ru
+  delay_sec: 2.0
+  # 1) crawl the case registry filtered to "223-ФЗ – жалоба" (procedure 43021; ~140k cases, 10 per page)
+  crawl_cases: true
+  procedure_id: 43021
+  cases_page_from: 1
+  cases_page_to: 30
+  date_from: "01.03.2025"  # dd.mm.yyyy; closed period so cases carry final decisions
+  date_to: "31.03.2025"
+  # 2) full-text search over decision documents (type=1)
+  queries:
+    - "223-ФЗ часть 6.1 статьи 3 описание предмета закупки"
+    - "223-ФЗ товарный знак эквивалент ограничение конкуренции"
+    - "223-ФЗ избыточные требования к товару"
+  max_pages_per_query: 5
+
+legal:
+  # Order = priority for the merged legal_rules table. Remove a source to skip it.
+  sources: [consultant, garant, pravo, files, ruslawod]
+  laws:
+    "223-ФЗ":
+      number: "223-ФЗ"
+      signing_date: "18.07.2011"
+      title_substring: "О закупках товаров, работ, услуг отдельными видами юридических лиц"
+      consultant_id: "116964"
+      garant_id: "12188083"
+      pravo_nd: "102149420"   # from RusLawOD pravogovruNd
+      file_urls:
+    "44-ФЗ":
+      number: "44-ФЗ"
+      signing_date: "05.04.2013"
+      title_substring: "О контрактной системе в сфере закупок"
+      consultant_id: "144624"
+      garant_id: "70353464"
+      pravo_nd: "102164547"
+      pravo_rdk: 157
+      file_urls: []
