@@ -9,7 +9,7 @@
   [OK ] opt  L7 CONTRADICTION          Спецификация озаглавлена «ремонтные работы», предмет — работы по замене; при нал  <- TITLE_SUBJECT_MISMATCH (FLAGGED)
   [OK ] opt  L8 FORM                   Сроки указаны только цифрами; принято дублировать прописью  <- NUMBER_WITHOUT_WORDS (INSUFFICIENT_EVIDENCE)
 
-=== metrology_source.docx: 27 findings, kind=GOODS
+=== metrology_source.docx: 19 findings, kind=GOODS
   [OK ] must M1 COMPLETENESS           Позиции-«комплекты» (ручной мерительный инструмент, вспомогательный инструмент,   <- KIT_SHOULD_BE_SPLIT (INSUFFICIENT_EVIDENCE)
   [OK ] must M2 WRONG_OKPD2            Коды ОКПД2 слишком общие (…190) или неверные для позиций: плита поверочная 26.51  <- OKPD2_TOO_GENERIC (INSUFFICIENT_EVIDENCE)
   [OK ] must M3 COMPLETENESS           Не у всех позиций указаны характеристики и комплектность  <- KIT_WITHOUT_COMPOSITION (INSUFFICIENT_EVIDENCE)

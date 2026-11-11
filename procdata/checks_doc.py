@@ -222,9 +222,13 @@ def check_okpd2(doc):
     codes = okpd()
     kind = doc["fields"].get("contract_kind")
     items = doc["items"]
+    seen = set()
     for it in items:
         code = it.get("okpd2")
         if not code: continue
+        key = (code, (it.get("name") or "").strip().lower())
+        if key in seen: continue                 # the same position listed in two tables
+        seen.add(key)
         name = (it.get("name") or "").lower()
         if codes and code not in codes:
             out.append(_f(doc, "WRONG_OKPD2", "OKPD2_UNKNOWN_CODE", "ERROR", f"Код ОКПД2 {code} отсутствует в классификаторе ОК 034-2014.", [it["anchor"]],
