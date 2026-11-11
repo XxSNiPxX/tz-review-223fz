@@ -211,12 +211,33 @@ CLAUSE_CHECKS = [check_missing_units, check_vague, check_gost, check_brand, chec
 DOC_CHECKS = [check_contradictions, check_sections]
 
 
+_role_model = None
+
+
+def _scope_all(clauses, min_conf=0.8):
+    """Heuristic scope for every clause; overridden by the fine-tuned clause-role model (models/clause-role) when it is
+    confident. Filename-based CONTRACT decisions are kept, the model only re-decides text-based cases."""
+    global _role_model
+    for c in clauses: c["scope"] = clause_scope(c); c["scope_method"] = "heuristic"
+    try:
+        from . import finetune
+        if _role_model is None and finetune.available(): _role_model = finetune.ClauseRole()
+    except Exception as ex:  # noqa  transformers missing or weights broken: heuristics only
+        _role_model = False
+    if not _role_model: return
+    idx = [i for i, c in enumerate(clauses) if not any(k in (c.get("document_name") or "").lower() for k in ("договор", "контракт"))]
+    preds = _role_model.predict([clauses[i]["clause_text"] for i in idx])
+    for i, (lab, conf) in zip(idx, preds):
+        if conf >= min_conf and lab != clauses[i]["scope"]:
+            clauses[i]["scope"], clauses[i]["scope_method"], clauses[i]["scope_conf"] = lab, "model", round(conf, 3)
+
+
 def run_checks(clauses):
     """clauses: dicts with clause_id, procurement_id, clause_text, position_start/end, page_number, document_name (optional).
     Completeness/competition checks run on TECHNICAL clauses only; document-level checks see everything."""
     out = []
+    _scope_all(clauses)
     for c in clauses:
-        c["scope"] = clause_scope(c)
         if c["scope"] != "TECHNICAL": continue
         for chk in CLAUSE_CHECKS:
             out.extend(chk(c))

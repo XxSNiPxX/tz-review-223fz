@@ -19,7 +19,7 @@
 """
 import argparse, logging, sys
 from procdata.common import load_config, open_db, log
-from procdata import eis_ftp, eis_parse, eis_attachments, extract_text, fas_br, legal, eis_html, findings, audit, convert, baseline
+from procdata import eis_ftp, eis_parse, eis_attachments, extract_text, fas_br, legal, eis_html, findings, audit, convert, baseline, finetune
 
 
 def cmd_eis(db, cfg, args):
@@ -58,6 +58,7 @@ COMMANDS = {
     "extract": lambda db, cfg, a: extract_text.extract_all(db, cfg, a.limit),
     "convert": lambda db, cfg, a: convert.run(db, a.limit),
     "baseline": lambda db, cfg, a: baseline.run(db),
+    "finetune": lambda db, cfg, a: finetune.train(db),
     "eis-html": lambda db, cfg, a: eis_html.collect(db, cfg, cfg["_data_dir"]),
     "eis-linked": lambda db, cfg, a: eis_html.collect_linked(db, cfg, cfg["_data_dir"], a.limit),
     "fas": lambda db, cfg, a: fas_br.collect(db, cfg, cfg["_data_dir"]),
