@@ -53,6 +53,11 @@
   .finding .t { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:4px } .finding .t b { font-size:13px } .finding .num { font:600 11px/18px system-ui; min-width:18px; text-align:center; border-radius:9px; color:#fff; background:var(--note) } .finding.ERROR .num { background:var(--err) } .finding.RISK .num { background:var(--risk) }
   .finding .where { font-size:12px; color:var(--muted) } .finding .expl { margin:6px 0 } .finding .prop { margin:6px 0; padding:6px 8px; background:var(--okbg); border-radius:6px; font-size:13px } .finding .ev { font-size:12px; color:var(--muted) } .finding .ev a { color:var(--accent); cursor:pointer; margin-right:6px }
   .finding details { font-size:13px } .finding summary { cursor:pointer; color:var(--accent) }
+  .editor { border:1px solid var(--accent2); border-radius:10px; padding:10px 12px; background:var(--card); margin:6px 0 10px }
+  .editor textarea { width:100%; min-height:110px; font:13px/1.45 Georgia,"Times New Roman",serif; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); resize:vertical }
+  .editor .row { margin-top:8px } .editor .hint { font-size:12px; color:var(--muted); margin-top:6px } .busy { opacity:.6; pointer-events:none }
+  .edited { outline:2px dashed var(--ok); outline-offset:1px } .mark.OK { background:var(--ok) }
+  .toast { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:var(--card); border:1px solid var(--line); border-left:4px solid var(--ok); border-radius:10px; padding:10px 14px; box-shadow:0 6px 24px rgba(0,0,0,.25); z-index:20; font-size:13px }
   dialog { border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); max-width:820px; width:92vw } pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:8px; max-height:60vh; overflow:auto }
   @media (max-width: 900px) { .panes { grid-template-columns:1fr; grid-template-rows:1fr 1fr } .doc { border-right:0; border-bottom:1px solid var(--line) } }
 </style>
@@ -92,6 +97,7 @@
       <span id="docinfo" class="muted"></span>
       <span style="flex:1"></span>
       <button id="btn-annot" onclick="dlAnnot()" title="Исходный DOCX с подсветкой и комментариями Word">ТЗ с пометками (DOCX)</button>
+      <button id="btn-edited" style="display:none" onclick="dlEdited()" title="Исходный DOCX с применёнными правками">Исправленный DOCX</button>
       <button class="secondary" onclick="dl('docx')">Заключение (DOCX)</button>
       <button class="secondary" onclick="dl('html')">Отчёт для печати</button>
       <button class="ghost" onclick="dl('json')">JSON</button>
@@ -155,9 +161,10 @@ async function dlAnnot(){ if(!RID) return; const r = await fetch(`/api/reviews/$
 async function open_(rid){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; filter = {sev:null, cat:null};
   $('#landing').style.display='none'; $('#review').classList.add('on'); $('#back').style.display='inline-block';
   $('#btn-annot').style.display = (j.upload_is_docx ? 'inline-block' : 'none');
+  $('#btn-edited').style.display = (j.upload_is_docx && (R.edits||[]).length ? 'inline-block' : 'none');
   const c = R.conclusion || {}; const v = $('#verdict'); v.textContent = c.verdict || '—'; v.className = 'v' + (c.errors ? ' bad' : '');
   const d = c.document || {}; const llm = R.llm_status==='pending'?' · LLM-объяснения: в очереди':R.llm_status==='running'?` · LLM-объяснения: ${R.llm_done}/${R.llm_total}`:R.llm_status==='done'?' · LLM-объяснения: готово':'';
-  $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${llm}`;
+  $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${llm}${(R.edits||[]).length?` · правок ${R.edits.length}`:''}`;
   clearTimeout(window._llmPoll); if (R.llm_status==='pending' || R.llm_status==='running') window._llmPoll = setTimeout(()=>open_(rid), 6000);
   R.findings.sort((a,b)=>(ORDER[a.severity]-ORDER[b.severity]) || ((a.disposition==='FLAGGED')===(b.disposition==='FLAGGED')?0:(a.disposition==='FLAGGED'?-1:1))); R.findings.forEach((f,i)=>f._n=i+1);
   byClause = {}; R.findings.forEach(f=>{ if(f.clause_id) (byClause[f.clause_id] ||= []).push(f); });
@@ -173,8 +180,10 @@ function visible(f){ return (!filter.sev || f.severity===filter.sev) && (!filter
 
 function sevOf(fs){ return fs.reduce((m,f)=>ORDER[f.severity]<ORDER[m]?f.severity:m,'NOTE'); }
 function marks(fs){ return fs.map(f=>`<span class="mark ${f.severity}" title="${esc(CATS[f.case_category]||'')}">${f._n}</span>`).join(''); }
-function wrap(id, text){ const fs = byClause[id]; if(!fs) return esc(text);
-  return `<span class="hl ${sevOf(fs)}" id="c_${id}" onclick="select_(${fs[0]._n})">${esc(text)}${marks(fs)}</span>`; }
+const edited = () => new Set(R.edited_clauses||[]);
+function wrap(id, text){ const fs = byClause[id]; const ed = edited().has(id);
+  if(!fs) return ed ? `<span class="hl edited" id="c_${id}">${esc(text)}<span class="mark OK" title="исправлено, замечаний нет">✓</span></span>` : esc(text);
+  return `<span class="hl ${sevOf(fs)} ${ed?'edited':''}" id="c_${id}" onclick="select_(${fs[0]._n})">${esc(text)}${marks(fs)}</span>`; }
 
 function renderDoc(){ const view = R.document_view || [];
   $('#doc').innerHTML = view.map(b=>{
@@ -192,10 +201,49 @@ function renderList(){ const fs = R.findings.filter(visible);
     <div class="t"><span class="num">${f._n}</span><b>${esc(CATS[f.case_category]||f.case_category)}</b><span class="pill ${f.severity}">${SEV[f.severity]}</span><span class="pill">${DISP[f.disposition]||f.disposition}</span>${f.method&&f.method.includes('LLM')?'<span class="pill">LLM</span>':''}</div>
     <div class="where">${esc((f.anchors||[]).join(' · ') || (f.page?'стр. '+f.page:''))}</div>
     <div class="expl">${esc(f.explanation)}</div>
-    ${f.proposed_text?`<div class="prop"><b>Исправить:</b> ${esc(f.proposed_text)}</div>`:''}
+    ${f.proposed_text?`<div class="prop"><b>Предложение:</b> ${esc(f.proposed_text)}</div>`:''}
+    ${f.clause_id?`<div class="row" style="margin-top:6px"><button class="secondary" onclick="event.stopPropagation();openEditor(${f._n})">Исправить фрагмент</button></div>`:''}
+    <div id="ed_${f._n}"></div>
     ${ev.length?`<details><summary>Основание (${ev.length})</summary><div class="ev">${ev.map(o=>`<a onclick='event.stopPropagation();ev(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${esc(o.id)}</a>`).join('')}</div></details>`:'<div class="ev">Основание: правило проверки по структуре документа</div>'}
   </div>`; }).join('') || '<div class="muted">Нет замечаний в этом фильтре</div>'; }
 
+function clauseText(id){ for(const b of (R.document_view||[])){ if(b.type==='p' && b.clause_id===id) return b.text; if(b.type==='table'){ const r=b.rows.find(r=>r.clause_id===id); if(r) return r.cells.join(' | '); } } return ''; }
+function openEditor(n){ const f = R.findings.find(x=>x._n===n); if(!f) return; select_(n);
+  document.querySelectorAll('.editor').forEach(e=>e.remove());
+  const host = $('#ed_'+n); const cur = clauseText(f.clause_id); const isRow = f.clause_id.startsWith('T');
+  host.innerHTML = `<div class="editor" onclick="event.stopPropagation()">
+    <div class="muted" style="font-size:12px;margin-bottom:4px">Фрагмент ${esc((f.anchors||[])[0]||f.clause_id)}${isRow?' · ячейки таблицы разделены « | »':''}</div>
+    <textarea id="ta_${n}">${esc(cur)}</textarea>
+    <div class="row">
+      <button onclick="applyEdit(${n},'manual')">Применить и перепроверить</button>
+      ${f.proposed_text?`<button class="secondary" onclick="useProposal(${n})">Подставить предложение</button>`:''}
+      <button class="secondary" onclick="askLLM(${n})">Спросить LLM</button>
+      <button class="ghost" onclick="closeEditor(${n})">Отмена</button>
+    </div>
+    <div class="hint" id="hint_${n}">Правка применяется к рабочей копии документа; весь документ проверяется заново (секунды). Каждая правка сохраняется в базу для обучения.</div>
+  </div>`; $('#ta_'+n).focus(); }
+function closeEditor(n){ const h=$('#ed_'+n); if(h) h.innerHTML=''; }
+let lastProposal = {};
+function useProposal(n){ const f = R.findings.find(x=>x._n===n); const ta=$('#ta_'+n); if(!f||!ta) return;
+  const cur = clauseText(f.clause_id); const prop = f.proposed_text||'';
+  // if the proposal is a rewritten fragment (starts like the fragment), replace; otherwise append as a note to edit by hand
+  ta.value = (prop.length>40 && cur.slice(0,15)===prop.slice(0,15)) ? prop : (cur + '\n\n[предложение: ' + prop + ']');
+  lastProposal[n] = {text: prop, method:'suggestion'}; $('#hint_'+n).textContent = 'Подставлено предложение правила. Отредактируйте при необходимости и примените.'; }
+async function askLLM(n){ const f = R.findings.find(x=>x._n===n); const ed=$('#ed_'+n); if(!f) return; ed.classList.add('busy'); $('#hint_'+n).textContent='LLM формулирует правку (около минуты, модель работает на CPU)…';
+  try{ const r = await fetch(`/api/reviews/${RID}/suggest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_id:f.clause_id, finding_id:f.finding_id})}); const j = await r.json();
+    if(!r.ok) throw new Error(j.detail||'ошибка'); const ta=$('#ta_'+n); const cur = clauseText(f.clause_id);
+    if(j.proposed_text){ ta.value = (j.proposed_text.length>40 && cur.slice(0,15)===j.proposed_text.slice(0,15)) ? j.proposed_text : (cur + '\n\n[LLM: ' + j.proposed_text + ']'); lastProposal[n]={text:j.proposed_text, method: j.llm?'llm':'suggestion'}; }
+    $('#hint_'+n).textContent = (j.llm?'LLM: ':'Правило: ') + (j.explanation||'') + (j.rejected?` (ответ модели отклонён проверкой: ${j.rejected}; показано предложение правила)`:'');
+  }catch(e){ $('#hint_'+n).textContent = 'Не удалось получить предложение: '+e.message; } finally { ed.classList.remove('busy'); } }
+async function applyEdit(n, how){ const f = R.findings.find(x=>x._n===n); const ta=$('#ta_'+n); if(!f||!ta) return; const ed=$('#ed_'+n); ed.classList.add('busy');
+  const lp = lastProposal[n]; const method = lp ? (ta.value.trim()===lp.text.trim() ? lp.method : (lp.method==='llm'?'llm_edited':'manual')) : 'manual';
+  try{ const r = await fetch(`/api/reviews/${RID}/edits`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_id:f.clause_id, new_text:ta.value, method, finding_ids:(byClause[f.clause_id]||[]).map(x=>x.finding_id), proposed_text: lp?lp.text:(f.proposed_text||null)})});
+    const j = await r.json(); if(!r.ok) throw new Error(j.detail||'ошибка');
+    toast(`Правка применена. Замечаний по фрагменту: ${j.findings_before} → ${j.findings_after}${j.resolved?' · фрагмент чист':''}. Всего по документу: ${j.total_findings}.`);
+    delete lastProposal[n]; await open_(RID);
+  }catch(e){ alert('Ошибка: '+e.message); ed.classList.remove('busy'); } }
+function dlEdited(){ if(RID) window.open(`/api/reviews/${RID}/edited.docx`, '_blank'); }
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 6000); }
 function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel')); const f = R.findings.find(x=>x._n===n); if(!f) return;
   const fe = $('#f_'+n); if(fe){ fe.classList.add('sel'); fe.scrollIntoView({block:'nearest', behavior:'smooth'}); }
   const ce = f.clause_id && document.getElementById('c_'+f.clause_id); if(ce){ ce.classList.add('sel'); ce.scrollIntoView({block:'center', behavior:'smooth'}); } }
