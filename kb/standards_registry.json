@@ -1,0 +1,4230 @@
+{
+ "ТР 010": {
+  "count": 27,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 27
+   }
+  ]
+ },
+ "СП 31.13330.2021": {
+  "count": 16,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 16
+   }
+  ]
+ },
+ "СП 32.13330.2018": {
+  "count": 27,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 27
+   }
+  ]
+ },
+ "СП 48.13330.2019": {
+  "count": 40,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 40
+   }
+  ]
+ },
+ "СП 68.13330.2017": {
+  "count": 21,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 21
+   }
+  ]
+ },
+ "СП 399.1325800.2018": {
+  "count": 9,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 9
+   }
+  ]
+ },
+ "СНИП 12": {
+  "count": 161,
+  "canonical_family": "СНИП",
+  "canonical_year": "03",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "03",
+    "count": 86
+   },
+   {
+    "family": "СНИП",
+    "year": "04",
+    "count": 61
+   },
+   {
+    "family": "СНИП",
+    "year": "01",
+    "count": 14
+   }
+  ]
+ },
+ "СП 112.13330.2011": {
+  "count": 9,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 9
+   }
+  ]
+ },
+ "СП 51.13330.2011": {
+  "count": 23,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 23
+   }
+  ]
+ },
+ "СП 124.13330.2012": {
+  "count": 10,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 10
+   }
+  ]
+ },
+ "ГОСТ 18599": {
+  "count": 142,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2001",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2001",
+    "count": 134
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 25129": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "82",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "82",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 8020": {
+  "count": 19,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2016",
+    "count": 10
+   },
+   {
+    "family": "ГОСТ",
+    "year": "80",
+    "count": 5
+   },
+   {
+    "family": "ГОСТ",
+    "year": "90",
+    "count": 4
+   }
+  ]
+ },
+ "СП 129.13330.2019.": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 49.13330.2010": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 31.13330": {
+  "count": 16,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 16
+   }
+  ]
+ },
+ "ГОСТ 8509": {
+  "count": 17,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "93",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "93",
+    "count": 14
+   },
+   {
+    "family": "ГОСТ",
+    "year": "83",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 19904": {
+  "count": 12,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "90",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "90",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 5781": {
+  "count": 16,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "82",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "82",
+    "count": 10
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ТР 005": {
+  "count": 2,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 31307": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2005",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2005",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 42.3.01": {
+  "count": 22,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2021",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2021",
+    "count": 22
+   }
+  ]
+ },
+ "ГОСТ 22.7.05": {
+  "count": 16,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2022",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2022",
+    "count": 16
+   }
+  ]
+ },
+ "ГОСТ 15150": {
+  "count": 22,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 12
+   },
+   {
+    "family": "ГОСТ",
+    "year": "69",
+    "count": 10
+   }
+  ]
+ },
+ "ГОСТ 14254": {
+  "count": 22,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2015",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2015",
+    "count": 18
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 16600": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "72",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "72",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 50840": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "95",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "95",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 50923": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "96",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "96",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 50948": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2021",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2021",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 56939": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2024",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2024",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 55199": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2012",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 23337": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "78",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "78",
+    "count": 4
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "2014",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 42.3.05": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2023",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2023",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 29322": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 34757": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2021",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2021",
+    "count": 2
+   }
+  ]
+ },
+ "ТР 037": {
+  "count": 3,
+  "canonical_family": "ТР ЕАЭС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ЕАЭС",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 51870": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 3
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "2014",
+    "count": 1
+   }
+  ]
+ },
+ "СП 246.1325800.2016": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 2.105": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2019",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2019",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 3.01.04": {
+  "count": 3,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 23407": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "78",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "78",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 51558": {
+  "count": 6,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2008",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2008",
+    "count": 3
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "2014",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 50775": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "95",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "95",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 3": {
+  "count": 3,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 51000.4": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2011",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 26342": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "84",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "84",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 58485": {
+  "count": 16,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2024",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2024",
+    "count": 16
+   }
+  ]
+ },
+ "ГОСТ 8732": {
+  "count": 16,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2025",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2025",
+    "count": 16
+   }
+  ]
+ },
+ "СНИП 1.04.03": {
+  "count": 12,
+  "canonical_family": "СНИП",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "85",
+    "count": 10
+   },
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 58967": {
+  "count": 12,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 12.3.053": {
+  "count": 12,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 12.4.026": {
+  "count": 10,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2015",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2015",
+    "count": 6
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 132.13330.2011": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 1": {
+  "count": 9,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.128": {
+  "count": 9,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "83",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "83",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.230.1": {
+  "count": 9,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2007",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2007",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.028": {
+  "count": 9,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "76",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "76",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 28507": {
+  "count": 45,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "90",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "90",
+    "count": 32
+   },
+   {
+    "family": "ГОСТ",
+    "year": "99",
+    "count": 13
+   }
+  ]
+ },
+ "ГОСТ 12.4.281": {
+  "count": 9,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.280": {
+  "count": 41,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 32
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.246": {
+  "count": 9,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.288": {
+  "count": 9,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2013",
+    "count": 9
+   }
+  ]
+ },
+ "ГОСТ 12.4.087": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "84",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "84",
+    "count": 6
+   }
+  ]
+ },
+ "СНИП 12.04.2002": {
+  "count": 6,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "СНИП 12.03.2001": {
+  "count": 6,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 12.1.046": {
+  "count": 9,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 6
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ",
+    "year": "85",
+    "count": 1
+   }
+  ]
+ },
+ "СП 2.2.3670": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": "20",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "20",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 21.101": {
+  "count": 6,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 21.703": {
+  "count": 6,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 6
+   }
+  ]
+ },
+ "СП 325.1325800.2017": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "СП 48.13330.2019.": {
+  "count": 10,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 10
+   }
+  ]
+ },
+ "ГОСТ 12.1.004": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "91",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "91",
+    "count": 7
+   }
+  ]
+ },
+ "ГОСТ 57678": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2017",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2017",
+    "count": 3
+   }
+  ]
+ },
+ "САНПИН 2.1.3684": {
+  "count": 29,
+  "canonical_family": "САНПИН",
+  "canonical_year": "21",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "21",
+    "count": 29
+   }
+  ]
+ },
+ "СП 2.2.4285": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": "26",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "26",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 12.3.009": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "76",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "76",
+    "count": 6
+   }
+  ]
+ },
+ "СП 70.13330.2012.": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "СП 1": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 54331": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2011",
+    "count": 4
+   }
+  ]
+ },
+ "ТР 020": {
+  "count": 11,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 11
+   }
+  ]
+ },
+ "ТР 004": {
+  "count": 5,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 5
+   }
+  ]
+ },
+ "ГОСТ 32511": {
+  "count": 21,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2013",
+    "count": 21
+   }
+  ]
+ },
+ "ГОСТ 1510": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "84",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "84",
+    "count": 7
+   }
+  ]
+ },
+ "ГОСТ 32415": {
+  "count": 14,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2013",
+    "count": 14
+   }
+  ]
+ },
+ "ТР 019": {
+  "count": 89,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 85
+   },
+   {
+    "family": "ТР ТС",
+    "year": "2011",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 58666": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2019",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2019",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 28560": {
+  "count": 8,
+  "canonical_family": "ГОСТ Р ИСО",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р ИСО",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 30333": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2007",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2007",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 59249": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 12.1.005": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "88",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "88",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 12.1.007": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "76",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "76",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 12.3.002": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 4
+   },
+   {
+    "family": "ГОСТ",
+    "year": "75",
+    "count": 3
+   }
+  ]
+ },
+ "СП 2": {
+  "count": 14,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 14
+   }
+  ]
+ },
+ "СП 3": {
+  "count": 15,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 15
+   }
+  ]
+ },
+ "СП 4": {
+  "count": 15,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 15
+   }
+  ]
+ },
+ "САНПИН 2.1.4.1074": {
+  "count": 2,
+  "canonical_family": "САНПИН",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 2874": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "82",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "82",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 3262": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "75",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "75",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 10704": {
+  "count": 88,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "91",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "91",
+    "count": 88
+   }
+  ]
+ },
+ "СП 18.13330.2019.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 30.13330.2020": {
+  "count": 11,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 11
+   }
+  ]
+ },
+ "САНПИН 1.2.3685": {
+  "count": 19,
+  "canonical_family": "САНПИН",
+  "canonical_year": "21",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "21",
+    "count": 19
+   }
+  ]
+ },
+ "ГОСТ 51232": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 31.13330.2012": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "СП 8.13130.2020.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 10.13130.2020.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 18.13330.2019": {
+  "count": 15,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 15
+   }
+  ]
+ },
+ "СП 40": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": "102",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "102",
+    "count": 4
+   }
+  ]
+ },
+ "СП 129.13330.2019": {
+  "count": 11,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 11
+   }
+  ]
+ },
+ "ГОСТ 22.6.01": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 88.13330.2014": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "СП 93.13330.2016": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 32": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": "106",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "106",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 55201": {
+  "count": 11,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2012",
+    "count": 11
+   }
+  ]
+ },
+ "СП 264.1325800.2016": {
+  "count": 5,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 5
+   }
+  ]
+ },
+ "ГОСТ 42.4.02": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2015",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2015",
+    "count": 2
+   }
+  ]
+ },
+ "СП 165.1325800.2014": {
+  "count": 5,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 5
+   }
+  ]
+ },
+ "СП 88.": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 131.13330.2020": {
+  "count": 66,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 66
+   }
+  ]
+ },
+ "СП 20.13330.2016": {
+  "count": 33,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 33
+   }
+  ]
+ },
+ "СП 115.13330.2016": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 165.13330.2014": {
+  "count": 5,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 5
+   }
+  ]
+ },
+ "ГОСТ 30826": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 50571": {
+  "count": 5,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 3
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "94",
+    "count": 2
+   }
+  ]
+ },
+ "СП 90.13330.2012": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 22.0.01": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2016",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 22.0.05": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2020",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 22.0.06": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "95",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "95",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 22.0.07": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "95",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "95",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 22.3.03": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "94",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "94",
+    "count": 2
+   }
+  ]
+ },
+ "СП 116.13330.2012": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СП 14.13330.2018": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 2.01.07": {
+  "count": 14,
+  "canonical_family": "СНИП",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "85",
+    "count": 14
+   }
+  ]
+ },
+ "СП 32.13330.2020.": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 32.13330.2020": {
+  "count": 32,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 32
+   }
+  ]
+ },
+ "СП 12.13130": {
+  "count": 44,
+  "canonical_family": "СП",
+  "canonical_year": "2009",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "2009",
+    "count": 36
+   },
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 7890": {
+  "count": 14,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "93",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "93",
+    "count": 12
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 33172": {
+  "count": 18,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 18
+   }
+  ]
+ },
+ "ГОСТ 22584": {
+  "count": 34,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "96",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "96",
+    "count": 34
+   }
+  ]
+ },
+ "СП 32.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 2.04.03": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "85",
+    "count": 2
+   }
+  ]
+ },
+ "САНПИН 2.1.5.980": {
+  "count": 24,
+  "canonical_family": "САНПИН",
+  "canonical_year": "000",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "000",
+    "count": 20
+   },
+   {
+    "family": "САНПИН",
+    "year": "00",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 14202": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "69",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "69",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 9941": {
+  "count": 26,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "81",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "81",
+    "count": 26
+   }
+  ]
+ },
+ "ГОСТ 34589": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2019",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2019",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 17379": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2001",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2001",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 17375": {
+  "count": 60,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2001",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2001",
+    "count": 60
+   }
+  ]
+ },
+ "ГОСТ 33259": {
+  "count": 46,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 40
+   },
+   {
+    "family": "ГОСТ",
+    "year": "2015",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 5632": {
+  "count": 24,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 20
+   },
+   {
+    "family": "ГОСТ",
+    "year": "72",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 34.10.753": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "97",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "97",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 17378": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2001",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2001",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 12820": {
+  "count": 18,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "80",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "80",
+    "count": 18
+   }
+  ]
+ },
+ "ГОСТ 3634": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "99",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 54560": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2015",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2015",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 12822": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "80",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "80",
+    "count": 7
+   }
+  ]
+ },
+ "ГОСТ 10705": {
+  "count": 10,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "80",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "80",
+    "count": 10
+   }
+  ]
+ },
+ "СП 54.13330.2016": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 131.13330.2018": {
+  "count": 11,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 11
+   }
+  ]
+ },
+ "СП 42.13330.2011": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СНИП 23": {
+  "count": 17,
+  "canonical_family": "СНИП",
+  "canonical_year": "01",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "01",
+    "count": 9
+   },
+   {
+    "family": "СНИП",
+    "year": "03",
+    "count": 4
+   },
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 2
+   },
+   {
+    "family": "СНИП",
+    "year": "02",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 25100": {
+  "count": 5,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2020",
+    "count": 3
+   },
+   {
+    "family": "ГОСТ",
+    "year": "2011",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 20522": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2012",
+    "count": 3
+   }
+  ]
+ },
+ "СП 34.13330.2012": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 11": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 11": {
+  "count": 14,
+  "canonical_family": "СП",
+  "canonical_year": "105",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "105",
+    "count": 5
+   },
+   {
+    "family": "СП",
+    "year": "102",
+    "count": 4
+   },
+   {
+    "family": "СП",
+    "year": "104",
+    "count": 4
+   },
+   {
+    "family": "СП",
+    "year": "103",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 17.5.3.04": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "83",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "83",
+    "count": 3
+   }
+  ]
+ },
+ "СП 32.13330.2012": {
+  "count": 11,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 11
+   }
+  ]
+ },
+ "СП 131.13330": {
+  "count": 10,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 10
+   }
+  ]
+ },
+ "СП 30.13330": {
+  "count": 5,
+  "canonical_family": "СП",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "2016",
+    "count": 5
+   }
+  ]
+ },
+ "СП 42.13330": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "2016",
+    "count": 2
+   }
+  ]
+ },
+ "СП 18.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 32.13330.2016": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "САНПИН 2.1.6.1032": {
+  "count": 4,
+  "canonical_family": "САНПИН",
+  "canonical_year": "01",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "01",
+    "count": 4
+   }
+  ]
+ },
+ "СП 252.1325800.2016": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 42.13330.2016": {
+  "count": 17,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 17
+   }
+  ]
+ },
+ "САНПИН 2.2.1": {
+  "count": 2,
+  "canonical_family": "САНПИН",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 17.4.4.02": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2017",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2017",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 17.4.2.01": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 26489": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "85",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 26951": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "86",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "86",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 26425": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "85",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 26423": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 31295.2": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2005",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2005",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 2.07.01": {
+  "count": 7,
+  "canonical_family": "СНИП",
+  "canonical_year": "89",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "89",
+    "count": 7
+   }
+  ]
+ },
+ "ГОСТ 17.5.3.06": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "85",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "85",
+    "count": 3
+   }
+  ]
+ },
+ "СП 3.5.3.3223": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": "14",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "14",
+    "count": 3
+   }
+  ]
+ },
+ "САНПИН 3.5.2.3472": {
+  "count": 3,
+  "canonical_family": "САНПИН",
+  "canonical_year": "17",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "17",
+    "count": 3
+   }
+  ]
+ },
+ "САНПИН 2.1.7.1322": {
+  "count": 2,
+  "canonical_family": "САНПИН",
+  "canonical_year": "03",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "03",
+    "count": 2
+   }
+  ]
+ },
+ "СП 47.13330.2016": {
+  "count": 5,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 5
+   }
+  ]
+ },
+ "СП 47.13330.2016.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 22.13330.2016": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 8568": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "77",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "77",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 31937": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 30970": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 7
+   }
+  ]
+ },
+ "ГОСТ 30674": {
+  "count": 5,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "99",
+    "count": 5
+   }
+  ]
+ },
+ "ГОСТ 31174": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2003",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2003",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ",
+    "year": "2017",
+    "count": 1
+   },
+   {
+    "family": "ГОСТ",
+    "year": "2016",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 30245": {
+  "count": 15,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2003",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2003",
+    "count": 15
+   }
+  ]
+ },
+ "ГОСТ 8240": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "97",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "97",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 530": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2012",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 32144": {
+  "count": 7,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2013",
+    "count": 4
+   },
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 31565": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2012",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 32414": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2013",
+    "count": 6
+   }
+  ]
+ },
+ "СП 60.13330.2016": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 14918": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "80",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "80",
+    "count": 2
+   }
+  ]
+ },
+ "СП 486.1311500.2020": {
+  "count": 31,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 31
+   }
+  ]
+ },
+ "СП 2.13130.2020": {
+  "count": 13,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 13
+   }
+  ]
+ },
+ "ГОСТ 52289": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "2019",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 52290": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2004",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2004",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 31": {
+  "count": 4,
+  "canonical_family": "СНИП",
+  "canonical_year": "06",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "06",
+    "count": 4
+   }
+  ]
+ },
+ "СП 20.13330": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 22.13330": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 2.02.01": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": "83",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "83",
+    "count": 2
+   }
+  ]
+ },
+ "СП 118.13330": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 2.2.2.1327": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   },
+   {
+    "family": "СП",
+    "year": "03",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 27751": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 56192": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 56193": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 56194": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 59.13330.2016": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 35": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": "01",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "01",
+    "count": 2
+   }
+  ]
+ },
+ "СП 35": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": "103",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "103",
+    "count": 2
+   }
+  ]
+ },
+ "СП 60.13330.2012": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 131.13330.2012": {
+  "count": 12,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 12
+   }
+  ]
+ },
+ "СП 50.13330.2012": {
+  "count": 234,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 234
+   }
+  ]
+ },
+ "ГОСТ 12.4.011": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "89",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "89",
+    "count": 3
+   }
+  ]
+ },
+ "СП 45.13330.2017": {
+  "count": 13,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 13
+   }
+  ]
+ },
+ "ГОСТ 12.2.003": {
+  "count": 3,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "91",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "91",
+    "count": 3
+   }
+  ]
+ },
+ "СП 484.1311500.2020": {
+  "count": 41,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 41
+   }
+  ]
+ },
+ "СП 484.1311500.2020.": {
+  "count": 26,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 26
+   }
+  ]
+ },
+ "СП 3.13330.2009": {
+  "count": 26,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 26
+   }
+  ]
+ },
+ "СП 23": {
+  "count": 26,
+  "canonical_family": "СП",
+  "canonical_year": "101",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "101",
+    "count": 26
+   }
+  ]
+ },
+ "СП 52.13330.2011": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 30494": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2011",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51379": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "99",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51380": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "99",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51387": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "99",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51541": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "99",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "99",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51749": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2001",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2001",
+    "count": 2
+   }
+  ]
+ },
+ "СП 50": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 52.13330.2016": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 56852": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2016",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТР 54468": {
+  "count": 10,
+  "canonical_family": "ГОСТР",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТР",
+    "year": "",
+    "count": 10
+   }
+  ]
+ },
+ "СП 8.13130.2020": {
+  "count": 30,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 30
+   }
+  ]
+ },
+ "ГОСТ 10923": {
+  "count": 12,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 9757": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 26633": {
+  "count": 14,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 12
+   },
+   {
+    "family": "ГОСТ",
+    "year": "2015",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 10884": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 9573": {
+  "count": 6,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 379": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 70.13330.2012": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 72.13330.2016": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 73.13330.2016": {
+  "count": 6,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 23279": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2012",
+    "count": 4
+   }
+  ]
+ },
+ "СП 70.133302012": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 18105": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2018",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2018",
+    "count": 4
+   }
+  ]
+ },
+ "СП 12": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": "136",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "136",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 12.1.019": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 131.13330.2016": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТР 12.1.019": {
+  "count": 2,
+  "canonical_family": "ГОСТР",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТР",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 12.04": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": "2002",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "2002",
+    "count": 2
+   }
+  ]
+ },
+ "СП 60.13330.2020": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 41": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": "01",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "01",
+    "count": 2
+   }
+  ]
+ },
+ "СНИП 3.05.01": {
+  "count": 2,
+  "canonical_family": "СНИП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "САНПИН 2.2.4.548": {
+  "count": 2,
+  "canonical_family": "САНПИН",
+  "canonical_year": "96",
+  "variants": [
+   {
+    "family": "САНПИН",
+    "year": "96",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 21.1101": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2020",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 21.602": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2016",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2016",
+    "count": 2
+   }
+  ]
+ },
+ "СП 4.13130.2020": {
+  "count": 20,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 20
+   }
+  ]
+ },
+ "СП 10.13130.2009": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СП 2.13130.2020.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 7473": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2010",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2010",
+    "count": 4
+   }
+  ]
+ },
+ "СП 1.13130.2020.": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 1.13130.2020": {
+  "count": 26,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 26
+   }
+  ]
+ },
+ "СП 8.13130.2009": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 5.13130": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 7.13130.2013": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СП 485.1311500.2020": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СП 3.13130.2009": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 4.13130.2013": {
+  "count": 8,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "СП 6.13130.2013": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 10.13130.2020": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 12.13130.2009": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 32830.": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 33220": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 50597.": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 9.401.": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "СП 42.13330.2016.": {
+  "count": 10,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 10
+   }
+  ]
+ },
+ "ГОСТ 6665": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "91",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "91",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 8736": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 58406.2": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 8267": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "93",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "93",
+    "count": 2
+   }
+  ]
+ },
+ "СП 157.1328500.2014": {
+  "count": 2,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 34.201": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "89",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "89",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 34.601": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "90",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "90",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 34.602": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "89",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "89",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 870": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р МЭК",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р МЭК",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 60870": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "104",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "104",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 51321.5": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2011",
+    "count": 2
+   }
+  ]
+ },
+ "СП 30.13330.2016": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 7293": {
+  "count": 12,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 54808": {
+  "count": 8,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 5762": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 12": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 5915": {
+  "count": 8,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 8
+   }
+  ]
+ },
+ "ГОСТ 13547": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ТР 032": {
+  "count": 4,
+  "canonical_family": "ТР ТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТР ТС",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 333.1325800.2020": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 301.1325800.2017": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 471.1325800.2019": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "СП 48.13330.2011": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 2.04.02": {
+  "count": 3,
+  "canonical_family": "СНИП",
+  "canonical_year": "84",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "84",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 12.3.048": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2002",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2002",
+    "count": 3
+   }
+  ]
+ },
+ "СП 63.13330.2012": {
+  "count": 3,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 3
+   }
+  ]
+ },
+ "СНИП 52": {
+  "count": 3,
+  "canonical_family": "СНИП",
+  "canonical_year": "01",
+  "variants": [
+   {
+    "family": "СНИП",
+    "year": "01",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 54475": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2011",
+    "count": 3
+   }
+  ]
+ },
+ "ГОСТ 12.0.230": {
+  "count": 12,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2007",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2007",
+    "count": 12
+   }
+  ]
+ },
+ "ГОСТ 58940": {
+  "count": 166,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2020",
+    "count": 166
+   }
+  ]
+ },
+ "ГОСТ 34693.6": {
+  "count": 10,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2020",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2020",
+    "count": 10
+   }
+  ]
+ },
+ "ГОСТ 11209": {
+  "count": 60,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2014",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2014",
+    "count": 60
+   }
+  ]
+ },
+ "ГОСТ 12.4.187": {
+  "count": 36,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "97",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "97",
+    "count": 36
+   }
+  ]
+ },
+ "ГОСТ 52239": {
+  "count": 92,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2024",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2024",
+    "count": 92
+   }
+  ]
+ },
+ "ГОСТ 52238": {
+  "count": 44,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2004",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2004",
+    "count": 44
+   }
+  ]
+ },
+ "ГОСТ 31508": {
+  "count": 16,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2012",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2012",
+    "count": 16
+   }
+  ]
+ },
+ "СП 59.13330.2020": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "СП",
+    "year": "",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 51261": {
+  "count": 3,
+  "canonical_family": "ГОСТ Р",
+  "canonical_year": "2025",
+  "variants": [
+   {
+    "family": "ГОСТ Р",
+    "year": "2025",
+    "count": 2
+   },
+   {
+    "family": "ГОСТ Р",
+    "year": "2022",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 3471": {
+  "count": 2,
+  "canonical_family": "ГОСТ Р ИСО",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ГОСТ Р ИСО",
+    "year": "",
+    "count": 2
+   }
+  ]
+ },
+ "ГОСТ 9045": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "93",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "93",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 7798": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "70",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "70",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 25835": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "83",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "83",
+    "count": 2
+   }
+  ]
+ },
+ "СП 31": {
+  "count": 4,
+  "canonical_family": "СП",
+  "canonical_year": "110",
+  "variants": [
+   {
+    "family": "СП",
+    "year": "110",
+    "count": 2
+   },
+   {
+    "family": "СП",
+    "year": "102",
+    "count": 1
+   },
+   {
+    "family": "СП",
+    "year": "115",
+    "count": 1
+   }
+  ]
+ },
+ "ГОСТ 12491": {
+  "count": 4,
+  "canonical_family": "ГОСТ Р ИСО",
+  "canonical_year": "2011",
+  "variants": [
+   {
+    "family": "ГОСТ Р ИСО",
+    "year": "2011",
+    "count": 4
+   }
+  ]
+ },
+ "ТРТС 100": {
+  "count": 6,
+  "canonical_family": "ТРТС",
+  "canonical_year": null,
+  "variants": [
+   {
+    "family": "ТРТС",
+    "year": "",
+    "count": 6
+   }
+  ]
+ },
+ "ГОСТ 15.309": {
+  "count": 5,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "98",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "98",
+    "count": 5
+   }
+  ]
+ },
+ "ГОСТ 32366": {
+  "count": 4,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2013",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2013",
+    "count": 4
+   }
+  ]
+ },
+ "ГОСТ 814": {
+  "count": 2,
+  "canonical_family": "ГОСТ",
+  "canonical_year": "2019",
+  "variants": [
+   {
+    "family": "ГОСТ",
+    "year": "2019",
+    "count": 2
+   }
+  ]
+ }
+}

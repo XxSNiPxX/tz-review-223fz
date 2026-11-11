@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Проверка ТЗ 223-ФЗ</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#6b7280; --line:#e5e7eb; --err:#b42318; --risk:#b54708; --ok:#067647; --accent:#1d4ed8; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; } }
+  * { box-sizing:border-box; min-width:0 } body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; overflow-wrap:anywhere; word-break:break-word }
+  main, .card, table { max-width:100% } table { display:block; overflow-x:auto }
+  header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:baseline; flex-wrap:wrap }
+  header h1 { font-size:18px; margin:0 } header .kb { color:var(--muted); font-size:13px }
+  main { max-width:1100px; margin:0 auto; padding:16px 20px; display:grid; gap:16px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+  input[type=text], select { padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); min-width:220px }
+  button { padding:8px 14px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer } button.secondary { background:transparent; color:var(--accent) }
+  button:disabled { opacity:.5; cursor:default }
+  table { width:100%; border-collapse:collapse; font-size:14px } td, th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top } th { color:var(--muted); font-weight:600 }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line) }
+  .ERROR { color:var(--err); border-color:var(--err) } .RISK { color:var(--risk); border-color:var(--risk) } .PASSED, .done { color:var(--ok); border-color:var(--ok) }
+  .section h2 { font-size:16px; margin:0 0 8px } .finding { border-top:1px solid var(--line); padding:10px 0 }
+  .finding .label { font-weight:600 } .frag { color:var(--muted); font-size:13px; margin:4px 0; white-space:pre-wrap } .prop { margin:4px 0 }
+  .ev { font-size:12px; color:var(--muted) } .ev a { color:var(--accent); text-decoration:none; margin-right:8px; cursor:pointer }
+  .muted { color:var(--muted) } .sum { display:flex; gap:14px; flex-wrap:wrap } .sum div { padding:8px 12px; border:1px solid var(--line); border-radius:8px }
+  pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:8px; max-height:320px; overflow:auto }
+  dialog { border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); max-width:800px; width:92vw }
+</style>
+</head>
+<body>
+<header><h1>Проверка технического задания (223-ФЗ)</h1><span class="kb" id="kb">загрузка базы знаний…</span></header>
+<main>
+  <div class="card">
+    <div class="row">
+      <form id="up" class="row" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".docx,.pdf,.xlsx" required>
+        <label><input type="checkbox" name="use_llm" id="llm1"> объяснения LLM</label>
+        <button type="submit">Проверить файл</button>
+      </form>
+      <span class="muted">или</span>
+      <form id="bynotice" class="row">
+        <input type="text" id="notice" placeholder="номер извещения из базы, напр. 32615808789" list="plist">
+        <datalist id="plist"></datalist>
+        <label><input type="checkbox" id="llm2"> LLM</label>
+        <button type="submit" class="secondary">Проверить из базы</button>
+      </form>
+    </div>
+    <div class="muted" style="margin-top:8px">Сервер не обращается в интернет: проверка идёт по внутренней базе норм, прецедентов ФАС и словарей.</div>
+  </div>
+
+  <div class="card"><h2 style="font-size:16px;margin:0 0 8px">Проверки</h2>
+    <table><thead><tr><th>id</th><th>источник</th><th>статус</th><th>итог</th><th></th></tr></thead><tbody id="jobs"></tbody></table>
+  </div>
+
+  <div id="report" class="card" style="display:none"></div>
+</main>
+<dialog id="dlg"><div id="dlgbody"></div><div class="row" style="justify-content:flex-end;margin-top:10px"><button onclick="dlg.close()">Закрыть</button></div></dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TYPES = {COMPLETENESS:'Полнота и корректность ТЗ', COMPETITION:'Ограничение конкуренции', COMPLIANCE:'Соответствие нормам'};
+const CATS = {CONTRADICTION:'Противоречие', INCORRECT_CHARACTERISTIC:'Некорректная характеристика', COMPLETENESS:'Комплектность / полнота', WRONG_OKPD2:'Код ОКПД 2',
+  WARRANTY:'Гарантийные условия', STANDARDS:'Стандарты', COMPETITION_RESTRICTION:'Ограничение конкуренции', OUT_OF_SCOPE_PROVISION:'Не относится к ТЗ', FORM:'Оформление'};
+let current = null;
+
+async function kb(){ try{ const k = await (await fetch('/api/kb')).json();
+  $('#kb').textContent = `норм: ${k.counts.legal_rules} · прецедентов ФАС: ${k.counts.fas_findings} · закупок с ТЗ: ${k.counts.procurements} · индекс: ${k.retrieval_index?'да':'нет'} · LLM: ${k.llm_available?'доступна':'нет'}`;
+  }catch(e){ $('#kb').textContent='база недоступна'; } }
+
+async function procs(){ try{ const ps = await (await fetch('/api/procurements')).json();
+  $('#plist').innerHTML = ps.map(p=>`<option value="${p.eis_id}">${esc((p.name||'').slice(0,80))} · ФАС: ${p.n_fas} · пунктов: ${p.n_clauses}</option>`).join(''); }catch(e){} }
+
+async function jobs(){ const js = await (await fetch('/api/reviews')).json();
+  $('#jobs').innerHTML = js.map(j=>`<tr><td class="muted">${j.review_id}</td><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status}${j.use_llm?' +LLM':''}</span></td>
+    <td>${j.summary?Object.entries(j.summary).map(([k,v])=>`${TYPES[k]||k}: ${v.findings}`).join(' · '):(j.error?esc(j.error):'')}</td>
+    <td>${j.status==='done'?`<button class="secondary" onclick="show('${j.review_id}')">отчёт</button>`:''}</td></tr>`).join('') || '<tr><td colspan=5 class="muted">пока нет проверок</td></tr>';
+  if (js.some(j=>j.status==='running')) setTimeout(jobs, 2000); }
+
+async function show(id){ const r = (await (await fetch('/api/reviews/'+id)).json()).report; current = r;
+  const con = r.conclusion || {};
+  const concl = con.verdict ? `<div class="card" style="margin:10px 0;border-color:${con.errors?'var(--err)':'var(--ok)'}"><b>Заключение:</b> ${esc(con.verdict)}<br>
+      <span class="muted">ошибок ${con.errors} · рисков ${con.risks} · на ручную проверку ${con.manual_review} · замечаний по оформлению ${con.notes}</span>
+      ${con.document?`<div class="muted" style="margin-top:6px">предмет: ${esc(con.document.subject||'—')} · тип: ${esc(con.document.contract_kind||'—')} · разделов ${con.document.sections??'—'} · таблиц ${con.document.tables??'—'} · позиций ${con.document.items??'—'} · ОКПД2: ${(con.document.okpd2_codes||[]).join(', ')||'—'}</div>`:''}
+      ${(con.top||[]).length?`<ol style="margin:8px 0 0 18px">${con.top.map(t=>`<li><b>${CATS[t.category]||t.category}:</b> ${esc(t.summary)} <span class="muted">${esc(t.anchor||'')}</span></li>`).join('')}</ol>`:''}</div>` : '';
+  const byCat = {}; r.findings.forEach(f=>{ byCat[f.case_category||'?']=(byCat[f.case_category||'?']||0)+1; });
+  const sum = Object.entries(byCat).map(([k,v])=>`<div><b>${CATS[k]||k}</b><br>${v}</div>`).join('');
+  const sections = ['COMPLETENESS','COMPETITION','COMPLIANCE'].map(t=>{ const fs = r.findings.filter(f=>f.analysis_type===t);
+    return `<div class="section"><h2>${TYPES[t]} <span class="muted">(${fs.length})</span></h2>` + (fs.length? fs.map(f=>`
+      <div class="finding"><span class="label">${f.label}</span> <span class="pill ${f.severity}">${f.severity}</span> <span class="pill">${f.disposition}</span>
+        <span class="pill">${CATS[f.case_category]||f.case_category||''}</span> ${f.page?`<span class="muted">стр. ${f.page}</span>`:''} ${f.method?`<span class="muted">${f.method}</span>`:''}
+        ${(f.anchors&&f.anchors.length)?`<div class="muted" style="font-size:12px">где: ${f.anchors.map(esc).join(' · ')}</div>`:''}
+        <div>${esc(f.explanation)}</div>
+        <div class="frag">«${esc(f.clause_text)}»</div>
+        ${f.proposed_text?`<div class="prop"><b>Предложение:</b> ${esc(f.proposed_text)}</div>`:''}
+        <div class="ev">Доказательства: ${(f.evidence_objects||[]).map(o=>`<a onclick='ev(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${esc(o.id)}</a>`).join('')||'—'}</div>
+      </div>`).join('') : '<div class="muted">замечаний нет</div>') + '</div>'; }).join('');
+  $('#report').style.display='block';
+  $('#report').innerHTML = `${concl}<div class="row" style="justify-content:space-between"><h2 style="margin:0;font-size:17px">Отчёт: ${esc(r.source)}</h2>
+    <span class="muted">пунктов: ${r.n_clauses} · технических: ${r.clause_scopes?.TECHNICAL??'?'} · ${r.llm_used?'с LLM':'без LLM'} · база: ${r.kb_release.legal_rules} норм / ${r.kb_release.fas_findings} прецедентов</span>
+    <button class="secondary" onclick="dl()">JSON</button></div><div class="sum" style="margin:10px 0">${sum}</div>${sections}`;
+  window.scrollTo({top: $('#report').offsetTop-10, behavior:'smooth'}); }
+
+function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score.toFixed(2)}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
+function dl(){ const b = new Blob([JSON.stringify(current,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=current.review_id+'.json'; a.click(); }
+
+$('#up').addEventListener('submit', async e=>{ e.preventDefault(); const fd = new FormData(e.target); fd.set('use_llm', $('#llm1').checked);
+  const r = await fetch('/api/reviews',{method:'POST',body:fd}); if(!r.ok){ alert((await r.json()).detail); return; } jobs(); });
+$('#bynotice').addEventListener('submit', async e=>{ e.preventDefault();
+  const r = await fetch('/api/reviews/by-notice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({notice:$('#notice').value.trim(), use_llm:$('#llm2').checked})});
+  if(!r.ok){ alert((await r.json()).detail); return; } jobs(); });
+kb(); procs(); jobs();
+</script>
+</body>
+</html>

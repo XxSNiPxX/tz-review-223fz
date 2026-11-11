@@ -1,0 +1,14 @@
+requests>=2.31
+lxml>=4.9
+beautifulsoup4>=4.12
+pdfplumber>=0.10
+python-docx>=1.1
+openpyxl>=3.1
+pyyaml>=6.0
+tqdm>=4.66
+# optional, only for the RusLawOD legal source (streams a 6 GB parquet corpus)
+pyarrow>=15
+huggingface_hub>=0.23
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9

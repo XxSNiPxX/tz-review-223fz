@@ -1,0 +1,8 @@
+.venv/
+data/
+models/
+certs/*.pem
+__pycache__/
+*.pyc
+kb_release_*.tar.gz*
+.claude/
