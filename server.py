@@ -31,7 +31,7 @@ UPLOADS = ROOT / "data" / "uploads"; UPLOADS.mkdir(parents=True, exist_ok=True)
 REVIEWS = ROOT / "data" / "reviews"; REVIEWS.mkdir(parents=True, exist_ok=True)
 JOBS = {}           # review_id -> {status, source, started, error, report_path}
 LOCK = threading.Lock()
-LLM_JOBS = threading.Semaphore(1)     # LLM reviews run strictly one at a time (see explain.LLM_LOCK); rule-only reviews stay parallel
+LLM_JOBS = threading.Lock()           # LLM phases run strictly one at a time (see explain.LLM_LOCK); rule phases stay parallel
 
 
 def _load_jobs():
@@ -62,34 +62,49 @@ def indexes():
     return _idx["rules"], _idx["prec"]
 
 
+def _write_report(review_id, report):
+    path = REVIEWS / f"{review_id}.json"; path.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8"); return path
+
+
 def run_review(review_id, clauses, source, use_llm, doc=None):
-    gate = LLM_JOBS if use_llm else None
-    if gate: gate.acquire()
+    """Phase 1 (seconds): rules + retrieval -> report is DONE and visible. Phase 2 (minutes, optional): LLM explanations are
+    added to the same report one finding at a time, serialised across reviews; the UI shows llm_status and refreshes."""
     try:
         conn = db()
         findings = rv.analyze(clauses, doc)
         rules_idx, prec_idx = indexes()
-        llm_on = use_llm and explain.available() and os.environ.get("REVIEW_USE_LLM", "1") not in ("0", "false", "no")
         for f in findings:
             f["evidence_objects"] = rv.resolve_evidence(conn, f["evidence"], rules_idx, prec_idx, f["clause_text"], f["analysis_type"], f["label"])
-            if llm_on and explain.wants_llm(f): explain.explain(f, f["evidence_objects"])
         by = {}
         for f in findings: by.setdefault(f["analysis_type"], []).append(f)
         scopes = {}
         for c in clauses: scopes[c.get("scope", "?")] = scopes.get(c.get("scope", "?"), 0) + 1
+        want_llm = use_llm and explain.available() and os.environ.get("REVIEW_USE_LLM", "1") not in ("0", "false", "no")
+        todo = [f for f in findings if explain.wants_llm(f)] if want_llm else []
         report = {"review_id": review_id, "source": source, "reviewed_at": datetime.datetime.now().isoformat(timespec="seconds"),
-                  "llm_used": llm_on, "n_clauses": len(clauses), "clause_scopes": scopes,
+                  "llm_used": False, "llm_status": ("pending" if todo else ("off" if not use_llm else "unavailable")), "llm_total": len(todo), "llm_done": 0,
+                  "n_clauses": len(clauses), "clause_scopes": scopes,
                   "kb_release": {"legal_rules": conn.execute("SELECT COUNT(*) FROM legal_rules").fetchone()[0],
                                  "fas_findings": conn.execute("SELECT COUNT(*) FROM fas_findings").fetchone()[0]},
                   "summary": {k: {"findings": len(v), "errors": sum(x["severity"] == "ERROR" for x in v), "risks": sum(x["severity"] == "RISK" for x in v)} for k, v in by.items()},
                   "conclusion": rv.conclusion(findings, doc), "document_view": rep.document_view(doc, clauses), "findings": findings}
-        path = REVIEWS / f"{review_id}.json"; path.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
-        with LOCK: JOBS[review_id].update(status="done", report_path=str(path), finished=datetime.datetime.now().isoformat(timespec="seconds"), summary=report["summary"])
+        path = _write_report(review_id, report)
+        with LOCK: JOBS[review_id].update(status="done", report_path=str(path), finished=datetime.datetime.now().isoformat(timespec="seconds"),
+                                          summary=report["summary"], llm_status=report["llm_status"], llm_total=len(todo), llm_done=0)
+        if not todo: return
+        with LLM_JOBS:                                   # one LLM review at a time; others wait here with their rule report already visible
+            with LOCK: JOBS[review_id]["llm_status"] = "running"
+            report["llm_status"] = "running"
+            for i, f in enumerate(todo, 1):
+                explain.explain(f, f["evidence_objects"])
+                report["llm_done"] = i; report["llm_used"] = True
+                _write_report(review_id, report)
+                with LOCK: JOBS[review_id].update(llm_done=i)
+            report["llm_status"] = "done"; _write_report(review_id, report)
+            with LOCK: JOBS[review_id].update(llm_status="done")
     except Exception as ex:  # noqa
         log.exception("review failed")
         with LOCK: JOBS[review_id].update(status="error", error=str(ex)[:300])
-    finally:
-        if gate: gate.release()
 
 
 def start(clauses, source, use_llm, doc=None):

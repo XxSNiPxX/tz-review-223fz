@@ -109,9 +109,9 @@ async function procs(){ try{ const ps = await (await fetch('/api/procurements'))
 
 async function jobs(){ const js = await (await fetch('/api/reviews')).json();
   $('#jobs').innerHTML = js.slice(0,12).map(j=>`<tr><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status==='done'?'готово':j.status==='running'?'выполняется…':'ошибка'}${j.use_llm?' +LLM':''}</span></td>
-    <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}</td>
+    <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}${j.llm_status==='pending'?' · LLM: в очереди':j.llm_status==='running'?` · LLM: ${j.llm_done||0}/${j.llm_total}`:j.llm_status==='done'?' · LLM: готово':''}</td>
     <td>${j.status==='done'?`<button class="secondary" onclick="open_('${j.review_id}')">открыть</button>`:''}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">пока нет проверок</td></tr>';
-  if (js.some(j=>j.status==='running')) setTimeout(jobs, 2000); }
+  if (js.some(j=>j.status==='running' || j.llm_status==='pending' || j.llm_status==='running')) setTimeout(jobs, 2500); }
 
 async function upload(file){ if(!file) return; const fd = new FormData(); fd.append('file', file); fd.append('use_llm', $('#llm').checked);
   $('#drop').querySelector('b').textContent = 'Загрузка и проверка…';
@@ -134,7 +134,9 @@ function dl(fmt){ if(RID) window.open(`/api/reviews/${RID}/report.${fmt}`, '_bla
 async function open_(rid){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; filter = {sev:null, cat:null};
   $('#landing').style.display='none'; $('#review').classList.add('on'); $('#back').style.display='inline-block';
   const c = R.conclusion || {}; const v = $('#verdict'); v.textContent = c.verdict || '—'; v.className = 'v' + (c.errors ? ' bad' : '');
-  const d = c.document || {}; $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${R.llm_used?' · с LLM':''}`;
+  const d = c.document || {}; const llm = R.llm_status==='pending'?' · LLM-объяснения: в очереди':R.llm_status==='running'?` · LLM-объяснения: ${R.llm_done}/${R.llm_total}`:R.llm_status==='done'?' · LLM-объяснения: готово':'';
+  $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${llm}`;
+  clearTimeout(window._llmPoll); if (R.llm_status==='pending' || R.llm_status==='running') window._llmPoll = setTimeout(()=>open_(rid), 6000);
   R.findings.sort((a,b)=>(ORDER[a.severity]-ORDER[b.severity]) || ((a.disposition==='FLAGGED')===(b.disposition==='FLAGGED')?0:(a.disposition==='FLAGGED'?-1:1))); R.findings.forEach((f,i)=>f._n=i+1);
   byClause = {}; R.findings.forEach(f=>{ if(f.clause_id) (byClause[f.clause_id] ||= []).push(f); });
   renderStats(); renderDoc(); renderList(); }
