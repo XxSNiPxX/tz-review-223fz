@@ -14,7 +14,7 @@ API
   GET  /api/precedents/{finding_id}
   GET  /                       web UI
 """
-import json, re, threading, uuid, datetime, shutil, logging
+import json, os, re, threading, uuid, datetime, shutil, logging
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
