@@ -207,6 +207,19 @@ Output: `data/reviews/<source>.json` (finding schema from the architecture doc) 
 separate sections. On the first linked procurement the rule tier went from 174 raw findings to 8 after scoping
 and the lexicon fixes; the brand findings there are real (Polair models without an equivalence clause).
 
+## Editing loop and training data
+
+In the UI every finding has «Исправить фрагмент»: the fragment opens in an editor (table rows as cells joined by « | »).
+You can type the fix, insert the rule's proposal, or ask the local LLM (`POST /api/reviews/{id}/suggest`, evidence-only,
+guarded). «Применить и перепроверить» (`POST /api/reviews/{id}/edits`) applies the change to the working copy of the
+document and re-runs the whole check in seconds; the finding count before/after is reported and edited fragments are
+marked. «Исправленный DOCX» (`GET /api/reviews/{id}/edited.docx`) is the original file with all edits applied.
+
+Every edit is stored in the `edits` table (review, clause, anchor, flagged labels and categories, original text, system
+proposal, applied text, method manual/suggestion/llm/llm_edited, whether the re-check cleared the finding, user, time).
+`GET /api/edits` returns them, `GET /api/edits?format=jsonl` exports a JSONL file: the supervised dataset for a correction
+model (flagged fragment + category → accepted rewrite).
+
 ## Server
 
 ```bash
