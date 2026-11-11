@@ -36,11 +36,15 @@ LLM_JOBS = threading.Lock()           # LLM phases run strictly one at a time (s
 
 def _load_jobs():
     """Reports persist as JSON; rebuild the job list from them so restarts/reloads keep history."""
+    seen = {}
     for p in sorted(REVIEWS.glob("R*.json")):
+        rid = p.name.split(".")[0]
+        if rid in seen and not p.name.endswith(".v2.json"): continue
+        seen[rid] = p
         try:
             r = json.loads(p.read_text(encoding="utf-8"))
             up = r.get("upload_path")
-            JOBS[r["review_id"]] = {"legacy": not r.get("document_view"),"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
+            JOBS[rid] = {"legacy": not r.get("document_view"),"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
                                     "started": r["reviewed_at"], "finished": r["reviewed_at"], "report_path": str(p), "summary": r["summary"],
                                     "llm_status": r.get("llm_status", "off"), "upload_path": up, "upload_is_docx": bool(up and up.lower().endswith(".docx"))}
         except Exception as ex:  # noqa
@@ -65,7 +69,16 @@ def indexes():
 
 
 def _write_report(review_id, report):
-    path = REVIEWS / f"{review_id}.json"; path.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8"); return path
+    """Write the report; if the existing file is not writable (e.g. created by the Docker container as root), write a
+    sibling and point the job at it. Reviews must never fail because of a file owned by another user."""
+    path = REVIEWS / f"{review_id}.json"
+    data = json.dumps(report, ensure_ascii=False, indent=1)
+    try:
+        path.write_text(data, encoding="utf-8")
+    except PermissionError:
+        path = REVIEWS / f"{review_id}.v2.json"; path.write_text(data, encoding="utf-8")
+        with LOCK: JOBS[review_id]["report_path"] = str(path)
+    return path
 
 
 def run_review(review_id, clauses, source, use_llm, doc=None):
