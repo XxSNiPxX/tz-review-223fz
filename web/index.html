@@ -5,21 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Проверка ТЗ 223-ФЗ</title>
 <style>
-  :root { --bg:#f3f4f6; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --err:#b42318; --errbg:#fee4e2; --risk:#b54708; --riskbg:#fef0c7; --note:#475467; --notebg:#eaecf0; --ok:#067647; --okbg:#d1fadf; --accent:#1d4ed8; --sel:#dbeafe; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#2a2f3a; --okbg:#143d2b; --sel:#1e3a5f; } }
-  :root[data-theme="dark"] { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#2a2f3a; --okbg:#143d2b; --sel:#1e3a5f; }
+  :root { --bg:#f3f6fc; --card:#fff; --ink:#0b1b3a; --muted:#5b6b8c; --line:#d9e1f2; --err:#b42318; --errbg:#fee4e2; --risk:#b54708; --riskbg:#fef0c7; --note:#475467; --notebg:#e9edf6; --ok:#067647; --okbg:#d1fadf; --accent:#003092; --accent2:#0a46c0; --sel:#e6ecf9; --tint:#e6ecf9; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#24345a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#84acff; --accent2:#a7c2ff; } }
+  :root[data-theme="dark"] { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#24345a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#84acff; --accent2:#a7c2ff; }
   * { box-sizing:border-box; min-width:0 }
-  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow-wrap:anywhere }
-  header { display:flex; gap:14px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; z-index:5 }
-  header h1 { font-size:16px; margin:0; white-space:nowrap } header .kb { color:var(--muted); font-size:12px; flex:1 }
-  button { font:inherit; padding:7px 12px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer }
-  button.secondary { background:transparent; color:var(--accent) } button.ghost { background:transparent; color:var(--ink); border-color:var(--line) } button:disabled { opacity:.5; cursor:default }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 "ALS Sirius","Golos Text","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow-wrap:anywhere }
+  header { display:flex; gap:16px; align-items:center; padding:8px 18px; border-bottom:3px solid var(--accent); background:var(--card); position:sticky; top:0; z-index:5 }
+  header .brand { display:flex; align-items:center; gap:12px } header .brand img { height:30px; width:auto; display:block } header .brand .sep { width:1px; height:26px; background:var(--line) }
+  header h1 { font-size:15px; margin:0; white-space:nowrap; color:var(--accent); letter-spacing:.01em } header h1 small { display:block; font-weight:400; color:var(--muted); font-size:11px }
+  header .kb { color:var(--muted); font-size:12px; flex:1; text-align:right }
+  button { font:inherit; font-weight:600; padding:7px 14px; border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer }
+  button:hover { background:var(--accent2); border-color:var(--accent2) } button.secondary { background:transparent; color:var(--accent) } button.secondary:hover { background:var(--tint) } button.ghost { background:transparent; color:var(--ink); border-color:var(--line) } button:disabled { opacity:.5; cursor:default }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) button { color:#0b1326 } :root:not([data-theme="light"]) header .brand img { filter:brightness(0) invert(1) } }
   .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; border:1px solid var(--line); vertical-align:middle; white-space:nowrap }
   .pill.ERROR { color:var(--err); border-color:var(--err); background:var(--errbg) } .pill.RISK { color:var(--risk); border-color:var(--risk); background:var(--riskbg) } .pill.NOTE { color:var(--note); background:var(--notebg) } .pill.done, .pill.ok { color:var(--ok); border-color:var(--ok) }
   .muted { color:var(--muted) }
   #landing { max-width:900px; margin:28px auto; padding:0 16px; display:grid; gap:14px }
   .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px }
-  .drop { display:block; border:2px dashed var(--line); border-radius:12px; padding:34px 16px; text-align:center; cursor:pointer; transition:.15s } .drop.over, .drop:hover { border-color:var(--accent); background:var(--sel) }
+  .drop { display:block; border:2px dashed #9fb7ea; border-radius:12px; padding:38px 16px; text-align:center; cursor:pointer; transition:.15s; background:var(--tint) } .drop.over, .drop:hover { border-color:var(--accent); background:var(--sel) }
   .drop b { font-size:16px } .drop input { display:none }
   .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center } input[type=text] { font:inherit; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); min-width:260px }
   table.jobs { width:100%; border-collapse:collapse; font-size:13px } .jobs td, .jobs th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line) } .jobs th { color:var(--muted); font-weight:600 }
@@ -44,7 +47,7 @@
 </head>
 <body>
 <header>
-  <h1>Проверка ТЗ · 223-ФЗ</h1>
+  <div class="brand"><img src="/static/logo.svg" alt="МФТИ"><span class="sep"></span><h1>Проверка технического задания · 223-ФЗ<small>Хакатон МФТИ · Задача 1 · интеллектуальная проверка ТЗ</small></h1></div>
   <span class="kb" id="kb">база знаний…</span>
   <button class="ghost" id="back" style="display:none" onclick="goHome()">← Новая проверка</button>
 </header>
@@ -75,7 +78,8 @@
       <span class="v" id="verdict">—</span>
       <span id="docinfo" class="muted"></span>
       <span style="flex:1"></span>
-      <button class="secondary" onclick="dl('docx')">Скачать DOCX</button>
+      <button id="btn-annot" onclick="dlAnnot()" title="Исходный DOCX с подсветкой и комментариями Word">ТЗ с пометками (DOCX)</button>
+      <button class="secondary" onclick="dl('docx')">Заключение (DOCX)</button>
       <button class="secondary" onclick="dl('html')">Отчёт для печати</button>
       <button class="ghost" onclick="dl('json')">JSON</button>
     </div>
@@ -130,9 +134,11 @@ $('#bynotice').addEventListener('click', async ()=>{ const n = $('#notice').valu
 
 function goHome(){ $('#review').classList.remove('on'); $('#landing').style.display='grid'; $('#back').style.display='none'; jobs(); }
 function dl(fmt){ if(RID) window.open(`/api/reviews/${RID}/report.${fmt}`, '_blank'); }
+async function dlAnnot(){ if(!RID) return; const r = await fetch(`/api/reviews/${RID}/annotated.docx`, {method:'HEAD'}); if(r.status===409){ alert('Размеченная копия доступна только для загруженных DOCX. Для PDF используйте «Заключение (DOCX)».'); return; } window.open(`/api/reviews/${RID}/annotated.docx`, '_blank'); }
 
 async function open_(rid){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; filter = {sev:null, cat:null};
   $('#landing').style.display='none'; $('#review').classList.add('on'); $('#back').style.display='inline-block';
+  $('#btn-annot').style.display = (j.upload_is_docx ? 'inline-block' : 'none');
   const c = R.conclusion || {}; const v = $('#verdict'); v.textContent = c.verdict || '—'; v.className = 'v' + (c.errors ? ' bad' : '');
   const d = c.document || {}; const llm = R.llm_status==='pending'?' · LLM-объяснения: в очереди':R.llm_status==='running'?` · LLM-объяснения: ${R.llm_done}/${R.llm_total}`:R.llm_status==='done'?' · LLM-объяснения: готово':'';
   $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${llm}`;
