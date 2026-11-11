@@ -87,6 +87,9 @@ def check_missing_units(clause):
 def check_vague(clause):
     tl = clause["clause_text"].lower()
     hits = [v for v in LEX["vague_terms"] if re.search(r"(?<![а-яё])" + re.escape(v) + r"(?![а-яё])", tl)]
+    # stems catch Russian case endings ("качественной", "современным"); "качеств" alone is too broad, keep adjective stems only
+    hits += [m.group(0) for v in LEX.get("vague_stems", []) for m in [re.search(r"(?<![а-яё])" + re.escape(v) + r"[а-яё]{0,4}(?![а-яё])", tl)] if m and m.group(0) not in hits
+             and not re.search(re.escape(v) + r"[а-яё]{0,4}\s+(качеств|характеристик)", tl)]   # "высокого качества" handled by the phrase itself
     hits += [v for v in LEX.get("vague_terms_if_no_number", []) if re.search(re.escape(v) + r"(?!\s*[±+\-]?\s*\d)", tl) and v in tl]
     enum_hits = [v for v in LEX.get("enumeration_abbrev", []) if v in tl]
     out = []

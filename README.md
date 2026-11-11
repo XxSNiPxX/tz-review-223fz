@@ -51,6 +51,7 @@ Current result (rules + retrieval, no LLM), full log in `docs/eval_latest.md`:
 | Mandatory reviewer corrections recovered | 10 / 10 (lift 6/6, metrology 4/4) |
 | Optional corrections recovered | 4 / 4 (SME-list and per-item commissioning are emitted as manual-review items) |
 | False positives on the corrected documents | 0 (remaining findings there are NOTE-level or «требует проверки») |
+| Own synthetic services ТЗ (`kb/gold/synthetic_cleaning.docx`, 10 planted problems, different domain) | 9 / 9 mandatory, 2 / 2 optional, correct fragments not flagged |
 
 Everything the engine is unsure about is emitted as *требует проверки* (disposition `INSUFFICIENT_EVIDENCE`) rather than as an error.
 
