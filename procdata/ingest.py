@@ -52,7 +52,57 @@ def _docx(path):
     return out
 
 
+def _pdf_blocks(path):
+    """PDF: tables via pdfplumber as table blocks, remaining text as paragraphs (table text removed to avoid duplicates)."""
+    import pdfplumber
+    out = []
+    with pdfplumber.open(path) as pdf:
+        for page_no, page in enumerate(pdf.pages, 1):
+            tables = page.find_tables()
+            if not tables:   # borderless tables (e.g. exported from Word without grid): text-alignment strategy, kept only if it looks tabular
+                cand = page.find_tables(table_settings={"vertical_strategy": "text", "horizontal_strategy": "text", "snap_tolerance": 4, "intersection_tolerance": 6})
+                tables = []
+                for tb in cand:
+                    rows = [r for r in tb.extract() if r and sum(1 for c in r if c and c.strip()) >= 2]
+                    ncols = max((len(r) for r in rows), default=0)
+                    if len(rows) >= 2 and 3 <= ncols <= 8 and sum(1 for r in rows if sum(1 for c in r if c and c.strip()) >= 2) >= len(rows) * 0.8:
+                        tables.append(tb)
+            table_bboxes = [tb.bbox for tb in tables]
+            for tb in tables:
+                rows = []
+                for r in tb.extract():
+                    cells, prev = [], None
+                    for c in r:
+                        tx = re.sub(r"\s+", " ", c or "").strip()
+                        if tx == prev: continue
+                        cells.append(tx); prev = tx
+                    if any(cells): rows.append(cells)
+                if rows: out.append(("t", rows, f"page{page_no}"))
+            body = page
+            for bb in table_bboxes:
+                try: body = body.outside_bbox(bb)
+                except Exception: pass
+            text = body.extract_text() or ""
+            # join wrapped lines into paragraphs: a new paragraph starts after sentence-final punctuation or at a numbered/bulleted line
+            buf = ""
+            for line in text.split("\n"):
+                line = line.strip()
+                if not line: continue
+                starts_new = re.match(r"^(\d+(\.\d+)*[.)]\s|[•\-–—]\s|[А-ЯЁ][А-ЯЁ\s]{6,}$|Раздел\s)", line)
+                if buf and (starts_new or re.search(r"[.;:!?]$", buf) or len(buf) > 1500):
+                    out.append(("p", buf, f"page{page_no}")); buf = line
+                else:
+                    buf = (buf + " " + line).strip()
+            if buf: out.append(("p", buf, f"page{page_no}"))
+    return out
+
+
 def _generic(path):
+    if path.suffix.lower() == ".pdf":
+        try:
+            return _pdf_blocks(path)
+        except Exception as ex:  # noqa
+            log.warning("pdf table extraction failed (%s); flat text", ex)
     from . import extract_text
     reader = extract_text.READERS.get(path.suffix.lower())
     if not reader: raise ValueError(f"unsupported format {path.suffix}")
@@ -98,8 +148,9 @@ def parse(path: Path):
             pid += 1
             para = {"pid": f"P{pid}", "text": content, "section_id": cur["section_id"], "style": style}
             cur["paragraphs"].append(para)
+            page = int(style[4:]) if style.startswith("page") and style[4:].isdigit() else None
             doc["clauses"].append({"clause_id": para["pid"], "clause_text": content, "section_id": cur["section_id"],
-                                   "anchor": f"раздел {cur['number']} «{cur['title'][:40]}», абзац {pid}", "page_number": None,
+                                   "anchor": (f"стр. {page}, " if page else "") + f"раздел {cur['number']} «{cur['title'][:40]}», абзац {pid}", "page_number": page,
                                    "position_start": 0, "position_end": len(content)})
             kv = KV_LINE.match(content)
             if kv and len(kv.group(1)) < 60 and not is_head:
