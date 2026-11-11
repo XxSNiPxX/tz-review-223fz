@@ -233,6 +233,7 @@ def _fields(doc):
     services = bool(re.search(r"оказани\w* услуг|обслуживани", subj))
     f["contract_kind"] = "MIXED" if (works and goods) else "WORKS" if works else "GOODS" if goods else "SERVICES" if services else "UNKNOWN"
     m = re.search(r"Заказчик\w*[^\n:]{0,40}:\s*([^\n|]{10,200})", text)
+    if m and (re.match(r"\s*\d", m.group(1)) or re.search(r"\bобл\.|\bул\.|\bд\.\s*\d|пер\.", m.group(1))): m = None
     if not m:
         m = re.search(r"((?:Федеральное государственное|Государственное|Муниципальное|Акционерное общество|Общество с ограниченной|ООО|АО|ПАО|МУП|ГБУ|ГАУ|ОГАУ|ФГ[АБ]ОУ)[^\n|]{10,200})", text)
     f["customer"] = (m.group(1).strip() if m else None)
