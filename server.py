@@ -31,6 +31,7 @@ UPLOADS = ROOT / "data" / "uploads"; UPLOADS.mkdir(parents=True, exist_ok=True)
 REVIEWS = ROOT / "data" / "reviews"; REVIEWS.mkdir(parents=True, exist_ok=True)
 JOBS = {}           # review_id -> {status, source, started, error, report_path}
 LOCK = threading.Lock()
+LLM_JOBS = threading.Semaphore(1)     # LLM reviews run strictly one at a time (see explain.LLM_LOCK); rule-only reviews stay parallel
 
 
 def _load_jobs():
@@ -62,6 +63,8 @@ def indexes():
 
 
 def run_review(review_id, clauses, source, use_llm, doc=None):
+    gate = LLM_JOBS if use_llm else None
+    if gate: gate.acquire()
     try:
         conn = db()
         findings = rv.analyze(clauses, doc)
@@ -85,6 +88,8 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
     except Exception as ex:  # noqa
         log.exception("review failed")
         with LOCK: JOBS[review_id].update(status="error", error=str(ex)[:300])
+    finally:
+        if gate: gate.release()
 
 
 def start(clauses, source, use_llm, doc=None):
