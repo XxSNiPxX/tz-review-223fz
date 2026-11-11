@@ -21,7 +21,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest, report as rep
+from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -39,8 +39,10 @@ def _load_jobs():
     for p in sorted(REVIEWS.glob("R*.json")):
         try:
             r = json.loads(p.read_text(encoding="utf-8"))
+            up = r.get("upload_path")
             JOBS[r["review_id"]] = {"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
-                                    "started": r["reviewed_at"], "finished": r["reviewed_at"], "report_path": str(p), "summary": r["summary"]}
+                                    "started": r["reviewed_at"], "finished": r["reviewed_at"], "report_path": str(p), "summary": r["summary"],
+                                    "llm_status": r.get("llm_status", "off"), "upload_path": up, "upload_is_docx": bool(up and up.lower().endswith(".docx"))}
         except Exception as ex:  # noqa
             log.warning("skip %s: %s", p.name, ex)
 
@@ -81,7 +83,8 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
         for c in clauses: scopes[c.get("scope", "?")] = scopes.get(c.get("scope", "?"), 0) + 1
         want_llm = use_llm and explain.available() and os.environ.get("REVIEW_USE_LLM", "1") not in ("0", "false", "no")
         todo = [f for f in findings if explain.wants_llm(f)] if want_llm else []
-        report = {"review_id": review_id, "source": source, "reviewed_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        with LOCK: up = JOBS[review_id].get("upload_path")
+        report = {"review_id": review_id, "source": source, "reviewed_at": datetime.datetime.now().isoformat(timespec="seconds"), "upload_path": up,
                   "llm_used": False, "llm_status": ("pending" if todo else ("off" if not use_llm else "unavailable")), "llm_total": len(todo), "llm_done": 0,
                   "n_clauses": len(clauses), "clause_scopes": scopes,
                   "kb_release": {"legal_rules": conn.execute("SELECT COUNT(*) FROM legal_rules").fetchone()[0],
@@ -133,7 +136,9 @@ async def create_review(file: UploadFile = File(...), use_llm: bool = Form(False
             raise HTTPException(422, f"файл поврежден или не читается ({type(ex2).__name__})")
     if not clauses: raise HTTPException(422, "текст не извлечен: пустой документ или скан без текстового слоя")
     for c in clauses: c["document_name"] = file.filename
-    return {"review_id": start(clauses, file.filename, use_llm, doc), "status": "running", "n_clauses": len(clauses)}
+    rid = start(clauses, file.filename, use_llm, doc)
+    with LOCK: JOBS[rid]["upload_path"] = str(path if path.suffix.lower() == ".docx" else dest); JOBS[rid]["upload_is_docx"] = path.suffix.lower() == ".docx"
+    return {"review_id": rid, "status": "running", "n_clauses": len(clauses)}
 
 
 class ByNotice(BaseModel):
@@ -176,6 +181,21 @@ def download_report(rid: str, fmt: str):
         p = REVIEWS / f"{rid}.docx"; rep.render_docx(report, p)
         return FileResponse(str(p), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename=f"review_{base}.docx")
     raise HTTPException(400, "fmt must be json, html or docx")
+
+
+@app.get("/api/reviews/{rid}/annotated.docx")
+def annotated_docx(rid: str):
+    """The uploaded DOCX itself with highlights and Word comments on every flagged fragment."""
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "report not ready")
+    src = j.get("upload_path")
+    if not src or not j.get("upload_is_docx") or not Path(src).exists():
+        raise HTTPException(409, "размеченная копия доступна только для загруженных DOCX (для PDF используйте отчёт)")
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    out = REVIEWS / f"{rid}.annotated.docx"
+    annotate.annotate_docx(Path(src), report["findings"], out)
+    base = re.sub(r"[^\w.-]", "_", Path(report["source"]).stem)[:60]
+    return FileResponse(str(out), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename=f"{base}_с_пометками.docx")
 
 
 @app.get("/api/kb")
