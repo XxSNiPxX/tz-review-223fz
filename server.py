@@ -21,7 +21,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate
+from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -104,9 +104,16 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
                                  "fas_findings": conn.execute("SELECT COUNT(*) FROM fas_findings").fetchone()[0]},
                   "summary": {k: {"findings": len(v), "errors": sum(x["severity"] == "ERROR" for x in v), "risks": sum(x["severity"] == "RISK" for x in v)} for k, v in by.items()},
                   "conclusion": rv.conclusion(findings, doc), "document_view": rep.document_view(doc, clauses), "findings": findings}
+        report["edited_clauses"] = sorted({c["clause_id"] for c in clauses if c.get("edited")})
+        report["edits"] = _edits_for(review_id)
         path = _write_report(review_id, report)
+        try:
+            (REVIEWS / f"{review_id}.doc.json").write_text(json.dumps({"doc": doc, "clauses": clauses}, ensure_ascii=False), encoding="utf-8")
+        except PermissionError:
+            pass
         with LOCK: JOBS[review_id].update(status="done", report_path=str(path), finished=datetime.datetime.now().isoformat(timespec="seconds"),
-                                          summary=report["summary"], llm_status=report["llm_status"], llm_total=len(todo), llm_done=0)
+                                          summary=report["summary"], llm_status=report["llm_status"], llm_total=len(todo), llm_done=0,
+                                          n_edits=len(report["edits"]))
         if not todo: return
         with LLM_JOBS:                                   # one LLM review at a time; others wait here with their rule report already visible
             with LOCK: JOBS[review_id]["llm_status"] = "running"
@@ -200,7 +207,9 @@ def get_review(rid: str):
     if not j: raise HTTPException(404, "unknown review")
     if j["status"] != "done": return j
     if j.get("legacy"): _upgrade_legacy(rid, JOBS[rid]); j = JOBS[rid]
-    return {**j, "report": json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))}
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    report.setdefault("edits", _edits_for(rid)); report.setdefault("edited_clauses", sorted({e["clause_id"] for e in report["edits"]}))
+    return {**j, "report": report}
 
 
 @app.get("/api/reviews/{rid}/report.{fmt}")
@@ -233,6 +242,112 @@ def annotated_docx(rid: str):
     annotate.annotate_docx(Path(src), report["findings"], out)
     base = re.sub(r"[^\w.-]", "_", Path(report["source"]).stem)[:60]
     return FileResponse(str(out), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename=f"{base}_с_пометками.docx")
+
+
+def _edits_for(rid):
+    try:
+        rows = db().execute("SELECT edit_id, clause_id, anchor, labels, categories, original_text, proposed_text, new_text, method, resolved, "
+                            "findings_before, findings_after, user_id, created_at FROM edits WHERE review_id=? ORDER BY created_at", (rid,)).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:  # noqa
+        return []
+
+
+def _load_doc(rid):
+    p = REVIEWS / f"{rid}.doc.json"
+    if not p.exists(): return None, None
+    d = json.loads(p.read_text(encoding="utf-8")); return d.get("doc"), d.get("clauses")
+
+
+class EditIn(BaseModel):
+    clause_id: str
+    new_text: str
+    method: str = "manual"            # manual | suggestion | llm | llm_edited
+    finding_ids: list = []
+    proposed_text: str | None = None
+    user_id: str | None = None
+
+
+@app.post("/api/reviews/{rid}/edits")
+def apply_edit(rid: str, body: EditIn):
+    """Apply one edit to the working document, re-run the full check synchronously, store the edit as training data."""
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
+    doc, clauses = _load_doc(rid)
+    if clauses is None: raise HTTPException(409, "рабочая копия документа не сохранена (старый отчёт): загрузите файл заново")
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    before = [f for f in report["findings"] if f.get("clause_id") == body.clause_id]
+    if doc is not None:
+        old, ok = ed.apply_edit(doc, body.clause_id, body.new_text); clauses = doc["clauses"]
+    else:
+        old, ok = None, False
+        for c in clauses:
+            if c["clause_id"] == body.clause_id: old, ok = c["clause_text"], True; c["clause_text"] = body.new_text; c["edited"] = True
+    if not ok: raise HTTPException(404, "clause not found")
+    with LOCK: JOBS[rid]["status"] = "running"
+    run_review(rid, clauses, j["source"], False, doc)        # synchronous re-check (rules + retrieval; LLM explanations are not re-run)
+    j = JOBS[rid]
+    new_report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    after = [f for f in new_report["findings"] if f.get("clause_id") == body.clause_id]
+    edit_id = "E" + uuid.uuid4().hex[:10]
+    conn = db()
+    conn.execute("INSERT INTO edits(edit_id, review_id, source, clause_id, anchor, finding_ids, labels, categories, original_text, proposed_text, new_text, method, "
+                 "resolved, findings_before, findings_after, user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                 (edit_id, rid, j["source"], body.clause_id, (before[0].get("anchors") or [None])[0] if before else None, json.dumps(body.finding_ids),
+                  json.dumps([f["label"] for f in before], ensure_ascii=False), json.dumps([f.get("case_category") for f in before], ensure_ascii=False),
+                  old, body.proposed_text, body.new_text, body.method, int(len(after) == 0), len(before), len(after), body.user_id))
+    conn.commit()
+    new_report["edits"] = _edits_for(rid); new_report["edited_clauses"] = sorted(set(new_report.get("edited_clauses", [])) | {body.clause_id})
+    _write_report(rid, new_report)
+    with LOCK: JOBS[rid]["n_edits"] = len(new_report["edits"])
+    return {"edit_id": edit_id, "findings_before": len(before), "findings_after": len(after), "resolved": len(after) == 0,
+            "total_findings": len(new_report["findings"]), "report": new_report, **{k: v for k, v in JOBS[rid].items()}}
+
+
+class SuggestIn(BaseModel):
+    clause_id: str
+    finding_id: str | None = None
+
+
+@app.post("/api/reviews/{rid}/suggest")
+def suggest(rid: str, body: SuggestIn):
+    """Ask the local LLM for a corrected wording of one fragment (evidence-only, guarded). Falls back to the rule proposal."""
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    fs = [f for f in report["findings"] if f.get("clause_id") == body.clause_id]
+    if body.finding_id: fs = [f for f in fs if f["finding_id"] == body.finding_id] or fs
+    if not fs: raise HTTPException(404, "no finding for this clause")
+    f = dict(fs[0]); f["clause_text"] = next((c["clause_text"] for c in (_load_doc(rid)[1] or []) if c["clause_id"] == body.clause_id), f["clause_text"])
+    if not explain.available():
+        return {"proposed_text": f.get("proposed_text"), "explanation": f["explanation"], "method": "rule", "llm": False}
+    f2 = explain.explain(f, f.get("evidence_objects", []))
+    return {"proposed_text": f2.get("proposed_text"), "explanation": f2.get("explanation"), "method": f2.get("method"),
+            "llm": "LLM" in (f2.get("method") or ""), "rejected": f2.get("llm_rejected")}
+
+
+@app.get("/api/reviews/{rid}/edited.docx")
+def edited_docx(rid: str):
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "report not ready")
+    src = j.get("upload_path")
+    if not src or not j.get("upload_is_docx") or not Path(src).exists(): raise HTTPException(409, "исправленная копия доступна только для загруженных DOCX")
+    latest = {}
+    for e in _edits_for(rid): latest[e["clause_id"]] = e["new_text"]
+    if not latest: raise HTTPException(409, "правок ещё нет")
+    out = REVIEWS / f"{rid}.edited.docx"; ed.export_edited_docx(Path(src), latest, out)
+    base = re.sub(r"[^\w.-]", "_", Path(j["source"]).stem)[:60]
+    return FileResponse(str(out), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename=f"{base}_исправлено.docx")
+
+
+@app.get("/api/edits")
+def list_edits(format: str = "json"):
+    """All edits ever made: the training set for a correction model."""
+    rows = [dict(r) for r in db().execute("SELECT * FROM edits ORDER BY created_at").fetchall()]
+    if format == "jsonl":
+        p = REVIEWS / "edits_export.jsonl"; p.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
+        return FileResponse(str(p), media_type="application/x-ndjson", filename="edits.jsonl")
+    return {"count": len(rows), "resolved": sum(r["resolved"] or 0 for r in rows), "by_method": {m: sum(1 for r in rows if r["method"] == m) for m in {r["method"] for r in rows}}, "edits": rows}
 
 
 @app.get("/api/kb")

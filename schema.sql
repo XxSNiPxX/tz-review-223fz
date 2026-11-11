@@ -178,3 +178,26 @@ CREATE TABLE IF NOT EXISTS fas_findings (
   reviewer_notes        TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_findings_case ON fas_findings(case_id);
+
+-- v4: human / LLM edits made in the review UI. Training data for the correction model: what was flagged, what the
+-- reviewer finally wrote, and whether the re-check cleared the finding.
+CREATE TABLE IF NOT EXISTS edits (
+  edit_id        TEXT PRIMARY KEY,
+  review_id      TEXT,
+  source         TEXT,                 -- file name
+  clause_id      TEXT,
+  anchor         TEXT,
+  finding_ids    TEXT,                 -- JSON list
+  labels         TEXT,                 -- JSON list of finding labels at the time of the edit
+  categories     TEXT,                 -- JSON list of case categories
+  original_text  TEXT,
+  proposed_text  TEXT,                 -- what the system suggested (rule or LLM), if any
+  new_text       TEXT,                 -- what was applied
+  method         TEXT,                 -- manual | suggestion | llm | llm_edited
+  resolved       INTEGER,              -- 1 if the re-check no longer flags this clause
+  findings_before INTEGER,
+  findings_after  INTEGER,
+  user_id        TEXT,
+  created_at     TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS ix_edits_review ON edits(review_id);
