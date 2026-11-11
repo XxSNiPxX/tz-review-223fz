@@ -4,9 +4,13 @@ The model receives ONE finding and the resolved evidence objects. It must answer
 evidence ids it was given; anything else is rejected and the deterministic explanation is kept instead.
 Without the model file the engine falls back to the rule-based explanation, so the pipeline always completes.
 """
-import json, re
+import json, re, threading
 from pathlib import Path
 from .common import ROOT, log
+
+# llama.cpp is NOT thread-safe: one model instance, one inference at a time. Concurrent calls corrupt the KV cache
+# and abort the whole process (GGML_ASSERT in set_rows). Every load and every completion goes through this lock.
+LLM_LOCK = threading.Lock()
 
 _llm = None
 
@@ -65,8 +69,9 @@ def explain(finding, evidence_objects, max_tokens=900):
             f"Допустимые id для cited (копировать точно): {', '.join(e['id'] for e in evidence_objects)}\n"
             f"proposed_text: не длиннее 500 символов; если фрагмент длиннее, приведи только исправленное предложение.\n\nОтвет JSON:")
     try:
-        out = llm().create_chat_completion(messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-                                           temperature=0.1, max_tokens=max_tokens, response_format={"type": "json_object"})
+        with LLM_LOCK:
+            out = llm().create_chat_completion(messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
+                                               temperature=0.1, max_tokens=max_tokens, response_format={"type": "json_object"})
         txt = out["choices"][0]["message"]["content"]
         data = json.loads(txt)
     except Exception as ex:  # noqa
