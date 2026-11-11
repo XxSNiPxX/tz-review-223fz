@@ -26,7 +26,8 @@ def norm(s): return re.sub(r"\s+", " ", (s or "")).lower()
 def main():
     total_must = found_must = total_opt = found_opt = fps = 0
     for name, g in GOLD["documents"].items():
-        doc, fs = review(CASE_DIR / name)
+        path = CASE_DIR / name if (CASE_DIR / name).exists() else Path("kb/gold") / name
+        doc, fs = review(path)
         print(f"\n=== {name}: {len(fs)} findings, kind={doc['fields']['contract_kind']}")
         if g["expected"]:
             for e in g["expected"]:

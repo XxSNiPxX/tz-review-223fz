@@ -59,6 +59,16 @@ def prepare_file(path: Path) -> Path:
         raise UnreadableFile("файл пустой")
     fmt = cv.MIME_EXT.get(cv.mime(path))
     ext = path.suffix.lower()
+    if fmt is None:                                        # file(1) says octet-stream for some generated OOXML: sniff the container
+        import zipfile
+        try:
+            if zipfile.is_zipfile(path):
+                names = set(zipfile.ZipFile(path).namelist())
+                fmt = "DOCX" if "word/document.xml" in names else "XLSX" if "xl/workbook.xml" in names else "ZIP"
+            elif path.read_bytes()[:5] == b"%PDF-":
+                fmt = "PDF"
+        except Exception:  # noqa
+            fmt = None
     if fmt in ("DOCX", "PDF", "XLSX"):
         want = "." + fmt.lower()
         if ext != want:                                   # e.g. a DOCX saved as .pdf

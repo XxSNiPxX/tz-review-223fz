@@ -1,6 +1,6 @@
-Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 8559.19it/s]
+Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 10307.64it/s]
 
-=== lift_source.docx: 13 findings, kind=WORKS
+=== lift_source.docx: 14 findings, kind=WORKS
   [OK ] must L1 CONTRADICTION          Тип лифта: таблица характеристик говорит «пассажирский», предмет закупки и специ  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
   [OK ] must L2 CONTRADICTION          Грузоподъемность: 300 кг в таблице характеристик против 500 кг в спецификации ра  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
   [OK ] must L3 CONTRADICTION          Проем двери: 850х2100 в таблице против 850х2000 в спецификации  <- DIMENSION_MISMATCH (INSUFFICIENT_EVIDENCE)
@@ -10,7 +10,7 @@
   [OK ] opt  L7 CONTRADICTION          Спецификация озаглавлена «ремонтные работы», предмет — работы по замене; при нал  <- TITLE_SUBJECT_MISMATCH (FLAGGED)
   [OK ] opt  L8 FORM                   Сроки указаны только цифрами; принято дублировать прописью  <- NUMBER_WITHOUT_WORDS (INSUFFICIENT_EVIDENCE)
 
-=== metrology_source.docx: 19 findings, kind=GOODS
+=== metrology_source.docx: 21 findings, kind=GOODS
   [OK ] must M1 COMPLETENESS           Позиции-«комплекты» (ручной мерительный инструмент, вспомогательный инструмент,   <- KIT_SHOULD_BE_SPLIT (INSUFFICIENT_EVIDENCE)
   [OK ] must M2 WRONG_OKPD2            Коды ОКПД2 слишком общие (…190) или неверные для позиций: плита поверочная 26.51  <- OKPD2_TOO_GENERIC (INSUFFICIENT_EVIDENCE)
   [OK ] must M3 COMPLETENESS           Не у всех позиций указаны характеристики и комплектность  <- KIT_WITHOUT_COMPOSITION (INSUFFICIENT_EVIDENCE)
@@ -24,7 +24,7 @@
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4) указано без единицы измерения при наличии измери
   [ok ] COMPLETENESS           OPEN_ENUMERATION             NOTE  INSUFFICIENT_EVIDENCE Открытый перечень (и др.) в требованиях к предмету закупки: участник н
 
-=== metrology_final.docx: 15 findings, kind=GOODS
+=== metrology_final.docx: 16 findings, kind=GOODS
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4, 25) указано без единицы измерения при наличии из
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (1000) указано без единицы измерения при наличии изм
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (60) указано без единицы измерения при наличии измер
@@ -38,7 +38,21 @@
   [ok ] WRONG_OKPD2            OKPD2_TOO_GENERIC            RISK  INSUFFICIENT_EVIDENCE Код 26.51.66.190 («Инструменты, приборы и машины для измерения или кон
   [ok ] WRONG_OKPD2            OKPD2_TOO_GENERIC            RISK  INSUFFICIENT_EVIDENCE Код 26.51.45.190 («Приборы и аппаратура для измерения или контроля эле
   [ok ] WRONG_OKPD2            OKPD2_TOO_GENERIC            RISK  INSUFFICIENT_EVIDENCE Код 26.51.66.190 («Инструменты, приборы и машины для измерения или кон
+  [ok ] COMPLETENESS           KIT_WITHOUT_COMPOSITION      ERROR INSUFFICIENT_EVIDENCE Позиция «Набор радиусных шаблонов R7–R25 мм» заявлена как комплект/наб
   [ok ] FORM                   NUMBER_WITHOUT_WORDS         NOTE  INSUFFICIENT_EVIDENCE Срок указан только цифрами; в закупочной документации принято дублиров
   [ok ] COMPETITION_RESTRICTION SME_LIST_CHECK               RISK  INSUFFICIENT_EVIDENCE Закупка упоминает субъектов МСП; 33 кодов ОКПД2 нужно сверить с перечн
 
-RECALL must: 10/10   optional: 4/4   FALSE POSITIVES on corrected docs: 0
+=== synthetic_cleaning.docx: 14 findings, kind=SERVICES
+  [OK ] must S1 CONTRADICTION          площадь 1200 м² в тексте vs 1500 м² в таблице  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
+  [OK ] must S2 WARRANTY               гарантия на услуги от товарной накладной  <- WARRANTY_BASIS_MISMATCH (FLAGGED)
+  [OK ] must S3 WRONG_OKPD2            код работ 43.29.19.110 у поломоечной машины  <- OKPD2_KIND_MISMATCH (FLAGGED)
+  [OK ] must S4 STANDARDS              ГОСТ 58393-2019 без Р  <- STANDARD_DESIGNATION (INSUFFICIENT_EVIDENCE)
+  [OK ] must S5 COMPETITION_RESTRICTION Grass Floor Wash без «или эквивалент»  <- BRAND_REFERENCE (FLAGGED)
+  [OK ] must S6 INCORRECT_CHARACTERISTIC температура воды не менее 40 без единицы  <- MISSING_UNIT (INSUFFICIENT_EVIDENCE)
+  [OK ] must S7 INCORRECT_CHARACTERISTIC качественной / современным  <- VAGUE_REQUIREMENT (FLAGGED)
+  [OK ] must S8 COMPLETENESS           комплект уборочного инвентаря без состава  <- KIT_WITHOUT_COMPOSITION (FLAGGED)
+  [OK ] must S9 OUT_OF_SCOPE_PROVISION фраза о национальном режиме  <- NATIONAL_REGIME_STATEMENT (INSUFFICIENT_EVIDENCE)
+  [OK ] opt  S10 COMPETITION_RESTRICTION опыт не менее 10 договоров  <- RESTRICTIVE_QUALIFICATION (INSUFFICIENT_EVIDENCE)
+  [OK ] opt  S11 FORM                   12 месяцев без прописи  <- NUMBER_WITHOUT_WORDS (INSUFFICIENT_EVIDENCE)
+
+RECALL must: 19/19   optional: 6/6   FALSE POSITIVES on corrected docs: 0

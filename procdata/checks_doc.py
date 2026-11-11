@@ -127,6 +127,41 @@ def _mentions(doc, fam):
 
 
 # ----------------------------------------------------------------- checks
+UNIT_IN_NAME = re.compile(r",\s*(м²|м2|кв\.?\s*м|м³|м3|кг|т|мм|см|м|км|л|шт\.?|мес\.?|мес|лет|дн\.?|дней|ч|час|кВт|Вт|В|А|°C|%|чел\.?|ед\.?)\s*$", re.I)
+
+
+def check_generic_attribute_contradictions(doc):
+    """Attribute table says «Общая площадь помещений, м² | 1500» while the prose says «площадь ... 1200 м²»."""
+    out = []
+    for a in doc["attributes"]:
+        m = UNIT_IN_NAME.search(a["name"])
+        if not m or a.get("table_id") is None: continue
+        unit = m.group(1).lower().replace("кв. м", "м²").replace("кв.м", "м²").replace("м2", "м²")
+        v = _value("объем", a["value"])
+        if v is None: continue
+        head = re.sub(UNIT_IN_NAME, "", a["name"]).lower()
+        nouns = [w for w in re.findall(r"[а-яё]{5,}", head) if w[:5] not in ("общая", "общий", "общее", "колич", "макси", "миним")]
+        if not nouns: continue
+        stem = nouns[0][:6]
+        unit_re = re.escape(m.group(1)).replace("м²", "(?:м²|м2|кв\\.?\\s*м)")
+        pat = re.compile(stem + r"[а-яё]*[^.;|\n]{0,80}?(?<![\d.,])(" + NUM + r")\s*(?:" + unit_re + r")(?![а-яa-z])", re.I)
+        others = {}
+        for c in doc["clauses"]:
+            if c.get("table_id") == a.get("table_id"): continue
+            for mm in pat.finditer(c["clause_text"].replace(",", ".") if "," in c["clause_text"] and not re.search(r"\d,\d", c["clause_text"]) else c["clause_text"]):
+                val = _value("объем", mm.group(1))
+                if val and val != v: others.setdefault(val, []).append((c["anchor"], c["clause_text"][:160], c["clause_id"]))
+        if others:
+            desc = "; ".join(f"«{k} {unit}» ({vv[0][0]})" for k, vv in others.items())
+            out.append(_f(doc, "CONTRADICTION", "CONTRADICTORY_REQUIREMENTS", "ERROR",
+                          f"«{a['name']}»: в таблице указано {v} {unit}, а в тексте — {desc}.", [a["anchor"]] + [vv[0][0] for vv in others.values()],
+                          [{"type": "doc", "id": "internal_consistency"}, {"type": "rule", "id": "223ФЗ_ART4_P10"}],
+                          proposed="Оставить одно значение во всех частях ТЗ или явно разделить объекты, к которым относятся разные значения.",
+                          confidence=0.8, clause_text=f"{a['name']}: {a['value']} || " + next(iter(others.values()))[0][1], clause_id=a.get("row_id"),
+                          matched=[str(v)] + list(others)))
+    return out
+
+
 def check_contradictions(doc):
     out = []
     for fam in ("тип лифта", "грузоподъемность", "проем двери", "количество остановок", "скорость", "высота подъема", "напряжение", "гарантийный срок"):
@@ -179,6 +214,11 @@ def check_warranty_basis(doc):
                           [c["anchor"]], [{"type": "rule", "id": "GK_RF_ART724"}, {"type": "rule", "id": "GK_RF_ART753"}, {"type": "doc", "id": "KS-2/KS-3 (Постановление Госкомстата № 100)"}],
                           proposed="«…с момента подписания сторонами Актов о приемке выполненных работ по форме КС-2 и справки о стоимости выполненных работ и затрат по форме КС-3».",
                           confidence=0.85, clause_text=c["clause_text"], clause_id=c["clause_id"], matched=["товарной накладной"]))
+        if kind == "SERVICES" and re.search(r"товарн\w+ накладн|кс-2|кс-3", tl):
+            out.append(_f(doc, "WARRANTY", "WARRANTY_BASIS_MISMATCH", "ERROR",
+                          "Предмет закупки — услуги, а гарантийный срок отсчитывается от товарной накладной / актов КС-2, КС-3. Для услуг основание — акт сдачи-приемки оказанных услуг.",
+                          [c["anchor"]], [{"type": "rule", "id": "GK_RF_ART783"}, {"type": "rule", "id": "GK_RF_ART720"}], proposed="«…с даты подписания сторонами акта сдачи-приемки оказанных услуг».",
+                          confidence=0.8, clause_text=c["clause_text"], clause_id=c["clause_id"], matched=["товарной накладной"]))
         if kind == "GOODS" and re.search(r"кс-2|кс-3|акт\w* выполненных работ", tl):
             out.append(_f(doc, "WARRANTY", "WARRANTY_BASIS_MISMATCH", "ERROR",
                           "Предмет закупки — поставка товара, а гарантия отсчитывается от актов выполненных работ (КС-2/КС-3). Для поставки основание — товарная накладная / акт приема-передачи товара.",
@@ -245,6 +285,22 @@ def check_okpd2(doc):
                               clause_text=f"{it['name']} | {code}", clause_id=it["row_id"], matched=[code]))
         sec = int(parts[0])
         is_works_code = 41 <= sec <= 43
+        is_service_code = sec >= 45 and sec != 58
+        name_is_goods = not re.search(r"^(услуг|работ|выполнени|оказани|поставк[аи] и монтаж)", name) and not re.search(r"\b(услуг|работ)\w*\b", name[:40])
+        name_is_work = bool(re.search(r"^(работ|выполнени)|\bработ\w*\b", name[:40]))
+        name_is_service = bool(re.search(r"^(услуг|оказани)|\bуслуг\w*\b", name[:40]))
+        if name_is_goods and (is_works_code or is_service_code):
+            out.append(_f(doc, "WRONG_OKPD2", "OKPD2_KIND_MISMATCH", "ERROR",
+                          f"Позиция «{it['name'][:60]}» — товар, а код {code} («{codes.get(code, '')[:50]}») относится к {'работам' if is_works_code else 'услугам'}.",
+                          [it["anchor"]], [{"type": "doc", "id": "ОК 034-2014 (ОКПД2)"}], proposed="Указать код товара (разделы 01–33), например из группы 28.xx для машин и оборудования.",
+                          confidence=0.8, clause_text=f"{it['name']} | {code}", clause_id=it["row_id"], matched=[code]))
+            continue
+        if (name_is_service and not is_service_code) or (name_is_work and not is_works_code and sec < 41):
+            out.append(_f(doc, "WRONG_OKPD2", "OKPD2_KIND_MISMATCH", "RISK",
+                          f"Позиция «{it['name'][:60]}» — {'услуги' if name_is_service else 'работы'}, а код {code} относится к другому виду объекта закупки.",
+                          [it["anchor"]], [{"type": "doc", "id": "ОК 034-2014 (ОКПД2)"}], confidence=0.6, disposition="INSUFFICIENT_EVIDENCE",
+                          clause_text=f"{it['name']} | {code}", clause_id=it["row_id"], matched=[code]))
+            continue
         if kind == "GOODS" and is_works_code:
             out.append(_f(doc, "WRONG_OKPD2", "OKPD2_KIND_MISMATCH", "ERROR", f"Предмет — поставка товара, а код {code} относится к строительным работам (разделы 41–43).", [it["anchor"]],
                           [{"type": "doc", "id": "ОК 034-2014 (ОКПД2)"}], proposed="Указать код товара (разделы 01–33).", confidence=0.8, clause_text=f"{it['name']} | {code}", clause_id=it["row_id"], matched=[code]))
@@ -285,8 +341,8 @@ def check_kits_and_items(doc):
     attr_text = " ".join(a["name"].lower() + " " + a["value"].lower() for a in doc["attributes"]) + " " + " ".join(c["clause_text"].lower() for c in doc["clauses"] if c.get("table_id"))
     for it in items:
         n = it["name"].lower()
-        is_kit = bool(re.search(r"^(комплект|набор)\s+(ручн\w+|вспомогательн\w+|лабораторн\w+|измерительн\w+|мерительн\w+|контрольн\w+)?\s*(инструмент|прибор|оборудован|средств)|комплекс оборудования|измерительный комплект|^стенд|стенд\b", n)) \
-                 and not re.search(r"набор (щуп|шаблон|ключ|сверл|бит|надфил|плашек|метчик|головок)", n)
+        is_kit = bool(re.search(r"^(комплект|набор|комплекс)\s+[а-яё]", n) or re.search(r"комплекс оборудования|измерительный комплект|^стенд|стенд\b", n)) \
+                 and not re.search(r"^(набор|комплект) (щуп|шаблон|ключ|сверл|бит|надфил|плашек|метчик|головок|отверт|гаечн|торцев|калибр|концевых мер|мер длины|гирь|фильтр|прокладок|уплотнен|крепеж|постельн)", n)
         if is_kit:
             row = _attr_row_for(it)
             val = (row["value"] if row else "")
@@ -400,7 +456,7 @@ def check_sme_list(doc):
 
 def run_doc_checks(doc):
     out = []
-    for chk in (check_contradictions, check_dimension_pairs, check_warranty_basis, check_standards, check_okpd2, check_kits_and_items, check_out_of_scope, check_title_subject, check_numbers_in_words, check_commissioning_per_item, check_sme_list):
+    for chk in (check_contradictions, check_generic_attribute_contradictions, check_dimension_pairs, check_warranty_basis, check_standards, check_okpd2, check_kits_and_items, check_out_of_scope, check_title_subject, check_numbers_in_words, check_commissioning_per_item, check_sme_list):
         try:
             out.extend(chk(doc))
         except Exception as ex:  # noqa
