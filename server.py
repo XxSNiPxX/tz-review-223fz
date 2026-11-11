@@ -158,11 +158,35 @@ def list_reviews():
     return sorted(JOBS.values(), key=lambda j: j["started"], reverse=True)
 
 
+def _find_upload(source):
+    """Latest kept upload whose original name matches the review source (uploads are stored as <hash>_<name>)."""
+    safe = re.sub(r"[^\w.\-]", "_", source or "")[:120]
+    cands = sorted(UPLOADS.glob(f"*_{safe}"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return cands[0] if cands else None
+
+
+def _upgrade_legacy(rid, j):
+    """Reports written before the document view existed: regenerate from the kept upload (rule phase only, seconds)."""
+    src = _find_upload(j["source"])
+    if not src: return False
+    try:
+        path = rv.prepare_file(src)
+        doc = ingest.parse(path); clauses = doc["clauses"]
+        for c in clauses: c["document_name"] = j["source"]
+        with LOCK: JOBS[rid].update(upload_path=str(path), upload_is_docx=path.suffix.lower() == ".docx", use_llm=False)
+        run_review(rid, clauses, j["source"], False, doc)      # synchronous; overwrites the report in place
+        with LOCK: JOBS[rid]["legacy"] = False
+        return True
+    except Exception as ex:  # noqa
+        log.warning("legacy upgrade failed for %s: %s", rid, ex); return False
+
+
 @app.get("/api/reviews/{rid}")
 def get_review(rid: str):
     j = JOBS.get(rid)
     if not j: raise HTTPException(404, "unknown review")
     if j["status"] != "done": return j
+    if j.get("legacy"): _upgrade_legacy(rid, JOBS[rid]); j = JOBS[rid]
     return {**j, "report": json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))}
 
 
