@@ -14,6 +14,10 @@ CASE_CATEGORIES = {   # case-brief category -> our analysis_type
     "COMPETITION_RESTRICTION": "COMPETITION", "FORM": "COMPLETENESS",
 }
 REG_PATH = ROOT / "kb" / "standards_registry.json"
+try:
+    from .checks import UNIT_ALT as UNIT_ALT_DOC
+except Exception:  # noqa
+    UNIT_ALT_DOC = r"мм|см|м|кг|г|л|шт|гб|вт|в|а|гц|%"
 OKPD_PATH = ROOT / "kb" / "okpd2" / "okpd2.json"
 _reg = _okpd = None
 
@@ -127,7 +131,7 @@ def _mentions(doc, fam):
 
 
 # ----------------------------------------------------------------- checks
-UNIT_IN_NAME = re.compile(r",\s*(м²|м2|кв\.?\s*м|м³|м3|кг|т|мм|см|м|км|л|шт\.?|мес\.?|мес|лет|дн\.?|дней|ч|час|кВт|Вт|В|А|°C|%|чел\.?|ед\.?)\s*$", re.I)
+UNIT_IN_NAME = re.compile(r",\s*(м²|м2|кв\.?\s*м|м³|м3|кг|т|мм|см|м|км|л|шт\.?|мес\.?|мес|лет|дн\.?|дней|ч|час|кВт|Вт|В|А|°C|%|чел\.?|ед\.?|ГБ|ТБ|МБ|Гбайт|дюйм\w*|Гц|МГц|ГГц|кд/м²|бит|Мп|л\.с\.|об/мин|бар|МПа|кПа)\s*$", re.I)
 
 
 def check_generic_attribute_contradictions(doc):
@@ -144,6 +148,7 @@ def check_generic_attribute_contradictions(doc):
         if not nouns: continue
         stem = nouns[0][:6]
         unit_re = re.escape(m.group(1)).replace("м²", "(?:м²|м2|кв\\.?\\s*м)")
+        if m.group(1).lower().startswith("дюйм"): unit_re = "дюйм\\w*"
         pat = re.compile(stem + r"[а-яё]*[^.;|\n]{0,80}?(?<![\d.,])(" + NUM + r")\s*(?:" + unit_re + r")(?![а-яa-z])", re.I)
         others = {}
         for c in doc["clauses"]:
@@ -365,9 +370,15 @@ def check_kits_and_items(doc):
     # items with no characteristics anywhere
     if doc["attributes"] or any(t["kind"] == "ATTRIBUTES" for t in doc["tables"]):
         char_text = " ".join(a["name"].lower() + " " + a["value"].lower() for a in doc["attributes"])
+        prose = " ".join(c["clause_text"].lower() for c in doc["clauses"] if not c.get("table_id"))
         for it in items:
             if _attr_row_for(it) is not None: continue
-            words = [w for w in re.findall(r"[а-яё]{5,}", it["name"].lower())][:2]
+            nl = it["name"].lower()
+            if re.match(r"\s*(услуг|работ|выполнени|оказани|монтаж|настройк|обучени|доставк)", nl): continue
+            words = [w for w in re.findall(r"[а-яё]{4,}", nl)][:2]
+            stem = words[0][:5] if words else None
+            # characteristics given in prose: the item's head noun followed within 120 chars by a number with a unit
+            if stem and re.search(stem + r"[а-яё]*[^.\n]{0,120}?\d+(?:[.,]\d+)?\s*(?:" + UNIT_ALT_DOC + r")(?![а-яa-z])", prose): continue
             if words and not all(w[:6] in char_text for w in words):
                 out.append(_f(doc, "COMPLETENESS", "ITEM_WITHOUT_CHARACTERISTICS", "RISK",
                               f"Для позиции «{it['name'][:70]}» не найдены технические характеристики в разделе требований к товару.", [it["anchor"]],

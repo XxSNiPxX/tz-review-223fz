@@ -170,7 +170,8 @@ def check_brand(clause):
     brands = [b for b in CAP_BRAND.findall(t) if _brandish(b)]
     cue = any(c in tl for c in LEX["brand_cues"])
     if not brands and not cue: return []
-    if any(m in tl for m in LEX["no_equivalent_markers"]):
+    negated = any(m in tl for m in LEX["no_equivalent_markers"]) or re.search(r"(без|не допуска\w+|запрещ\w+|исключ\w+)[^.;\n]{0,40}эквивалент|эквивалент\w*[^.;\n]{0,20}(не допуска|не принима|не рассматрива|запрещ)", tl)
+    if negated:
         return [_f(clause, "COMPETITION", "NO_EQUIVALENT", "RISK",
                    "Указание на конкретную марку/модель с прямым запретом эквивалента.",
                    [{"type": "rule", "id": R_EQUIV}, {"type": "rule", "id": R_PRINC}],

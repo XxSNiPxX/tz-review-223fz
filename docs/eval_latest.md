@@ -1,4 +1,4 @@
-Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 10307.64it/s]
+Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 7787.98it/s]
 
 === lift_source.docx: 14 findings, kind=WORKS
   [OK ] must L1 CONTRADICTION          Тип лифта: таблица характеристик говорит «пассажирский», предмет закупки и специ  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
@@ -24,10 +24,9 @@
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4) указано без единицы измерения при наличии измери
   [ok ] COMPLETENESS           OPEN_ENUMERATION             NOTE  INSUFFICIENT_EVIDENCE Открытый перечень (и др.) в требованиях к предмету закупки: участник н
 
-=== metrology_final.docx: 16 findings, kind=GOODS
+=== metrology_final.docx: 15 findings, kind=GOODS
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4, 25) указано без единицы измерения при наличии из
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (1000) указано без единицы измерения при наличии изм
-  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (60) указано без единицы измерения при наличии измер
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (8, 50) указано без единицы измерения при наличии из
   [ok ] COMPLETENESS           OPEN_ENUMERATION             NOTE  INSUFFICIENT_EVIDENCE Открытый перечень (и т.п.) в требованиях к предмету закупки: участник 
   [ok ] STANDARDS              INCOMPLETE_STANDARD_REFERENCE NOTE  INSUFFICIENT_EVIDENCE Стандарт «ГОСТ Р ИСО 4287.» указан без года принятия; проверить актуал
@@ -55,4 +54,15 @@
   [OK ] opt  S10 COMPETITION_RESTRICTION опыт не менее 10 договоров  <- RESTRICTIVE_QUALIFICATION (INSUFFICIENT_EVIDENCE)
   [OK ] opt  S11 FORM                   12 месяцев без прописи  <- NUMBER_WITHOUT_WORDS (INSUFFICIENT_EVIDENCE)
 
-RECALL must: 19/19   optional: 6/6   FALSE POSITIVES on corrected docs: 0
+=== it_hardware_tz.docx: 10 findings, kind=GOODS
+  [OK ] must I1 COMPETITION_RESTRICTION Lenovo ThinkPad с запретом эквивалента  <- NO_EQUIVALENT (FLAGGED)
+  [OK ] must I2 CONTRADICTION          ОЗУ 16 ГБ в тексте vs 32 в таблице  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
+  [OK ] must I3 INCORRECT_CHARACTERISTIC масса не более 1,5 без единицы  <- MISSING_UNIT (INSUFFICIENT_EVIDENCE)
+  [OK ] opt  I4 INCORRECT_CHARACTERISTIC не хуже конкурентов / современный  <- VAGUE_REQUIREMENT (INSUFFICIENT_EVIDENCE)
+  [OK ] must I5 STANDARDS              ГОСТ 50948-2001 без Р  <- STANDARD_DESIGNATION (FLAGGED)
+  [OK ] must I6 COMPLETENESS           комплект периферии без состава  <- KIT_WITHOUT_COMPOSITION (FLAGGED)
+  [OK ] must I7 WRONG_OKPD2            обобщающий код .190 у комплекта  <- OKPD2_TOO_GENERIC (INSUFFICIENT_EVIDENCE)
+  [OK ] must I8 WRONG_OKPD2            код товара у услуги настройки  <- OKPD2_KIND_MISMATCH (INSUFFICIENT_EVIDENCE)
+  [OK ] must I9 WARRANTY               гарантия на товар от КС-2  <- WARRANTY_BASIS_MISMATCH (FLAGGED)
+
+RECALL must: 27/27   optional: 7/7   FALSE POSITIVES on corrected docs: 0

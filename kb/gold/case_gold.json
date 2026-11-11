@@ -300,6 +300,103 @@
      "fix": "прописью"
     }
    ]
+  },
+  "it_hardware_tz.docx": {
+   "contract_kind": "GOODS",
+   "note": "own goods ТЗ (IT hardware) with 9 planted problems",
+   "expected": [
+    {
+     "id": "I1",
+     "category": "COMPETITION_RESTRICTION",
+     "must": true,
+     "what": "Lenovo ThinkPad с запретом эквивалента",
+     "anchors": [
+      "Lenovo ThinkPad"
+     ],
+     "fix": "или эквивалент"
+    },
+    {
+     "id": "I2",
+     "category": "CONTRADICTION",
+     "must": true,
+     "what": "ОЗУ 16 ГБ в тексте vs 32 в таблице",
+     "anchors": [
+      "32",
+      "16"
+     ],
+     "fix": "одно значение"
+    },
+    {
+     "id": "I3",
+     "category": "INCORRECT_CHARACTERISTIC",
+     "must": true,
+     "what": "масса не более 1,5 без единицы",
+     "anchors": [
+      "1,5"
+     ],
+     "fix": "кг"
+    },
+    {
+     "id": "I4",
+     "category": "INCORRECT_CHARACTERISTIC",
+     "must": false,
+     "what": "не хуже конкурентов / современный",
+     "anchors": [
+      "не хуже"
+     ],
+     "fix": "измеримо"
+    },
+    {
+     "id": "I5",
+     "category": "STANDARDS",
+     "must": true,
+     "what": "ГОСТ 50948-2001 без Р",
+     "anchors": [
+      "ГОСТ 50948-2001"
+     ],
+     "fix": "ГОСТ Р 50948-2001"
+    },
+    {
+     "id": "I6",
+     "category": "COMPLETENESS",
+     "must": true,
+     "what": "комплект периферии без состава",
+     "anchors": [
+      "Комплект периферии"
+     ],
+     "fix": "раскрыть"
+    },
+    {
+     "id": "I7",
+     "category": "WRONG_OKPD2",
+     "must": true,
+     "what": "обобщающий код .190 у комплекта",
+     "anchors": [
+      "26.20.16.190"
+     ],
+     "fix": "уточнить"
+    },
+    {
+     "id": "I8",
+     "category": "WRONG_OKPD2",
+     "must": true,
+     "what": "код товара у услуги настройки",
+     "anchors": [
+      "Услуги по настройке"
+     ],
+     "fix": "код услуг 62.xx"
+    },
+    {
+     "id": "I9",
+     "category": "WARRANTY",
+     "must": true,
+     "what": "гарантия на товар от КС-2",
+     "anchors": [
+      "КС-2"
+     ],
+     "fix": "товарная накладная"
+    }
+   ]
   }
  }
 }
