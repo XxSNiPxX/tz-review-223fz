@@ -6,8 +6,8 @@
 <title>Проверка ТЗ 223-ФЗ</title>
 <style>
   :root { --bg:#f3f6fc; --card:#fff; --ink:#0b1b3a; --muted:#5b6b8c; --line:#d9e1f2; --err:#b42318; --errbg:#fee4e2; --risk:#b54708; --riskbg:#fef0c7; --note:#475467; --notebg:#e9edf6; --ok:#067647; --okbg:#d1fadf; --accent:#003092; --accent2:#0a46c0; --sel:#e6ecf9; --tint:#e6ecf9; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#24345a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#84acff; --accent2:#a7c2ff; } }
   :root[data-theme="dark"] { --bg:#0b1326; --card:#121c33; --ink:#e8edf8; --muted:#9fb0d0; --line:#24345a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#24345a; --okbg:#143d2b; --sel:#1b2f5e; --tint:#17264a; --accent:#84acff; --accent2:#a7c2ff; }
+  :root[data-theme="dark"] button { color:#0b1326 } :root[data-theme="dark"] header .brand img { filter:brightness(0) invert(1) }
   * { box-sizing:border-box; min-width:0 }
   body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 "ALS Sirius","Golos Text","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow-wrap:anywhere }
   header { display:flex; gap:16px; align-items:center; padding:8px 18px; border-bottom:3px solid var(--accent); background:var(--card); position:sticky; top:0; z-index:5 }
@@ -16,7 +16,7 @@
   header .kb { color:var(--muted); font-size:12px; flex:1; text-align:right }
   button { font:inherit; font-weight:600; padding:7px 14px; border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer }
   button:hover { background:var(--accent2); border-color:var(--accent2) } button.secondary { background:transparent; color:var(--accent) } button.secondary:hover { background:var(--tint) } button.ghost { background:transparent; color:var(--ink); border-color:var(--line) } button:disabled { opacity:.5; cursor:default }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) button { color:#0b1326 } :root:not([data-theme="light"]) header .brand img { filter:brightness(0) invert(1) } }
+ }
   .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; border:1px solid var(--line); vertical-align:middle; white-space:nowrap }
   .pill.ERROR { color:var(--err); border-color:var(--err); background:var(--errbg) } .pill.RISK { color:var(--risk); border-color:var(--risk); background:var(--riskbg) } .pill.NOTE { color:var(--note); background:var(--notebg) } .pill.done, .pill.ok { color:var(--ok); border-color:var(--ok) }
   .muted { color:var(--muted) }
@@ -49,6 +49,7 @@
 <header>
   <div class="brand"><img src="/static/logo.svg" alt="МФТИ"><span class="sep"></span><h1>Проверка технического задания · 223-ФЗ<small>Хакатон МФТИ · Задача 1 · интеллектуальная проверка ТЗ</small></h1></div>
   <span class="kb" id="kb">база знаний…</span>
+  <button class="ghost" id="theme" title="Светлая / тёмная тема" onclick="toggleTheme()">☾</button>
   <button class="ghost" id="back" style="display:none" onclick="goHome()">← Новая проверка</button>
 </header>
 
@@ -98,6 +99,9 @@
 
 <script>
 const $ = s => document.querySelector(s);
+function applyTheme(t){ if(t==='dark') document.documentElement.setAttribute('data-theme','dark'); else document.documentElement.removeAttribute('data-theme'); const b=document.getElementById('theme'); if(b) b.textContent = t==='dark'?'☀':'☾'; }
+function toggleTheme(){ const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('theme', t); }catch(e){} applyTheme(t); }
+try{ applyTheme(localStorage.getItem('theme')||'light'); }catch(e){ applyTheme('light'); }
 const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const CATS = {CONTRADICTION:'Противоречие', INCORRECT_CHARACTERISTIC:'Некорректная характеристика', COMPLETENESS:'Комплектность / полнота', WRONG_OKPD2:'Код ОКПД 2',
   WARRANTY:'Гарантийные условия', STANDARDS:'Стандарты', COMPETITION_RESTRICTION:'Ограничение конкуренции', OUT_OF_SCOPE_PROVISION:'Не относится к ТЗ', FORM:'Оформление'};
@@ -167,7 +171,7 @@ function renderDoc(){ const view = R.document_view || [];
     if(b.type==='table') return `<table>${b.caption?`<caption>${esc(b.caption)}</caption>`:''}<tr>${b.header.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>` +
       b.rows.map(r=>{ const fs = byClause[r.clause_id]; const cls = fs?`hl ${sevOf(fs)}`:'';
         return `<tr class="${cls}" id="c_${r.clause_id}" ${fs?`onclick="select_(${fs[0]._n})"`:''}>${r.cells.map((c,i)=>`<td>${esc(c)}${(fs&&i===r.cells.length-1)?marks(fs):''}</td>`).join('')}</tr>`; }).join('') + '</table>';
-    return ''; }).join('') || '<p class="muted">Текст документа недоступен для показа (проверка из базы без исходного файла).</p>'; }
+    return ''; }).join('') || '<p class="muted">Для этого отчёта текст документа не сохранён (проверка выполнена старой версией или из базы без исходного файла). Загрузите файл заново — новая проверка занимает несколько секунд.</p>'; }
 
 function renderList(){ const fs = R.findings.filter(visible);
   $('#filters').innerHTML = `<span class="muted">${fs.length} из ${R.findings.length} замечаний${filter.sev||filter.cat?' · <a style="cursor:pointer;color:var(--accent)" onclick="filter={sev:null,cat:null};renderStats();renderList()">сбросить фильтр</a>':''}</span>`;
