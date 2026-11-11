@@ -8,7 +8,7 @@
 import argparse, json, logging, re, sys, datetime
 from pathlib import Path
 from procdata.common import load_config, open_db, log, ROOT
-from procdata import checks, extract_text, index as kb_index, explain, ingest, checks_doc
+from procdata import checks, extract_text, index as kb_index, explain, ingest, checks_doc, report as rep
 
 
 CASE_CAT = {"COMPETITION": "COMPETITION_RESTRICTION", "COMPLETENESS": "COMPLETENESS", "COMPLIANCE": "STANDARDS"}
@@ -223,7 +223,12 @@ def main():
               "findings": findings}
     out = Path(a.out) if a.out else ROOT / "data" / "reviews" / (re.sub(r"\W", "_", src) + ".json")
     out.parent.mkdir(parents=True, exist_ok=True)
+    report["document_view"] = rep.document_view(doc, clauses)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    out.with_suffix(".html").write_text(rep.render_html(report), encoding="utf-8")
+    try: rep.render_docx(report, out.with_suffix(".docx"))
+    except Exception as ex:  # noqa
+        log.warning("docx report failed: %s", ex)
     con = report["conclusion"]
     md = [f"# Review: {src}", f"clauses: {len(clauses)}", "", f"## Заключение: {con['verdict']}",
           f"ошибок: {con['errors']} · рисков: {con['risks']} · на ручную проверку: {con['manual_review']} · по категориям: {con['by_category']}", ""]

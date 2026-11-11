@@ -5,111 +5,178 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Проверка ТЗ 223-ФЗ</title>
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#6b7280; --line:#e5e7eb; --err:#b42318; --risk:#b54708; --ok:#067647; --accent:#1d4ed8; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; } }
-  * { box-sizing:border-box; min-width:0 } body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; overflow-wrap:anywhere; word-break:break-word }
-  main, .card, table { max-width:100% } table { display:block; overflow-x:auto }
-  header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:baseline; flex-wrap:wrap }
-  header h1 { font-size:18px; margin:0 } header .kb { color:var(--muted); font-size:13px }
-  main { max-width:1100px; margin:0 auto; padding:16px 20px; display:grid; gap:16px }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px }
-  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-  input[type=text], select { padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); min-width:220px }
-  button { padding:8px 14px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer } button.secondary { background:transparent; color:var(--accent) }
-  button:disabled { opacity:.5; cursor:default }
-  table { width:100%; border-collapse:collapse; font-size:14px } td, th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top } th { color:var(--muted); font-weight:600 }
-  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line) }
-  .ERROR { color:var(--err); border-color:var(--err) } .RISK { color:var(--risk); border-color:var(--risk) } .PASSED, .done { color:var(--ok); border-color:var(--ok) }
-  .section h2 { font-size:16px; margin:0 0 8px } .finding { border-top:1px solid var(--line); padding:10px 0 }
-  .finding .label { font-weight:600 } .frag { color:var(--muted); font-size:13px; margin:4px 0; white-space:pre-wrap } .prop { margin:4px 0 }
-  .ev { font-size:12px; color:var(--muted) } .ev a { color:var(--accent); text-decoration:none; margin-right:8px; cursor:pointer }
-  .muted { color:var(--muted) } .sum { display:flex; gap:14px; flex-wrap:wrap } .sum div { padding:8px 12px; border:1px solid var(--line); border-radius:8px }
-  pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:8px; max-height:320px; overflow:auto }
-  dialog { border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); max-width:800px; width:92vw }
+  :root { --bg:#f3f4f6; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --err:#b42318; --errbg:#fee4e2; --risk:#b54708; --riskbg:#fef0c7; --note:#475467; --notebg:#eaecf0; --ok:#067647; --okbg:#d1fadf; --accent:#1d4ed8; --sel:#dbeafe; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#2a2f3a; --okbg:#143d2b; --sel:#1e3a5f; } }
+  :root[data-theme="dark"] { --bg:#0f1115; --card:#171a21; --ink:#e6e8eb; --muted:#9aa3ad; --line:#2a2f3a; --errbg:#4a1d1a; --riskbg:#4a3312; --notebg:#2a2f3a; --okbg:#143d2b; --sel:#1e3a5f; }
+  * { box-sizing:border-box; min-width:0 }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow-wrap:anywhere }
+  header { display:flex; gap:14px; align-items:center; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; z-index:5 }
+  header h1 { font-size:16px; margin:0; white-space:nowrap } header .kb { color:var(--muted); font-size:12px; flex:1 }
+  button { font:inherit; padding:7px 12px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer }
+  button.secondary { background:transparent; color:var(--accent) } button.ghost { background:transparent; color:var(--ink); border-color:var(--line) } button:disabled { opacity:.5; cursor:default }
+  .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:11px; border:1px solid var(--line); vertical-align:middle; white-space:nowrap }
+  .pill.ERROR { color:var(--err); border-color:var(--err); background:var(--errbg) } .pill.RISK { color:var(--risk); border-color:var(--risk); background:var(--riskbg) } .pill.NOTE { color:var(--note); background:var(--notebg) } .pill.done, .pill.ok { color:var(--ok); border-color:var(--ok) }
+  .muted { color:var(--muted) }
+  #landing { max-width:900px; margin:28px auto; padding:0 16px; display:grid; gap:14px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px }
+  .drop { display:block; border:2px dashed var(--line); border-radius:12px; padding:34px 16px; text-align:center; cursor:pointer; transition:.15s } .drop.over, .drop:hover { border-color:var(--accent); background:var(--sel) }
+  .drop b { font-size:16px } .drop input { display:none }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center } input[type=text] { font:inherit; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink); min-width:260px }
+  table.jobs { width:100%; border-collapse:collapse; font-size:13px } .jobs td, .jobs th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line) } .jobs th { color:var(--muted); font-weight:600 }
+  #review { display:none; height:calc(100vh - 53px) } #review.on { display:grid; grid-template-rows:auto 1fr }
+  .topbar { padding:10px 16px; background:var(--card); border-bottom:1px solid var(--line); display:grid; gap:8px }
+  .verdict { display:flex; gap:14px; align-items:center; flex-wrap:wrap } .verdict .v { font-weight:700; font-size:15px; padding:6px 12px; border-radius:8px; border:2px solid var(--ok); background:var(--okbg) } .verdict .v.bad { border-color:var(--err); background:var(--errbg) }
+  .stats { display:flex; gap:8px; flex-wrap:wrap } .stat { padding:4px 10px; border:1px solid var(--line); border-radius:8px; cursor:pointer; font-size:13px } .stat.active { background:var(--sel); border-color:var(--accent) } .stat b { font-size:15px }
+  .panes { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(320px,.9fr); min-height:0 }
+  .doc { overflow:auto; padding:18px 26px; background:var(--card); border-right:1px solid var(--line); font:14px/1.6 Georgia,"Times New Roman",serif }
+  .doc h2 { font-size:15px; margin:18px 0 6px; font-family:system-ui,sans-serif } .doc p { margin:0 0 8px; padding:2px 4px; border-radius:4px }
+  .doc table { border-collapse:collapse; width:100%; margin:8px 0 12px; font-size:13px } .doc td, .doc th { border:1px solid var(--line); padding:3px 6px; vertical-align:top } .doc caption { text-align:left; font-style:italic; color:var(--muted); margin-bottom:4px }
+  .hl { cursor:pointer; outline:0 } .hl.ERROR { background:var(--errbg); box-shadow:inset 3px 0 0 var(--err) } .hl.RISK { background:var(--riskbg); box-shadow:inset 3px 0 0 var(--risk) } .hl.NOTE { background:var(--notebg); box-shadow:inset 3px 0 0 var(--note) }
+  .hl.sel { outline:2px solid var(--accent); outline-offset:1px } .mark { display:inline-block; min-width:18px; text-align:center; font:11px/18px system-ui,sans-serif; border-radius:9px; color:#fff; background:var(--note); margin-left:4px; vertical-align:middle } .mark.ERROR { background:var(--err) } .mark.RISK { background:var(--risk) }
+  .side { overflow:auto; padding:12px 14px; display:grid; gap:10px; align-content:start }
+  .finding { border:1px solid var(--line); border-left-width:4px; border-radius:10px; padding:10px 12px; background:var(--card); cursor:pointer } .finding.ERROR { border-left-color:var(--err) } .finding.RISK { border-left-color:var(--risk) } .finding.NOTE { border-left-color:var(--note) } .finding.sel { outline:2px solid var(--accent) }
+  .finding .t { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:4px } .finding .t b { font-size:13px } .finding .num { font:600 11px/18px system-ui; min-width:18px; text-align:center; border-radius:9px; color:#fff; background:var(--note) } .finding.ERROR .num { background:var(--err) } .finding.RISK .num { background:var(--risk) }
+  .finding .where { font-size:12px; color:var(--muted) } .finding .expl { margin:6px 0 } .finding .prop { margin:6px 0; padding:6px 8px; background:var(--okbg); border-radius:6px; font-size:13px } .finding .ev { font-size:12px; color:var(--muted) } .finding .ev a { color:var(--accent); cursor:pointer; margin-right:6px }
+  .finding details { font-size:13px } .finding summary { cursor:pointer; color:var(--accent) }
+  dialog { border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); max-width:820px; width:92vw } pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:8px; max-height:60vh; overflow:auto }
+  @media (max-width: 900px) { .panes { grid-template-columns:1fr; grid-template-rows:1fr 1fr } .doc { border-right:0; border-bottom:1px solid var(--line) } }
 </style>
 </head>
 <body>
-<header><h1>Проверка технического задания (223-ФЗ)</h1><span class="kb" id="kb">загрузка базы знаний…</span></header>
-<main>
+<header>
+  <h1>Проверка ТЗ · 223-ФЗ</h1>
+  <span class="kb" id="kb">база знаний…</span>
+  <button class="ghost" id="back" style="display:none" onclick="goHome()">← Новая проверка</button>
+</header>
+
+<section id="landing">
   <div class="card">
-    <div class="row">
-      <form id="up" class="row" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".docx,.pdf,.xlsx" required>
-        <label><input type="checkbox" name="use_llm" id="llm1"> объяснения LLM</label>
-        <button type="submit">Проверить файл</button>
-      </form>
-      <span class="muted">или</span>
-      <form id="bynotice" class="row">
-        <input type="text" id="notice" placeholder="номер извещения из базы, напр. 32615808789" list="plist">
-        <datalist id="plist"></datalist>
-        <label><input type="checkbox" id="llm2"> LLM</label>
-        <button type="submit" class="secondary">Проверить из базы</button>
-      </form>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept=".docx,.doc,.rtf,.odt,.pdf,.xlsx,.xls">
+      <b>Перетащите файл технического задания или нажмите для выбора</b>
+      <div class="muted" style="margin-top:6px">DOCX, DOC, RTF, ODT, PDF, XLSX, XLS · проверка занимает несколько секунд · документ не покидает сервер</div>
+    </label>
+    <div class="row" style="margin-top:10px">
+      <label><input type="checkbox" id="llm"> добавить объяснения локальной LLM (медленно, ~1 мин на замечание)</label>
+      <span class="muted">или из базы:</span>
+      <input type="text" id="notice" placeholder="номер извещения ЕИС, напр. 32615808789" list="plist"><datalist id="plist"></datalist>
+      <button class="secondary" id="bynotice">Проверить</button>
     </div>
-    <div class="muted" style="margin-top:8px">Сервер не обращается в интернет: проверка идёт по внутренней базе норм, прецедентов ФАС и словарей.</div>
   </div>
-
-  <div class="card"><h2 style="font-size:16px;margin:0 0 8px">Проверки</h2>
-    <table><thead><tr><th>id</th><th>источник</th><th>статус</th><th>итог</th><th></th></tr></thead><tbody id="jobs"></tbody></table>
+  <div class="card">
+    <h2 style="font-size:15px;margin:0 0 8px">Последние проверки</h2>
+    <table class="jobs"><thead><tr><th>Документ</th><th>Статус</th><th>Итог</th><th></th></tr></thead><tbody id="jobs"></tbody></table>
   </div>
+</section>
 
-  <div id="report" class="card" style="display:none"></div>
-</main>
+<section id="review">
+  <div class="topbar">
+    <div class="verdict">
+      <span class="v" id="verdict">—</span>
+      <span id="docinfo" class="muted"></span>
+      <span style="flex:1"></span>
+      <button class="secondary" onclick="dl('docx')">Скачать DOCX</button>
+      <button class="secondary" onclick="dl('html')">Отчёт для печати</button>
+      <button class="ghost" onclick="dl('json')">JSON</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="panes">
+    <div class="doc" id="doc"></div>
+    <div class="side">
+      <div class="filters" id="filters"></div>
+      <div id="flist"></div>
+    </div>
+  </div>
+</section>
+
 <dialog id="dlg"><div id="dlgbody"></div><div class="row" style="justify-content:flex-end;margin-top:10px"><button onclick="dlg.close()">Закрыть</button></div></dialog>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const TYPES = {COMPLETENESS:'Полнота и корректность ТЗ', COMPETITION:'Ограничение конкуренции', COMPLIANCE:'Соответствие нормам'};
 const CATS = {CONTRADICTION:'Противоречие', INCORRECT_CHARACTERISTIC:'Некорректная характеристика', COMPLETENESS:'Комплектность / полнота', WRONG_OKPD2:'Код ОКПД 2',
   WARRANTY:'Гарантийные условия', STANDARDS:'Стандарты', COMPETITION_RESTRICTION:'Ограничение конкуренции', OUT_OF_SCOPE_PROVISION:'Не относится к ТЗ', FORM:'Оформление'};
-let current = null;
+const SEV = {ERROR:'ошибка', RISK:'риск', NOTE:'замечание'}; const DISP = {FLAGGED:'подтверждено', INSUFFICIENT_EVIDENCE:'требует проверки', PASSED:'ок'};
+const ORDER = {ERROR:0, RISK:1, NOTE:2};
+let R = null, RID = null, filter = {sev:null, cat:null}, byClause = {};
 
 async function kb(){ try{ const k = await (await fetch('/api/kb')).json();
-  $('#kb').textContent = `норм: ${k.counts.legal_rules} · прецедентов ФАС: ${k.counts.fas_findings} · закупок с ТЗ: ${k.counts.procurements} · индекс: ${k.retrieval_index?'да':'нет'} · LLM: ${k.llm_available?'доступна':'нет'}`;
-  }catch(e){ $('#kb').textContent='база недоступна'; } }
-
+  $('#kb').textContent = `норм ${k.counts.legal_rules} · прецедентов ФАС ${k.counts.fas_findings} · ТЗ в базе ${k.counts.procurements} · индекс ${k.retrieval_index?'да':'нет'} · LLM ${k.llm_available?'доступна':'нет'}`;
+  }catch(e){ $('#kb').textContent='сервер недоступен'; } }
 async function procs(){ try{ const ps = await (await fetch('/api/procurements')).json();
-  $('#plist').innerHTML = ps.map(p=>`<option value="${p.eis_id}">${esc((p.name||'').slice(0,80))} · ФАС: ${p.n_fas} · пунктов: ${p.n_clauses}</option>`).join(''); }catch(e){} }
+  $('#plist').innerHTML = ps.map(p=>`<option value="${p.eis_id}">${esc((p.name||'').slice(0,80))} · ФАС ${p.n_fas} · пунктов ${p.n_clauses}</option>`).join(''); }catch(e){} }
 
 async function jobs(){ const js = await (await fetch('/api/reviews')).json();
-  $('#jobs').innerHTML = js.map(j=>`<tr><td class="muted">${j.review_id}</td><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status}${j.use_llm?' +LLM':''}</span></td>
-    <td>${j.summary?Object.entries(j.summary).map(([k,v])=>`${TYPES[k]||k}: ${v.findings}`).join(' · '):(j.error?esc(j.error):'')}</td>
-    <td>${j.status==='done'?`<button class="secondary" onclick="show('${j.review_id}')">отчёт</button>`:''}</td></tr>`).join('') || '<tr><td colspan=5 class="muted">пока нет проверок</td></tr>';
+  $('#jobs').innerHTML = js.slice(0,12).map(j=>`<tr><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status==='done'?'готово':j.status==='running'?'выполняется…':'ошибка'}${j.use_llm?' +LLM':''}</span></td>
+    <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}</td>
+    <td>${j.status==='done'?`<button class="secondary" onclick="open_('${j.review_id}')">открыть</button>`:''}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">пока нет проверок</td></tr>';
   if (js.some(j=>j.status==='running')) setTimeout(jobs, 2000); }
 
-async function show(id){ const r = (await (await fetch('/api/reviews/'+id)).json()).report; current = r;
-  const con = r.conclusion || {};
-  const concl = con.verdict ? `<div class="card" style="margin:10px 0;border-color:${con.errors?'var(--err)':'var(--ok)'}"><b>Заключение:</b> ${esc(con.verdict)}<br>
-      <span class="muted">ошибок ${con.errors} · рисков ${con.risks} · на ручную проверку ${con.manual_review} · замечаний по оформлению ${con.notes}</span>
-      ${con.document?`<div class="muted" style="margin-top:6px">предмет: ${esc(con.document.subject||'—')} · тип: ${esc(con.document.contract_kind||'—')} · разделов ${con.document.sections??'—'} · таблиц ${con.document.tables??'—'} · позиций ${con.document.items??'—'} · ОКПД2: ${(con.document.okpd2_codes||[]).join(', ')||'—'}</div>`:''}
-      ${(con.top||[]).length?`<ol style="margin:8px 0 0 18px">${con.top.map(t=>`<li><b>${CATS[t.category]||t.category}:</b> ${esc(t.summary)} <span class="muted">${esc(t.anchor||'')}</span></li>`).join('')}</ol>`:''}</div>` : '';
-  const byCat = {}; r.findings.forEach(f=>{ byCat[f.case_category||'?']=(byCat[f.case_category||'?']||0)+1; });
-  const sum = Object.entries(byCat).map(([k,v])=>`<div><b>${CATS[k]||k}</b><br>${v}</div>`).join('');
-  const sections = ['COMPLETENESS','COMPETITION','COMPLIANCE'].map(t=>{ const fs = r.findings.filter(f=>f.analysis_type===t);
-    return `<div class="section"><h2>${TYPES[t]} <span class="muted">(${fs.length})</span></h2>` + (fs.length? fs.map(f=>`
-      <div class="finding"><span class="label">${f.label}</span> <span class="pill ${f.severity}">${f.severity}</span> <span class="pill">${f.disposition}</span>
-        <span class="pill">${CATS[f.case_category]||f.case_category||''}</span> ${f.page?`<span class="muted">стр. ${f.page}</span>`:''} ${f.method?`<span class="muted">${f.method}</span>`:''}
-        ${(f.anchors&&f.anchors.length)?`<div class="muted" style="font-size:12px">где: ${f.anchors.map(esc).join(' · ')}</div>`:''}
-        <div>${esc(f.explanation)}</div>
-        <div class="frag">«${esc(f.clause_text)}»</div>
-        ${f.proposed_text?`<div class="prop"><b>Предложение:</b> ${esc(f.proposed_text)}</div>`:''}
-        <div class="ev">Доказательства: ${(f.evidence_objects||[]).map(o=>`<a onclick='ev(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${esc(o.id)}</a>`).join('')||'—'}</div>
-      </div>`).join('') : '<div class="muted">замечаний нет</div>') + '</div>'; }).join('');
-  $('#report').style.display='block';
-  $('#report').innerHTML = `${concl}<div class="row" style="justify-content:space-between"><h2 style="margin:0;font-size:17px">Отчёт: ${esc(r.source)}</h2>
-    <span class="muted">пунктов: ${r.n_clauses} · технических: ${r.clause_scopes?.TECHNICAL??'?'} · ${r.llm_used?'с LLM':'без LLM'} · база: ${r.kb_release.legal_rules} норм / ${r.kb_release.fas_findings} прецедентов</span>
-    <button class="secondary" onclick="dl()">JSON</button></div><div class="sum" style="margin:10px 0">${sum}</div>${sections}`;
-  window.scrollTo({top: $('#report').offsetTop-10, behavior:'smooth'}); }
+async function upload(file){ if(!file) return; const fd = new FormData(); fd.append('file', file); fd.append('use_llm', $('#llm').checked);
+  $('#drop').querySelector('b').textContent = 'Загрузка и проверка…';
+  const r = await fetch('/api/reviews',{method:'POST',body:fd}); const j = await r.json();
+  $('#drop').querySelector('b').textContent = 'Перетащите файл технического задания или нажмите для выбора';
+  if(!r.ok){ alert(j.detail || 'ошибка'); return; } waitAndOpen(j.review_id); }
+async function waitAndOpen(rid){ jobs(); for(;;){ const j = await (await fetch('/api/reviews/'+rid)).json(); if(j.status==='done'){ open_(rid); return; } if(j.status==='error'){ alert('Ошибка проверки: '+j.error); return; } await new Promise(r=>setTimeout(r,1500)); } }
 
-function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score.toFixed(2)}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
-function dl(){ const b = new Blob([JSON.stringify(current,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=current.review_id+'.json'; a.click(); }
+$('#file').addEventListener('change', e=>upload(e.target.files[0]));
+const drop = $('#drop'); ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.remove('over');}));
+drop.addEventListener('drop', e=>upload(e.dataTransfer.files[0]));
+$('#bynotice').addEventListener('click', async ()=>{ const n = $('#notice').value.trim(); if(!n) return;
+  const r = await fetch('/api/reviews/by-notice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({notice:n, use_llm:$('#llm').checked})});
+  const j = await r.json(); if(!r.ok){ alert(j.detail); return; } waitAndOpen(j.review_id); });
 
-$('#up').addEventListener('submit', async e=>{ e.preventDefault(); const fd = new FormData(e.target); fd.set('use_llm', $('#llm1').checked);
-  const r = await fetch('/api/reviews',{method:'POST',body:fd}); if(!r.ok){ alert((await r.json()).detail); return; } jobs(); });
-$('#bynotice').addEventListener('submit', async e=>{ e.preventDefault();
-  const r = await fetch('/api/reviews/by-notice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({notice:$('#notice').value.trim(), use_llm:$('#llm2').checked})});
-  if(!r.ok){ alert((await r.json()).detail); return; } jobs(); });
+function goHome(){ $('#review').classList.remove('on'); $('#landing').style.display='grid'; $('#back').style.display='none'; jobs(); }
+function dl(fmt){ if(RID) window.open(`/api/reviews/${RID}/report.${fmt}`, '_blank'); }
+
+async function open_(rid){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; filter = {sev:null, cat:null};
+  $('#landing').style.display='none'; $('#review').classList.add('on'); $('#back').style.display='inline-block';
+  const c = R.conclusion || {}; const v = $('#verdict'); v.textContent = c.verdict || '—'; v.className = 'v' + (c.errors ? ' bad' : '');
+  const d = c.document || {}; $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${R.llm_used?' · с LLM':''}`;
+  R.findings.sort((a,b)=>(ORDER[a.severity]-ORDER[b.severity]) || ((a.disposition==='FLAGGED')===(b.disposition==='FLAGGED')?0:(a.disposition==='FLAGGED'?-1:1))); R.findings.forEach((f,i)=>f._n=i+1);
+  byClause = {}; R.findings.forEach(f=>{ if(f.clause_id) (byClause[f.clause_id] ||= []).push(f); });
+  renderStats(); renderDoc(); renderList(); }
+
+function renderStats(){ const c = R.conclusion || {}; const cats = {}; R.findings.forEach(f=>{ cats[f.case_category]=(cats[f.case_category]||0)+1; });
+  $('#stats').innerHTML = [['ERROR','Ошибки',c.errors],['RISK','Риски',c.risks],['NOTE','Оформление',c.notes]]
+    .map(([s,l,n])=>`<span class="stat ${filter.sev===s?'active':''}" onclick="setSev('${s}')"><b>${n??0}</b> ${l}</span>`).join('')
+    + `<span class="stat"><b>${c.manual_review??0}</b> требует проверки</span>`
+    + Object.entries(cats).map(([k,n])=>`<span class="stat ${filter.cat===k?'active':''}" onclick="setCat('${k}')">${CATS[k]||k} <b>${n}</b></span>`).join(''); }
+function setSev(s){ filter.sev = filter.sev===s?null:s; renderStats(); renderList(); } function setCat(k){ filter.cat = filter.cat===k?null:k; renderStats(); renderList(); }
+function visible(f){ return (!filter.sev || f.severity===filter.sev) && (!filter.cat || f.case_category===filter.cat); }
+
+function sevOf(fs){ return fs.reduce((m,f)=>ORDER[f.severity]<ORDER[m]?f.severity:m,'NOTE'); }
+function marks(fs){ return fs.map(f=>`<span class="mark ${f.severity}" title="${esc(CATS[f.case_category]||'')}">${f._n}</span>`).join(''); }
+function wrap(id, text){ const fs = byClause[id]; if(!fs) return esc(text);
+  return `<span class="hl ${sevOf(fs)}" id="c_${id}" onclick="select_(${fs[0]._n})">${esc(text)}${marks(fs)}</span>`; }
+
+function renderDoc(){ const view = R.document_view || [];
+  $('#doc').innerHTML = view.map(b=>{
+    if(b.type==='h') return `<h2>${esc(b.text)}</h2>`;
+    if(b.type==='p') return `<p>${wrap(b.clause_id, b.text)}</p>`;
+    if(b.type==='table') return `<table>${b.caption?`<caption>${esc(b.caption)}</caption>`:''}<tr>${b.header.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>` +
+      b.rows.map(r=>{ const fs = byClause[r.clause_id]; const cls = fs?`hl ${sevOf(fs)}`:'';
+        return `<tr class="${cls}" id="c_${r.clause_id}" ${fs?`onclick="select_(${fs[0]._n})"`:''}>${r.cells.map((c,i)=>`<td>${esc(c)}${(fs&&i===r.cells.length-1)?marks(fs):''}</td>`).join('')}</tr>`; }).join('') + '</table>';
+    return ''; }).join('') || '<p class="muted">Текст документа недоступен для показа (проверка из базы без исходного файла).</p>'; }
+
+function renderList(){ const fs = R.findings.filter(visible);
+  $('#filters').innerHTML = `<span class="muted">${fs.length} из ${R.findings.length} замечаний${filter.sev||filter.cat?' · <a style="cursor:pointer;color:var(--accent)" onclick="filter={sev:null,cat:null};renderStats();renderList()">сбросить фильтр</a>':''}</span>`;
+  $('#flist').innerHTML = fs.map(f=>{ const ev = (f.evidence_objects||[]).filter(o=>o.type!=='lexicon');
+    return `<div class="finding ${f.severity}" id="f_${f._n}" onclick="select_(${f._n})">
+    <div class="t"><span class="num">${f._n}</span><b>${esc(CATS[f.case_category]||f.case_category)}</b><span class="pill ${f.severity}">${SEV[f.severity]}</span><span class="pill">${DISP[f.disposition]||f.disposition}</span>${f.method&&f.method.includes('LLM')?'<span class="pill">LLM</span>':''}</div>
+    <div class="where">${esc((f.anchors||[]).join(' · ') || (f.page?'стр. '+f.page:''))}</div>
+    <div class="expl">${esc(f.explanation)}</div>
+    ${f.proposed_text?`<div class="prop"><b>Исправить:</b> ${esc(f.proposed_text)}</div>`:''}
+    ${ev.length?`<details><summary>Основание (${ev.length})</summary><div class="ev">${ev.map(o=>`<a onclick='event.stopPropagation();ev(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${esc(o.id)}</a>`).join('')}</div></details>`:'<div class="ev">Основание: правило проверки по структуре документа</div>'}
+  </div>`; }).join('') || '<div class="muted">Нет замечаний в этом фильтре</div>'; }
+
+function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel')); const f = R.findings.find(x=>x._n===n); if(!f) return;
+  const fe = $('#f_'+n); if(fe){ fe.classList.add('sel'); fe.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+  const ce = f.clause_id && document.getElementById('c_'+f.clause_id); if(ce){ ce.classList.add('sel'); ce.scrollIntoView({block:'center', behavior:'smooth'}); } }
+function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
+
 kb(); procs(); jobs();
 </script>
 </body>
