@@ -21,7 +21,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest
+from procdata import checks, explain, index as kb_index, ingest, report as rep
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -79,7 +79,7 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
                   "kb_release": {"legal_rules": conn.execute("SELECT COUNT(*) FROM legal_rules").fetchone()[0],
                                  "fas_findings": conn.execute("SELECT COUNT(*) FROM fas_findings").fetchone()[0]},
                   "summary": {k: {"findings": len(v), "errors": sum(x["severity"] == "ERROR" for x in v), "risks": sum(x["severity"] == "RISK" for x in v)} for k, v in by.items()},
-                  "conclusion": rv.conclusion(findings, doc), "findings": findings}
+                  "conclusion": rv.conclusion(findings, doc), "document_view": rep.document_view(doc, clauses), "findings": findings}
         path = REVIEWS / f"{review_id}.json"; path.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
         with LOCK: JOBS[review_id].update(status="done", report_path=str(path), finished=datetime.datetime.now().isoformat(timespec="seconds"), summary=report["summary"])
     except Exception as ex:  # noqa
@@ -141,6 +141,23 @@ def get_review(rid: str):
     return {**j, "report": json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))}
 
 
+@app.get("/api/reviews/{rid}/report.{fmt}")
+def download_report(rid: str, fmt: str):
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "report not ready")
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    base = re.sub(r"[^\w.-]", "_", Path(report["source"]).stem)[:60]
+    if fmt == "json":
+        return FileResponse(j["report_path"], media_type="application/json", filename=f"review_{base}.json")
+    if fmt == "html":
+        p = REVIEWS / f"{rid}.html"; p.write_text(rep.render_html(report), encoding="utf-8")
+        return FileResponse(str(p), media_type="text/html", filename=f"review_{base}.html")
+    if fmt == "docx":
+        p = REVIEWS / f"{rid}.docx"; rep.render_docx(report, p)
+        return FileResponse(str(p), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename=f"review_{base}.docx")
+    raise HTTPException(400, "fmt must be json, html or docx")
+
+
 @app.get("/api/kb")
 def kb():
     conn = db()
@@ -179,7 +196,7 @@ app.mount("/static", StaticFiles(directory=str(ROOT / "web")), name="static")
 
 @app.get("/")
 def index():
-    return FileResponse(str(ROOT / "web" / "index.html"))
+    return FileResponse(str(ROOT / "web" / "index.html"), headers={"Cache-Control": "no-cache"})
 
 
 if __name__ == "__main__":
