@@ -135,16 +135,16 @@ async function procs(){ try{ const ps = await (await fetch('/api/procurements'))
 
 async function jobs(){ const js = await (await fetch('/api/reviews')).json();
   $('#jobs').innerHTML = js.slice(0,12).map(j=>`<tr><td>${esc(j.source)}</td><td><span class="pill ${j.status}">${j.status==='done'?'готово':j.status==='running'?'выполняется…':'ошибка'}${j.use_llm?' +LLM':''}</span></td>
-    <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}${j.llm_status==='pending'?' · LLM: в очереди':j.llm_status==='running'?` · LLM: ${j.llm_done||0}/${j.llm_total}`:j.llm_status==='done'?' · LLM: готово':''}</td>
+    <td class="muted">${j.summary?Object.values(j.summary).reduce((a,v)=>a+v.findings,0)+' замечаний':(j.error?esc(j.error):'')}${j.llm_status==='pending'?' · LLM: в очереди':j.llm_status==='running'?` · LLM: ${j.llm_done||0}/${j.llm_total}`:j.llm_status==='done'?' · LLM: готово':j.llm_status==='interrupted'?' · LLM: прервано перезапуском':''}</td>
     <td>${j.status==='done'?`<button class="secondary" onclick="open_('${j.review_id}')">открыть</button>${j.legacy?'<div class="muted" style="font-size:11px">старый формат: без текста документа</div>':''}`:''}</td></tr>`).join('') || '<tr><td colspan=4 class="muted">пока нет проверок</td></tr>';
-  if (js.some(j=>j.status==='running' || j.llm_status==='pending' || j.llm_status==='running')) setTimeout(jobs, 2500); }
+  clearTimeout(window._jobsPoll); if ($('#landing').style.display!=='none' && js.some(j=>j.status==='running' || j.llm_status==='pending' || j.llm_status==='running')) window._jobsPoll = setTimeout(jobs, 2500); }
 
 async function upload(file){ if(!file) return; const fd = new FormData(); fd.append('file', file); fd.append('use_llm', $('#llm').checked);
   $('#drop').querySelector('b').textContent = 'Загрузка и проверка…';
   const r = await fetch('/api/reviews',{method:'POST',body:fd}); const j = await r.json();
   $('#drop').querySelector('b').textContent = 'Перетащите файл технического задания или нажмите для выбора';
   if(!r.ok){ alert(j.detail || 'ошибка'); return; } waitAndOpen(j.review_id); }
-async function waitAndOpen(rid){ jobs(); for(;;){ const j = await (await fetch('/api/reviews/'+rid)).json(); if(j.status==='done'){ open_(rid); return; } if(j.status==='error'){ alert('Ошибка проверки: '+j.error); return; } await new Promise(r=>setTimeout(r,1500)); } }
+async function waitAndOpen(rid){ jobs(); for(let i=0;i<400;i++){ const r = await fetch('/api/reviews/'+rid); if(r.status===404){ alert('Проверка не найдена (сервер перезапускался). Загрузите файл заново.'); return; } const j = await r.json(); if(j.status==='done'){ open_(rid); return; } if(j.status==='error'){ alert('Ошибка проверки: '+j.error); return; } await new Promise(r=>setTimeout(r,1500)); } }
 
 $('#file').addEventListener('change', e=>upload(e.target.files[0]));
 const drop = $('#drop'); ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.add('over');}));
@@ -154,7 +154,8 @@ $('#bynotice').addEventListener('click', async ()=>{ const n = $('#notice').valu
   const r = await fetch('/api/reviews/by-notice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({notice:n, use_llm:$('#llm').checked})});
   const j = await r.json(); if(!r.ok){ alert(j.detail); return; } waitAndOpen(j.review_id); });
 
-function goHome(){ $('#review').classList.remove('on'); $('#landing').style.display='grid'; $('#back').style.display='none'; jobs(); }
+function open_poll_later(rid){ clearTimeout(window._llmPoll); window._llmPoll = setTimeout(()=>{ if(!document.querySelector('.editor') && RID===rid) open_(rid); else open_poll_later(rid); }, 6000); }
+function goHome(){ clearTimeout(window._llmPoll); $('#review').classList.remove('on'); $('#landing').style.display='grid'; $('#back').style.display='none'; jobs(); }
 function dl(fmt){ if(RID) window.open(`/api/reviews/${RID}/report.${fmt}`, '_blank'); }
 async function dlAnnot(){ if(!RID) return; const r = await fetch(`/api/reviews/${RID}/annotated.docx`, {method:'HEAD'}); if(r.status===409){ alert('Размеченная копия доступна только для загруженных DOCX. Для PDF используйте «Заключение (DOCX)».'); return; } window.open(`/api/reviews/${RID}/annotated.docx`, '_blank'); }
 
@@ -165,7 +166,9 @@ async function open_(rid){ const j = await (await fetch('/api/reviews/'+rid)).js
   const c = R.conclusion || {}; const v = $('#verdict'); v.textContent = c.verdict || '—'; v.className = 'v' + (c.errors ? ' bad' : '');
   const d = c.document || {}; const llm = R.llm_status==='pending'?' · LLM-объяснения: в очереди':R.llm_status==='running'?` · LLM-объяснения: ${R.llm_done}/${R.llm_total}`:R.llm_status==='done'?' · LLM-объяснения: готово':'';
   $('#docinfo').textContent = `${R.source} · ${d.contract_kind||''} · разделов ${d.sections??'—'} · таблиц ${d.tables??'—'} · позиций ${d.items??'—'} · пунктов ${R.n_clauses}${llm}${(R.edits||[]).length?` · правок ${R.edits.length}`:''}`;
-  clearTimeout(window._llmPoll); if (R.llm_status==='pending' || R.llm_status==='running') window._llmPoll = setTimeout(()=>open_(rid), 6000);
+  clearTimeout(window._llmPoll);
+  const live = (j.llm_status==='pending' || j.llm_status==='running');
+  if (live) window._llmPoll = setTimeout(()=>{ if(!document.querySelector('.editor') && RID===rid) open_(rid); else open_poll_later(rid); }, 6000);
   R.findings.sort((a,b)=>(ORDER[a.severity]-ORDER[b.severity]) || ((a.disposition==='FLAGGED')===(b.disposition==='FLAGGED')?0:(a.disposition==='FLAGGED'?-1:1))); R.findings.forEach((f,i)=>f._n=i+1);
   byClause = {}; R.findings.forEach(f=>{ if(f.clause_id) (byClause[f.clause_id] ||= []).push(f); });
   renderStats(); renderDoc(); renderList(); }
@@ -213,6 +216,7 @@ function openEditor(n){ const f = R.findings.find(x=>x._n===n); if(!f) return; s
   const host = $('#ed_'+n); const cur = clauseText(f.clause_id); const isRow = f.clause_id.startsWith('T');
   host.innerHTML = `<div class="editor" onclick="event.stopPropagation()">
     <div class="muted" style="font-size:12px;margin-bottom:4px">Фрагмент ${esc((f.anchors||[])[0]||f.clause_id)}${isRow?' · ячейки таблицы разделены « | »':''}</div>
+    <div class="prop" id="guide_${n}" style="display:none"></div>
     <textarea id="ta_${n}">${esc(cur)}</textarea>
     <div class="row">
       <button onclick="applyEdit(${n},'manual')">Применить и перепроверить</button>
@@ -224,26 +228,35 @@ function openEditor(n){ const f = R.findings.find(x=>x._n===n); if(!f) return; s
   </div>`; $('#ta_'+n).focus(); }
 function closeEditor(n){ const h=$('#ed_'+n); if(h) h.innerHTML=''; }
 let lastProposal = {};
+function showGuide(n, label, text){ const g=$('#guide_'+n); if(!g) return; g.style.display='block'; g.innerHTML = `<b>${esc(label)}:</b> ${esc(text)}`; }
+function isFullRewrite(cur, prop){ if(!prop) return false; const a = cur.replace(/\s+/g,' ').trim(), b = prop.replace(/\s+/g,' ').trim();
+  return b.length >= Math.min(40, a.length*0.6) && !/^[«"…\.]/.test(b) && !/^(добавить|указать|удалить|заменить|привести|раскрыть|уточнить|оставить|сверить|проверить)/i.test(b); }
 function useProposal(n){ const f = R.findings.find(x=>x._n===n); const ta=$('#ta_'+n); if(!f||!ta) return;
   const cur = clauseText(f.clause_id); const prop = f.proposed_text||'';
-  // if the proposal is a rewritten fragment (starts like the fragment), replace; otherwise append as a note to edit by hand
-  ta.value = (prop.length>40 && cur.slice(0,15)===prop.slice(0,15)) ? prop : (cur + '\n\n[предложение: ' + prop + ']');
-  lastProposal[n] = {text: prop, method:'suggestion'}; $('#hint_'+n).textContent = 'Подставлено предложение правила. Отредактируйте при необходимости и примените.'; }
+  if (isFullRewrite(cur, prop)) { ta.value = prop; lastProposal[n] = {text: prop, method:'suggestion'}; $('#hint_'+n).textContent = 'Подставлена формулировка правила. Отредактируйте при необходимости и примените.'; }
+  else { showGuide(n, 'Что исправить', prop); lastProposal[n] = {text: prop, method:'suggestion'}; $('#hint_'+n).textContent = 'Это указание, а не готовый текст: внесите изменение в текст фрагмента выше и нажмите «Применить и перепроверить».'; ta.focus(); } }
 async function askLLM(n){ const f = R.findings.find(x=>x._n===n); const ed=$('#ed_'+n); if(!f) return; ed.classList.add('busy'); $('#hint_'+n).textContent='LLM формулирует правку (около минуты, модель работает на CPU)…';
   try{ const r = await fetch(`/api/reviews/${RID}/suggest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_id:f.clause_id, finding_id:f.finding_id})}); const j = await r.json();
     if(!r.ok) throw new Error(j.detail||'ошибка'); const ta=$('#ta_'+n); const cur = clauseText(f.clause_id);
-    if(j.proposed_text){ ta.value = (j.proposed_text.length>40 && cur.slice(0,15)===j.proposed_text.slice(0,15)) ? j.proposed_text : (cur + '\n\n[LLM: ' + j.proposed_text + ']'); lastProposal[n]={text:j.proposed_text, method: j.llm?'llm':'suggestion'}; }
+    if(j.proposed_text){
+      if (isFullRewrite(cur, j.proposed_text)) { ta.value = j.proposed_text; lastProposal[n]={text: j.proposed_text, method: j.llm?'llm':'suggestion'}; }
+      else { showGuide(n, j.llm?'LLM предлагает':'Что исправить', j.proposed_text); lastProposal[n]={text: j.proposed_text, method: j.llm?'llm':'suggestion'}; } }
     $('#hint_'+n).textContent = (j.llm?'LLM: ':'Правило: ') + (j.explanation||'') + (j.rejected?` (ответ модели отклонён проверкой: ${j.rejected}; показано предложение правила)`:'');
   }catch(e){ $('#hint_'+n).textContent = 'Не удалось получить предложение: '+e.message; } finally { ed.classList.remove('busy'); } }
 async function applyEdit(n, how){ const f = R.findings.find(x=>x._n===n); const ta=$('#ta_'+n); if(!f||!ta) return; const ed=$('#ed_'+n); ed.classList.add('busy');
   const lp = lastProposal[n]; const method = lp ? (ta.value.trim()===lp.text.trim() ? lp.method : (lp.method==='llm'?'llm_edited':'manual')) : 'manual';
   try{ const r = await fetch(`/api/reviews/${RID}/edits`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clause_id:f.clause_id, new_text:ta.value, method, finding_ids:(byClause[f.clause_id]||[]).map(x=>x.finding_id), proposed_text: lp?lp.text:(f.proposed_text||null)})});
     const j = await r.json(); if(!r.ok) throw new Error(j.detail||'ошибка');
-    toast(`Правка применена. Замечаний по фрагменту: ${j.findings_before} → ${j.findings_after}${j.resolved?' · фрагмент чист':''}. Всего по документу: ${j.total_findings}.`);
-    delete lastProposal[n]; await open_(RID);
-  }catch(e){ alert('Ошибка: '+e.message); ed.classList.remove('busy'); } }
+    delete lastProposal[n]; const cid = f.clause_id; await open_(RID);
+    if (j.resolved) { toast(`Готово: замечаний по фрагменту ${j.findings_before} → 0. Всего по документу: ${j.total_findings}.`); }
+    else {
+      const left = R.findings.filter(x=>x.clause_id===cid);
+      toast(`Правка сохранена, но фрагмент всё ещё помечен (${j.findings_before} → ${j.findings_after}): ${left.map(x=>CATS[x.case_category]||x.label).join(', ')}. Откройте замечание, чтобы увидеть, что осталось.`, true);
+      if (left[0]) { select_(left[0]._n); openEditor(left[0]._n); const h=$('#hint_'+left[0]._n); if(h) h.innerHTML = '<b>Осталось:</b> '+esc(left[0].explanation); }
+    }
+  }catch(e){ ed.classList.remove('busy'); const h=$('#hint_'+n); if(h) h.innerHTML = '<b style="color:var(--err)">Не применено:</b> '+esc(e.message); toast('Правка не применена: '+e.message, true); } }
 function dlEdited(){ if(RID) window.open(`/api/reviews/${RID}/edited.docx`, '_blank'); }
-function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 6000); }
+function toast(msg, warn){ const t=document.createElement('div'); t.className='toast'; if(warn) t.style.borderLeftColor='var(--risk)'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), warn?10000:6000); }
 function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel')); const f = R.findings.find(x=>x._n===n); if(!f) return;
   const fe = $('#f_'+n); if(fe){ fe.classList.add('sel'); fe.scrollIntoView({block:'nearest', behavior:'smooth'}); }
   const ce = f.clause_id && document.getElementById('c_'+f.clause_id); if(ce){ ce.classList.add('sel'); ce.scrollIntoView({block:'center', behavior:'smooth'}); } }

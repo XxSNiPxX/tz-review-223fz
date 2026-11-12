@@ -136,6 +136,11 @@ def resolve_evidence(db, ev, rules_idx, prec_idx, clause_text, analysis_type=Non
         elif e["type"] == "clause":
             r = db.execute("SELECT clause_text FROM clauses WHERE clause_id=?", (e["id"],)).fetchone()
             if r: objs.append({"id": e["id"], "type": "clause", "text": r["clause_text"][:600]})
+        elif e["type"] == "registry":
+            entry = __import__("procdata.checks_doc", fromlist=["registry"]).registry().get(e["id"].replace("ГОСТ Р ", "ГОСТ "), {})
+            objs.append({"id": e["id"], "type": "registry", "text": f"Реестр стандартов из корпуса закупок: {e['id']} встречается {entry.get('count', '?')} раз, обычно как «{entry.get('canonical_family', '?')}»."})
+        elif e["type"] == "doc":
+            objs.append({"id": e["id"], "type": "doc", "text": f"Нормативный или справочный документ: {e['id']}."})
     phrase = LABEL_QUERY.get(label, "")
     query = (phrase + " " + clause_text[:600]).strip()
     ctoks = _tokens(clause_text) | _tokens(phrase)
