@@ -38,6 +38,7 @@ def _load_jobs():
     """Reports persist as JSON; rebuild the job list from them so restarts/reloads keep history."""
     seen = {}
     for p in sorted(REVIEWS.glob("R*.json")):
+        if not re.fullmatch(r"R[0-9a-f]{10}(\.v2)?\.json", p.name): continue        # skip working copies (.doc.json) and exports
         rid = p.name.split(".")[0]
         if rid in seen and not p.name.endswith(".v2.json"): continue
         seen[rid] = p
