@@ -32,6 +32,17 @@ SYSTEM = ("Ты эксперт по закупкам по 223-ФЗ. Тебе д�
           "есть норма (id вида 223ФЗ_...), сошлись на неё.\n"
           "Отвечай строго JSON: {\"explanation\": str, \"proposed_text\": str, \"cited\": [id,...], \"confidence\": 0..1}")
 FORBIDDEN_IN_PROPOSAL = re.compile(r"\bровно\b", re.I)
+LABEL_FIX = {   # what a correct rewrite must do, per label, so that the re-check clears the finding
+    "NO_EQUIVALENT": "Удали запрет эквивалента и после наименования модели добавь слова «или эквивалент»; если можно, перечисли параметры эквивалентности из фрагмента.",
+    "BRAND_REFERENCE": "После наименования марки/модели добавь слова «или эквивалент»; если можно, перечисли параметры эквивалентности из фрагмента.",
+    "MISSING_UNIT": "Добавь единицу измерения к числу без единицы; если единица неочевидна, поставь [ед. изм.].",
+    "VAGUE_REQUIREMENT": "Замени оценочные слова измеримым требованием; неизвестные значения пиши как [значение] с единицей.",
+    "STANDARD_DESIGNATION": "Исправь обозначение стандарта на «ГОСТ Р <номер>-<год>».",
+    "INCOMPLETE_STANDARD_REFERENCE": "Укажи полное обозначение стандарта; если номер неизвестен, поставь [обозначение стандарта].",
+    "WARRANTY_BASIS_MISMATCH": "Замени документ-основание начала гарантийного срока на соответствующий виду договора (товар — товарная накладная/акт приема-передачи, работы — КС-2/КС-3, услуги — акт оказанных услуг).",
+    "CONTRADICTORY_REQUIREMENTS": "Приведи значение во фрагменте к одному из значений, указанных в доказательствах; не придумывай новое.",
+    "RESTRICTIVE_QUALIFICATION": "Смягчи требование: сделай его критерием оценки или убери количественный порог; не добавляй новых требований.",
+}
 
 
 LLM_LABELS = {"BRAND_REFERENCE", "NO_EQUIVALENT", "EXCESSIVE_PARAMETER", "RESTRICTIVE_QUALIFICATION",
@@ -62,7 +73,9 @@ def explain(finding, evidence_objects, max_tokens=900):
         finding["method"] = finding.get("method", "RULE"); return finding
     ev = "\n".join(f"[{e['id']}] ({e['type']}) {e['text'][:900]}" for e in evidence_objects)
     matched = ", ".join(map(str, finding.get("matched") or [])) or "см. автоматическое пояснение"
+    fix = LABEL_FIX.get(finding["label"])
     user = (f"Замечание: {finding['label']} ({finding['analysis_type']}, {finding['severity']}).\n"
+            + (f"Как исправить: {fix}\n" if fix else "") +
             f"Проблемные места (менять только их): {matched}\n"
             f"Фрагмент ТЗ: «{finding['clause_text'][:700]}»\n"
             f"Автоматическое пояснение: {finding['explanation']}\n\nДоказательства:\n{ev}\n"
@@ -77,8 +90,13 @@ def explain(finding, evidence_objects, max_tokens=900):
     except Exception as ex:  # noqa
         log.warning("llm failed: %s", ex); return finding
     allowed = {e["id"] for e in evidence_objects}
-    cited = [c for c in data.get("cited", []) if c in allowed]
-    bad = [c for c in data.get("cited", []) if c not in allowed]
+    raw_cited = data.get("cited", [])
+    blob = json.dumps(raw_cited, ensure_ascii=False) + " " + str(data.get("explanation", ""))
+    # tolerant: small models garble JSON lists ("[223, \",1,223ФЗ_ART3_P6.1\"]"); accept any allowed id present,
+    # reject only id-shaped tokens that are NOT in the evidence (an invented rule or precedent)
+    cited = [a for a in allowed if a in blob]
+    idlike = re.findall(r"\b\d{2,3}ФЗ_ART[\w.\-]+|\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?::\d+)?", blob)
+    bad = [x for x in idlike if not any(x == a or x.startswith(a) or a.startswith(x) for a in allowed)]
     if bad or not cited:
         log.info("llm cited unknown evidence %s; keeping rule explanation", bad); finding["llm_rejected"] = "unknown_citation"; return finding
     prop = data.get("proposed_text") or ""

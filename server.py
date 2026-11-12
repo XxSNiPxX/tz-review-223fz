@@ -340,8 +340,18 @@ def suggest(rid: str, body: SuggestIn):
     if not explain.available():
         return {"proposed_text": f.get("proposed_text"), "explanation": f["explanation"], "method": "rule", "llm": False}
     f2 = explain.explain(f, f.get("evidence_objects", []))
-    return {"proposed_text": f2.get("proposed_text"), "explanation": f2.get("explanation"), "method": f2.get("method"),
-            "llm": "LLM" in (f2.get("method") or ""), "rejected": f2.get("llm_rejected")}
+    prop = f2.get("proposed_text")
+    # pre-check: would the proposed wording still trigger the same clause-level check?
+    would = None
+    if prop and "LLM" in (f2.get("method") or ""):
+        probe = [{"clause_id": "probe", "clause_text": prop, "document_name": j["source"], "position_start": 0, "position_end": len(prop)}]
+        try:
+            left = [x["label"] for x in checks.run_checks(probe) if x["label"] == f["label"] and x["disposition"] == "FLAGGED"]
+            would = not left
+        except Exception:  # noqa
+            would = None
+    return {"proposed_text": prop, "explanation": f2.get("explanation"), "method": f2.get("method"),
+            "llm": "LLM" in (f2.get("method") or ""), "rejected": f2.get("llm_rejected"), "would_resolve": would}
 
 
 @app.get("/api/reviews/{rid}/edited.docx")
