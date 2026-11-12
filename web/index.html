@@ -241,7 +241,8 @@ async function askLLM(n){ const f = R.findings.find(x=>x._n===n); const ed=$('#e
     if(j.proposed_text){
       if (isFullRewrite(cur, j.proposed_text)) { ta.value = j.proposed_text; lastProposal[n]={text: j.proposed_text, method: j.llm?'llm':'suggestion'}; }
       else { showGuide(n, j.llm?'LLM предлагает':'Что исправить', j.proposed_text); lastProposal[n]={text: j.proposed_text, method: j.llm?'llm':'suggestion'}; } }
-    $('#hint_'+n).textContent = (j.llm?'LLM: ':'Правило: ') + (j.explanation||'') + (j.rejected?` (ответ модели отклонён проверкой: ${j.rejected}; показано предложение правила)`:'');
+    $('#hint_'+n).textContent = (j.llm?'LLM: ':'Правило: ') + (j.explanation||'') + (j.rejected?` (ответ модели отклонён проверкой: ${j.rejected}; показано предложение правила)`:'')
+      + (j.would_resolve===true?' · предварительная проверка: замечание будет снято':j.would_resolve===false?' · предварительная проверка: замечание останется, поправьте текст':'');
   }catch(e){ $('#hint_'+n).textContent = 'Не удалось получить предложение: '+e.message; } finally { ed.classList.remove('busy'); } }
 async function applyEdit(n, how){ const f = R.findings.find(x=>x._n===n); const ta=$('#ta_'+n); if(!f||!ta) return; const ed=$('#ed_'+n); ed.classList.add('busy');
   const lp = lastProposal[n]; const method = lp ? (ta.value.trim()===lp.text.trim() ? lp.method : (lp.method==='llm'?'llm_edited':'manual')) : 'manual';
