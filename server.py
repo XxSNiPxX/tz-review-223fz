@@ -46,7 +46,7 @@ def _load_jobs():
             up = r.get("upload_path")
             JOBS[rid] = {"legacy": not r.get("document_view"),"review_id": r["review_id"], "status": "done", "source": r["source"], "use_llm": r.get("llm_used", False),
                                     "started": r["reviewed_at"], "finished": r["reviewed_at"], "report_path": str(p), "summary": r["summary"],
-                                    "llm_status": r.get("llm_status", "off"), "upload_path": up, "upload_is_docx": bool(up and up.lower().endswith(".docx"))}
+                                    "llm_status": ("interrupted" if r.get("llm_status") in ("pending", "running") else r.get("llm_status", "off")), "upload_path": up, "upload_is_docx": bool(up and up.lower().endswith(".docx"))}
         except Exception as ex:  # noqa
             log.warning("skip %s: %s", p.name, ex)
 
@@ -254,9 +254,27 @@ def _edits_for(rid):
 
 
 def _load_doc(rid):
+    """Working copy of the document for editing. Reviews made before editing existed have none: rebuild it from the kept
+    upload (parse again and replay any stored edits), so every review is editable."""
     p = REVIEWS / f"{rid}.doc.json"
-    if not p.exists(): return None, None
-    d = json.loads(p.read_text(encoding="utf-8")); return d.get("doc"), d.get("clauses")
+    if p.exists():
+        d = json.loads(p.read_text(encoding="utf-8")); return d.get("doc"), d.get("clauses")
+    j = JOBS.get(rid) or {}
+    src = Path(j["upload_path"]) if j.get("upload_path") and Path(j["upload_path"]).exists() else _find_upload(j.get("source"))
+    if not src: return None, None
+    try:
+        path = rv.prepare_file(Path(src)); doc = ingest.parse(path)
+    except Exception as ex:  # noqa
+        log.warning("cannot rebuild working copy for %s: %s", rid, ex); return None, None
+    for c in doc["clauses"]: c["document_name"] = j.get("source")
+    for e in _edits_for(rid): ed.apply_edit(doc, e["clause_id"], e["new_text"])
+    with LOCK:
+        JOBS[rid]["upload_path"] = str(path); JOBS[rid]["upload_is_docx"] = path.suffix.lower() == ".docx"
+    try:
+        p.write_text(json.dumps({"doc": doc, "clauses": doc["clauses"]}, ensure_ascii=False), encoding="utf-8")
+    except PermissionError:
+        pass
+    return doc, doc["clauses"]
 
 
 class EditIn(BaseModel):
@@ -274,7 +292,7 @@ def apply_edit(rid: str, body: EditIn):
     j = JOBS.get(rid)
     if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
     doc, clauses = _load_doc(rid)
-    if clauses is None: raise HTTPException(409, "рабочая копия документа не сохранена (старый отчёт): загрузите файл заново")
+    if clauses is None: raise HTTPException(409, "исходный файл этой проверки не найден на сервере: загрузите документ заново")
     report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
     before = [f for f in report["findings"] if f.get("clause_id") == body.clause_id]
     if doc is not None:
