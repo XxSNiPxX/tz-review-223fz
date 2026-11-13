@@ -17,7 +17,7 @@
   python collect.py all
   python collect.py stats
 """
-import argparse, logging, sys
+import argparse, json, logging, sys
 from procdata.common import load_config, open_db, log
 from procdata import eis_ftp, eis_parse, eis_attachments, extract_text, fas_br, legal, eis_html, findings, audit, convert, baseline, finetune
 

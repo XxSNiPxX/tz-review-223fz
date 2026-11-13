@@ -201,3 +201,23 @@ CREATE TABLE IF NOT EXISTS edits (
   created_at     TEXT DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS ix_edits_review ON edits(review_id);
+
+-- v5: feedback loop. Everything the reviewer sees and does is stored so it can become training data.
+CREATE TABLE IF NOT EXISTS reviews (
+  review_id TEXT PRIMARY KEY, source TEXT, file_sha256 TEXT, upload_path TEXT, contract_kind TEXT, subject TEXT,
+  n_clauses INTEGER, n_findings INTEGER, errors INTEGER, risks INTEGER, manual INTEGER, verdict TEXT,
+  llm_used INTEGER, engine_version TEXT, kb_rules INTEGER, kb_findings INTEGER, created_at TEXT, updated_at TEXT);
+CREATE TABLE IF NOT EXISTS review_findings (
+  finding_id TEXT PRIMARY KEY, review_id TEXT, clause_id TEXT, anchor TEXT, label TEXT, case_category TEXT, analysis_type TEXT,
+  severity TEXT, disposition TEXT, confidence REAL, method TEXT, clause_text TEXT, explanation TEXT, proposed_text TEXT,
+  evidence_ids TEXT, scope_method TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, superseded INTEGER DEFAULT 0);
+CREATE INDEX IF NOT EXISTS ix_rf_review ON review_findings(review_id);
+CREATE TABLE IF NOT EXISTS feedback (
+  feedback_id TEXT PRIMARY KEY, review_id TEXT, finding_id TEXT, clause_id TEXT, label TEXT, case_category TEXT,
+  verdict TEXT,                 -- confirm | reject | wrong_category | missed | comment
+  correct_category TEXT, comment TEXT, clause_text TEXT, user_id TEXT, source TEXT DEFAULT 'ui',
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX IF NOT EXISTS ix_fb_review ON feedback(review_id);
+CREATE TABLE IF NOT EXISTS model_registry (
+  model_id TEXT PRIMARY KEY, kind TEXT, path TEXT, trained_at TEXT, n_train INTEGER, metrics TEXT,
+  gold_must TEXT, gold_fp INTEGER, status TEXT, notes TEXT);

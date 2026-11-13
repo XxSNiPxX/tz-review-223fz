@@ -21,7 +21,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed
+from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed, store, training
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -112,6 +112,8 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
             (REVIEWS / f"{review_id}.doc.json").write_text(json.dumps({"doc": doc, "clauses": clauses}, ensure_ascii=False), encoding="utf-8")
         except PermissionError:
             pass
+        try: store.save_review(conn, report, up)
+        except Exception as ex: log.warning("store.save_review failed: %s", ex)  # noqa
         with LOCK: JOBS[review_id].update(status="done", report_path=str(path), finished=datetime.datetime.now().isoformat(timespec="seconds"),
                                           summary=report["summary"], llm_status=report["llm_status"], llm_total=len(todo), llm_done=0,
                                           n_edits=len(report["edits"]))
@@ -125,6 +127,8 @@ def run_review(review_id, clauses, source, use_llm, doc=None):
                 _write_report(review_id, report)
                 with LOCK: JOBS[review_id].update(llm_done=i)
             report["llm_status"] = "done"; _write_report(review_id, report)
+            try: store.save_review(db(), report, up)
+            except Exception as ex: log.warning("store.save_review failed: %s", ex)  # noqa
             with LOCK: JOBS[review_id].update(llm_status="done")
     except Exception as ex:  # noqa
         log.exception("review failed")
@@ -210,6 +214,7 @@ def get_review(rid: str):
     if j.get("legacy"): _upgrade_legacy(rid, JOBS[rid]); j = JOBS[rid]
     report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
     report.setdefault("edits", _edits_for(rid)); report.setdefault("edited_clauses", sorted({e["clause_id"] for e in report["edits"]}))
+    report["feedback"] = store.feedback_for(db(), rid)
     return {**j, "report": report}
 
 
@@ -377,6 +382,83 @@ def list_edits(format: str = "json"):
         p = REVIEWS / "edits_export.jsonl"; p.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8")
         return FileResponse(str(p), media_type="application/x-ndjson", filename="edits.jsonl")
     return {"count": len(rows), "resolved": sum(r["resolved"] or 0 for r in rows), "by_method": {m: sum(1 for r in rows if r["method"] == m) for m in {r["method"] for r in rows}}, "edits": rows}
+
+
+class FeedbackIn(BaseModel):
+    verdict: str                      # confirm | reject | wrong_category | missed | comment
+    finding_id: str | None = None
+    clause_id: str | None = None
+    correct_category: str | None = None
+    comment: str | None = None
+    user_id: str | None = None
+
+
+@app.post("/api/reviews/{rid}/feedback")
+def post_feedback(rid: str, body: FeedbackIn):
+    """Reviewer's verdict on a finding (confirm / reject / wrong category), a comment, or an issue the system missed."""
+    if body.verdict not in ("confirm", "reject", "wrong_category", "missed", "comment"): raise HTTPException(400, "bad verdict")
+    j = JOBS.get(rid)
+    if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
+    report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
+    f = next((x for x in report["findings"] if x["finding_id"] == body.finding_id), None) if body.finding_id else None
+    if body.finding_id and not f: raise HTTPException(404, "finding not found (the document was re-checked; reload)")
+    clause_text = None
+    if body.clause_id and not f:
+        clause_text = next((c["text"] for c in report.get("document_view", []) if c.get("type") == "p" and c.get("clause_id") == body.clause_id), None)
+        if clause_text is None:
+            clause_text = next((" | ".join(r["cells"]) for b in report.get("document_view", []) if b.get("type") == "table" for r in b["rows"] if r["clause_id"] == body.clause_id), None)
+    fid = store.add_feedback(db(), rid, body.verdict, finding=f, clause_id=body.clause_id, clause_text=clause_text,
+                             correct_category=body.correct_category, comment=body.comment, user_id=body.user_id)
+    return {"feedback_id": fid, "feedback": store.feedback_for(db(), rid)}
+
+
+@app.get("/api/reviews/{rid}/feedback")
+def get_feedback(rid: str):
+    return store.feedback_for(db(), rid)
+
+
+@app.get("/api/training/stats")
+def training_stats():
+    s = store.stats(db())
+    s["filter_active"] = (training.FILTER_DIR / "active.joblib").exists()
+    return s
+
+
+@app.post("/api/training/export")
+def training_export():
+    out, manifest = training.export(db())
+    return {"path": str(out.relative_to(ROOT)), "manifest": manifest, "files": sorted(p.name for p in out.iterdir())}
+
+
+@app.get("/api/training/export/{stamp}/{name}")
+def training_file(stamp: str, name: str):
+    p = training.OUT / stamp / name
+    if not re.fullmatch(r"[\w.]+", stamp + name) or not p.exists(): raise HTTPException(404)
+    return FileResponse(str(p), filename=name)
+
+
+TRAIN_STATE = {"status": "idle"}
+
+
+@app.post("/api/training/retrain")
+def training_retrain(seed_gold: bool = False):
+    """Runs in the background: optional gold seed → export → train finding filter → gold-suite gate → promote/reject."""
+    if TRAIN_STATE["status"] == "running": return TRAIN_STATE
+    def job():
+        TRAIN_STATE.update(status="running", started=datetime.datetime.now().isoformat(timespec="seconds"), result=None)
+        try:
+            conn = db()
+            if seed_gold: TRAIN_STATE["seed"] = training.seed_gold(conn)
+            TRAIN_STATE["result"] = training.retrain(conn); TRAIN_STATE["status"] = "done"
+        except Exception as ex:  # noqa
+            log.exception("retrain failed"); TRAIN_STATE.update(status="error", error=str(ex)[:300])
+    threading.Thread(target=job, daemon=True).start()
+    return {"status": "started"}
+
+
+@app.get("/api/training/retrain")
+def training_retrain_status():
+    return TRAIN_STATE
 
 
 @app.get("/api/kb")

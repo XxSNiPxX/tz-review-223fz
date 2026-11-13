@@ -29,7 +29,8 @@ def analyze(clauses, doc=None):
         if len(doc.get("items") or []) >= 2:
             findings = [f for f in findings if f["label"] != "CONTRADICTORY_REQUIREMENTS"]
         findings += [categorize(f) for f in checks_doc.run_doc_checks(doc)]
-    return findings
+    from procdata import training            # feedback-trained filter (only if one passed the gold gate); never removes findings
+    return training.apply_filter(findings)
 
 
 def conclusion(findings, doc=None):
