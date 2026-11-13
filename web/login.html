@@ -19,6 +19,11 @@
   .btn svg { width:20px; height:20px; flex:none }
   .yandex { background:#fff; color:#000; border-color:#fff } .yandex:hover { background:#f2f2f2 }
   .google { background:#fff; color:#1f1f1f; border-color:#dadce0 } .google:hover { background:#f2f2f2 }
+  .demo { background:var(--accent); color:#fff; border-color:#2565b2 } .demo:hover { background:#1557d6 }
+  .off { background:transparent; color:var(--muted); border-style:dashed; cursor:not-allowed; opacity:.75 } .off small { font-weight:400; margin-left:6px }
+  .or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; margin:14px 0 } .or::before, .or::after { content:""; flex:1; height:1px; background:var(--line) }
+  .demo-form input { width:100%; padding:10px 12px; margin:0 0 10px; border-radius:10px; border:1px solid var(--line); background:#0f1a33; color:var(--ink); font:inherit }
+  .badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; background:rgba(132,172,255,.15); color:#a7c2ff; margin-bottom:10px }
   .err { background:rgba(249,112,102,.12); border:1px solid var(--err); color:#fecdca; padding:10px 12px; border-radius:10px; font-size:13px; margin:0 0 16px; display:none }
   .note { color:var(--muted); font-size:12px; margin-top:14px; text-align:center } .none { color:var(--muted); font-size:14px; text-align:center; padding:8px 0 }
   footer { color:var(--muted); font-size:12px; text-align:center; padding:14px }
@@ -46,8 +51,16 @@ const q = new URLSearchParams(location.search);
 if (q.get('error')) { const e = document.getElementById('err'); e.textContent = q.get('error') === 'access_denied' || q.get('error') === 'cancelled' ? 'Вход отменён.' : q.get('error'); e.style.display = 'block'; }
 fetch('/api/auth/providers').then(r => r.json()).then(j => {
   const b = document.getElementById('buttons');
-  if (!j.providers.length) { b.innerHTML = '<div class="none">Вход не настроен: система открыта без авторизации.</div><a class="btn yandex" href="/">Перейти к проверке</a>'; return; }
-  b.innerHTML = j.providers.map(p => `<a class="btn ${p.id}" href="/auth/${p.id}">${ICONS[p.id] || ''}Войти через ${esc(p.name)}</a>`).join('');
+  const live = new Set(j.providers.map(p => p.id));
+  const prov = (j.all || j.providers).map(p => live.has(p.id)
+      ? `<a class="btn ${p.id}" href="/auth/${p.id}">${ICONS[p.id] || ''}Войти через ${esc(p.name)}</a>`
+      : `<span class="btn off" title="Вход через ${esc(p.name)} будет доступен после подключения">${ICONS[p.id] || ''}${esc(p.name)}<small>скоро</small></span>`).join('');
+  const demo = j.demo ? `<span class="badge">Демо-стенд хакатона</span>
+      <form class="demo-form" method="post" action="/auth/demo"><input name="name" placeholder="Ваше имя (необязательно)" maxlength="60" autocomplete="name">
+      <button class="btn demo" type="submit">Войти в демо-режиме</button></form>
+      <div class="note" style="margin:0 0 4px">Без регистрации. Ваши оценки и правки сохраняются анонимно и помогают обучать систему.</div>` : '';
+  if (!j.required) { b.innerHTML = '<div class="none">Вход не требуется: система открыта.</div><a class="btn demo" href="/">Перейти к проверке</a>'; return; }
+  b.innerHTML = demo + (demo ? '<div class="or">или</div>' : '') + prov;
   if (j.restricted) document.getElementById('note').textContent = 'Доступ ограничен списком адресов. ' + document.getElementById('note').textContent;
 });
 </script>

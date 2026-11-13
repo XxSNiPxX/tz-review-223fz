@@ -29,8 +29,18 @@ def enabled_providers():
     return [p for p in PROVIDERS if all(_cfg(p))]
 
 
+def demo_enabled():
+    return os.environ.get("AUTH_DEMO") == "1"
+
+
 def required():
-    return bool(enabled_providers()) or os.environ.get("AUTH_REQUIRED") == "1"
+    return bool(enabled_providers()) or os.environ.get("AUTH_REQUIRED") == "1" or demo_enabled()
+
+
+def demo_user(name=None):
+    """Anonymous demo session: no personal data, a random id per visitor so feedback stays separable."""
+    nm = (name or "").strip()[:60] or "Демо-пользователь"
+    return {"id": "demo:" + secrets.token_hex(6), "email": None, "name": nm, "provider": "demo"}
 
 
 def public_url(request):

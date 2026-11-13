@@ -76,7 +76,16 @@ def login_page():
 @app.get("/api/auth/providers")
 def auth_providers():
     return {"providers": [{"id": p, "name": auth.PROVIDERS[p]["name"]} for p in auth.enabled_providers()], "required": auth.required(),
+            "demo": auth.demo_enabled(), "all": [{"id": p, "name": auth.PROVIDERS[p]["name"]} for p in auth.PROVIDERS],
             "restricted": bool(os.environ.get("AUTH_ALLOWED_EMAILS") or os.environ.get("AUTH_ALLOWED_DOMAINS"))}
+
+
+@app.post("/auth/demo")
+async def auth_demo(request: Request):
+    if not auth.demo_enabled(): raise HTTPException(404, "demo login disabled")
+    form = await request.form()
+    request.session["user"] = auth.demo_user(form.get("name"))
+    return RedirectResponse("/", status_code=303)
 
 
 @app.get("/auth/{provider}")

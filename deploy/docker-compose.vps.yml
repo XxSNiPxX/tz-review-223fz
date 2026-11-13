@@ -25,6 +25,7 @@ services:
       - AUTH_ALLOWED_EMAILS=${AUTH_ALLOWED_EMAILS:-}
       - AUTH_ALLOWED_DOMAINS=${AUTH_ALLOWED_DOMAINS:-}
       - AUTH_REQUIRED=${AUTH_REQUIRED:-0}
+      - AUTH_DEMO=${AUTH_DEMO:-0}
     volumes:
       - ../data:/app/data
       - ../models:/app/models
