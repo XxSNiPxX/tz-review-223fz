@@ -1,0 +1,18 @@
+{
+ "_doc": "What each kind of characteristic expects after a number. count/dimensionless: no unit needed. physical: a unit is required; 'default' is proposed by the auto-fix.",
+ "count": ["количеств", "число", "остановк", "этаж", "дверей", "дверь", "двери", "канал", "вход", "выход", "порт", "позици", "мест", "ступен", "уровн", "скорост\\w* вентилятор", "режим", "секци", "полок", "ящик", "лотк", "розет", "ядер", "поток", "камер", "смен", "человек", "экземпляр", "комплект", "штук", "единиц", "измерени", "циклов", "пользовател", "лицензи"],
+ "dimensionless": ["класс", "степень защиты", "категори", "разряд", "сорт", "марк", "тип", "ip\\s*\\d", "версия", "поколени", "ревизи", "редакци", "номер", "код", "твердост\\w* по шкале"],
+ "physical": {
+  "масса": {"kind": "mass", "default": "кг"}, "вес": {"kind": "mass", "default": "кг"}, "грузоподъ": {"kind": "mass", "default": "кг"},
+  "длин": {"kind": "length", "default": "мм"}, "ширин": {"kind": "length", "default": "мм"}, "высот": {"kind": "length", "default": "мм"}, "глубин": {"kind": "length", "default": "мм"},
+  "толщин": {"kind": "length", "default": "мм"}, "диаметр": {"kind": "length", "default": "мм"}, "габарит": {"kind": "length", "default": "мм"}, "диагонал": {"kind": "length", "default": "дюйм"},
+  "мощност": {"kind": "power", "default": "Вт"}, "напряжени": {"kind": "voltage", "default": "В"}, "ток": {"kind": "current", "default": "А"}, "частот": {"kind": "frequency", "default": "Гц"},
+  "давлени": {"kind": "pressure", "default": "МПа"}, "температур": {"kind": "temperature", "default": "°C"}, "объ[её]м": {"kind": "volume", "default": "л"}, "емкост": {"kind": "volume", "default": "л"},
+  "ёмкост": {"kind": "volume", "default": "л"}, "скорост": {"kind": "speed", "default": "м/с"}, "расход": {"kind": "flow", "default": "л/мин"}, "производительност": {"kind": "rate", "default": "[ед./ч]"},
+  "память": {"kind": "data", "default": "ГБ"}, "озу": {"kind": "data", "default": "ГБ"}, "накопител": {"kind": "data", "default": "ГБ"}, "яркост": {"kind": "luminance", "default": "кд/м²"},
+  "погрешност": {"kind": "accuracy", "default": "[ед. изм.]"}, "точност": {"kind": "accuracy", "default": "[ед. изм.]"}, "разрешени": {"kind": "resolution", "default": "пикс."},
+  "срок": {"kind": "time", "default": "мес."}, "гаранти": {"kind": "time", "default": "мес."}, "ресурс": {"kind": "time", "default": "ч"}, "наработк": {"kind": "time", "default": "ч"},
+  "время": {"kind": "time", "default": "ч"}, "площад": {"kind": "area", "default": "м²"}, "крутящ": {"kind": "torque", "default": "Н·м"}, "сил": {"kind": "force", "default": "Н"}, "шум": {"kind": "sound", "default": "дБ"}
+ },
+ "count_nouns_after_number": ["остановк", "этаж", "двер", "канал", "вход", "выход", "порт", "позици", "мест", "уров", "скорост", "режим", "секци", "полк", "лотк", "розет", "ядр", "поток", "камер", "смен", "человек", "шт", "компл", "ед", "измерени", "цикл", "пользовател", "раз"]
+}
