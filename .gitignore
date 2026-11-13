@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 kb_release_*.tar.gz*
 .claude/
+.env
+*.gguf
+*.safetensors
