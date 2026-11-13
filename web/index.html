@@ -71,6 +71,7 @@
 <header>
   <div class="brand"><img src="/static/logo.svg" alt="МФТИ"><span class="sep"></span><h1>Проверка технического задания · 223-ФЗ<small>Хакатон МФТИ · Задача 1 · интеллектуальная проверка ТЗ</small></h1></div>
   <span class="kb" id="kb">база знаний…</span>
+  <span id="who" class="muted" style="font-size:12px;white-space:nowrap"></span>
   <button class="ghost" id="theme" title="Светлая / тёмная тема" onclick="toggleTheme()">☾</button>
   <button class="ghost" id="back" style="display:none" onclick="goHome()">← Новая проверка</button>
 </header>
@@ -317,7 +318,11 @@ function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.re
   const ce = f.clause_id && document.getElementById('c_'+f.clause_id); if(ce){ ce.classList.add('sel'); ce.scrollIntoView({block:'center', behavior:'smooth'}); } }
 function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
 
-kb(); procs(); jobs(); trainStats();
+async function whoami(){ try{ const j = await (await fetch('/api/me')).json(); const u = j.user;
+  $('#who').innerHTML = u ? `${esc(u.name||u.email)} <span class="muted">(${u.provider==='yandex'?'Яндекс':'Google'})</span> · <a href="/logout" style="color:var(--accent2)">выйти</a>` : (j.required ? '<a href="/login">войти</a>' : ''); }catch(e){} }
+// session expired while the page was open: any 401 from the API sends the user to the login page
+const _fetch = window.fetch; window.fetch = async (...a) => { const r = await _fetch(...a); if (r.status === 401 && String(a[0]).startsWith('/api/')) location.href = '/login'; return r; };
+kb(); procs(); jobs(); trainStats(); whoami();
 </script>
 </body>
 </html>

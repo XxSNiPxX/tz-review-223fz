@@ -22,7 +22,7 @@ echo "== 1b Stop whatever else serves on ports 80/443/8000 (recorded in $DIR/sto
 $SSH "mkdir -p $DIR; LOG=$DIR/stopped_services.txt; date >> \$LOG
   echo '--- listeners before:'; ss -ltnp | grep -E ':(80|443|8000)\\b' || echo none
   if command -v docker >/dev/null; then
-    for c in \$(docker ps --format '{{.ID}} {{.Names}} {{.Ports}}' | grep -E ':(80|443|8000)->' | grep -v ' tz-review ' | awk '{print \$1}'); do
+    for c in \$(docker ps --format '{{.ID}} {{.Names}} {{.Ports}}' | grep -E ':(80|443|8000)->' | grep -v -E ' (tz-review|tz-caddy) ' | awk '{print \$1}'); do
       echo \"docker container \$(docker inspect -f '{{.Name}} {{.Config.Image}} restart={{.HostConfig.RestartPolicy.Name}}' \$c)\" | tee -a \$LOG
       docker update --restart=no \$c >/dev/null; docker stop \$c >/dev/null && echo '  stopped (not removed)'
     done
@@ -67,12 +67,18 @@ if [ "$LITE" != "1" ]; then rsync -az --relative "$E5/./config.json" "$E5/./mode
 if [ "$WITH_LLM" = "1" ]; then rsync -az --info=progress2 models/Qwen2.5-7B-Instruct-Q4_K_M.gguf "$TARGET:$DIR/models/"; fi
 
 echo "== 5/6 Build and start (first build 5-10 min)"
-$SSH "cd $DIR && printf 'WITH_LLM=%s\nLITE=%s\nREVIEW_BASIC_AUTH=%s\n' '$WITH_LLM' '$LITE' '${REVIEW_BASIC_AUTH:-}' > deploy/.env && \
+SITE_DOMAIN="${SITE_DOMAIN:-$(echo "$HOST" | tr . -).sslip.io}"
+$SSH "cd $DIR && touch deploy/.env && \
+      grep -v -E '^(WITH_LLM|LITE|REVIEW_BASIC_AUTH|SITE_DOMAIN|HOST_IP)=' deploy/.env > deploy/.env.new || true; \
+      printf 'WITH_LLM=%s\nLITE=%s\nREVIEW_BASIC_AUTH=%s\nSITE_DOMAIN=%s\nHOST_IP=%s\n' '$WITH_LLM' '$LITE' '${REVIEW_BASIC_AUTH:-}' '$SITE_DOMAIN' '$HOST' >> deploy/.env.new; \
+      grep -q '^SESSION_SECRET=.\+' deploy/.env.new || echo SESSION_SECRET=\$(openssl rand -hex 32) >> deploy/.env.new; \
+      mv deploy/.env.new deploy/.env && chmod 600 deploy/.env && \
+      (docker rm -f tz-review >/dev/null 2>&1 || true) && \
       docker compose --env-file deploy/.env -f deploy/docker-compose.vps.yml up -d --build && \
-      (command -v ufw >/dev/null && ufw status | grep -q active && ufw allow 80/tcp || true)"
+      (command -v ufw >/dev/null && ufw status | grep -q active && ufw allow 80/tcp && ufw allow 443/tcp || true)"
 
 echo "== 6/6 Health check"
-for i in $(seq 1 30); do
-  if curl -s -m 5 "http://$HOST/api/health" | grep -q ok; then echo "UP: http://$HOST/"; exit 0; fi; sleep 5
+for i in $(seq 1 40); do
+  if curl -s -m 8 "https://$SITE_DOMAIN/api/health" | grep -q ok; then echo "UP: https://$SITE_DOMAIN/  (http://$HOST/ redirects there)"; exit 0; fi; sleep 6
 done
-echo "not responding yet; logs:"; $SSH "cd $DIR && docker compose -f deploy/docker-compose.vps.yml logs --tail 40"; exit 1
+echo "not responding yet; logs:"; $SSH "cd $DIR && docker compose --env-file deploy/.env -f deploy/docker-compose.vps.yml logs --tail 40"; exit 1

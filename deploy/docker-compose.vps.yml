@@ -1,5 +1,5 @@
-# Public deployment on a CPU VPS. Usage (on the server, in the project dir):
-#   docker compose -f deploy/docker-compose.vps.yml up -d --build
+# Public deployment on a CPU VPS: Caddy (HTTPS, ports 80/443) -> review server (internal port 8000).
+#   docker compose --env-file deploy/.env -f deploy/docker-compose.vps.yml up -d --build
 services:
   review:
     build:
@@ -9,14 +9,41 @@ services:
         LITE: "${LITE:-0}"                # 1 = no PyTorch models (servers with <2 GB RAM)
     image: tz-review:vps
     container_name: tz-review
-    ports: ["80:8000"]
+    expose: ["8000"]
     environment:
       - REVIEW_HOST=0.0.0.0
       - REVIEW_PORT=8000
       - REVIEW_USE_LLM=${WITH_LLM:-0}
       - REVIEW_LITE=${LITE:-0}
-      - REVIEW_BASIC_AUTH=${REVIEW_BASIC_AUTH:-}     # "user:password" to protect the page; empty = open to everyone
+      - REVIEW_BASIC_AUTH=${REVIEW_BASIC_AUTH:-}
+      - AUTH_PUBLIC_URL=https://${SITE_DOMAIN}
+      - SESSION_SECRET=${SESSION_SECRET:-}
+      - AUTH_YANDEX_CLIENT_ID=${AUTH_YANDEX_CLIENT_ID:-}
+      - AUTH_YANDEX_CLIENT_SECRET=${AUTH_YANDEX_CLIENT_SECRET:-}
+      - AUTH_GOOGLE_CLIENT_ID=${AUTH_GOOGLE_CLIENT_ID:-}
+      - AUTH_GOOGLE_CLIENT_SECRET=${AUTH_GOOGLE_CLIENT_SECRET:-}
+      - AUTH_ALLOWED_EMAILS=${AUTH_ALLOWED_EMAILS:-}
+      - AUTH_ALLOWED_DOMAINS=${AUTH_ALLOWED_DOMAINS:-}
+      - AUTH_REQUIRED=${AUTH_REQUIRED:-0}
     volumes:
       - ../data:/app/data
       - ../models:/app/models
     restart: always
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: tz-caddy
+    depends_on: [review]
+    ports: ["80:80", "443:443"]
+    environment:
+      - SITE_DOMAIN=${SITE_DOMAIN}
+      - HOST_IP=${HOST_IP}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: always
+
+volumes:
+  caddy_data:
+  caddy_config:

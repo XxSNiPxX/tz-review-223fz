@@ -17,11 +17,13 @@ API
 import json, os, re, threading, uuid, datetime, shutil, logging
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi import Request
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed, store, training
+from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed, store, training, auth
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -44,6 +46,67 @@ if _BASIC:
 @app.get("/api/health")
 def health():
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- login (Yandex ID / Google)
+PUBLIC_PATHS = ("/login", "/auth/", "/static/", "/api/health", "/api/auth/")
+
+
+@app.middleware("http")
+async def _require_login(request, call_next):
+    if auth.required() and not request.url.path.startswith(PUBLIC_PATHS) and not request.session.get("user"):
+        if request.url.path.startswith("/api/"):
+            return JSONResponse({"detail": "требуется вход"}, status_code=401)
+        return RedirectResponse("/login?next=" + request.url.path)
+    return await call_next(request)
+
+
+_secret = os.environ.get("SESSION_SECRET") or ("dev-" + uuid.uuid4().hex)
+if auth.required() and not os.environ.get("SESSION_SECRET"):
+    log.warning("SESSION_SECRET not set: sessions reset on every restart")
+app.add_middleware(SessionMiddleware, secret_key=_secret, session_cookie="tz_session", max_age=14 * 24 * 3600,
+                   same_site="lax", https_only=os.environ.get("AUTH_PUBLIC_URL", "").startswith("https"))
+
+
+@app.get("/login")
+def login_page():
+    return FileResponse(str(ROOT / "web" / "login.html"), headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/api/auth/providers")
+def auth_providers():
+    return {"providers": [{"id": p, "name": auth.PROVIDERS[p]["name"]} for p in auth.enabled_providers()], "required": auth.required(),
+            "restricted": bool(os.environ.get("AUTH_ALLOWED_EMAILS") or os.environ.get("AUTH_ALLOWED_DOMAINS"))}
+
+
+@app.get("/auth/{provider}")
+def auth_start(provider: str, request: Request):
+    if provider not in auth.enabled_providers(): raise HTTPException(404, "provider not configured")
+    return RedirectResponse(auth.authorize_redirect(request, provider))
+
+
+@app.get("/auth/{provider}/callback")
+def auth_callback(provider: str, request: Request, code: str = "", state: str = "", error: str = ""):
+    if error or not code: return RedirectResponse("/login?error=" + (error or "cancelled"))
+    user, err = auth.finish(request, provider, code, state)
+    if err: return RedirectResponse("/login?error=" + err)
+    request.session["user"] = user
+    return RedirectResponse("/")
+
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear(); return RedirectResponse("/login" if auth.required() else "/")
+
+
+@app.get("/api/me")
+def me(request: Request):
+    return {"user": request.session.get("user"), "required": auth.required()}
+
+
+def _uid(request):
+    u = request.session.get("user") if request is not None else None
+    return u and (u.get("email") or u.get("id"))
 CFG = load_config()
 UPLOADS = ROOT / "data" / "uploads"; UPLOADS.mkdir(parents=True, exist_ok=True)
 REVIEWS = ROOT / "data" / "reviews"; REVIEWS.mkdir(parents=True, exist_ok=True)
@@ -312,7 +375,7 @@ class EditIn(BaseModel):
 
 
 @app.post("/api/reviews/{rid}/edits")
-def apply_edit(rid: str, body: EditIn):
+def apply_edit(rid: str, body: EditIn, request: Request):
     """Apply one edit to the working document, re-run the full check synchronously, store the edit as training data."""
     j = JOBS.get(rid)
     if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
@@ -338,7 +401,7 @@ def apply_edit(rid: str, body: EditIn):
                  "resolved, findings_before, findings_after, user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                  (edit_id, rid, j["source"], body.clause_id, (before[0].get("anchors") or [None])[0] if before else None, json.dumps(body.finding_ids),
                   json.dumps([f["label"] for f in before], ensure_ascii=False), json.dumps([f.get("case_category") for f in before], ensure_ascii=False),
-                  old, body.proposed_text, body.new_text, body.method, int(len(after) == 0), len(before), len(after), body.user_id))
+                  old, body.proposed_text, body.new_text, body.method, int(len(after) == 0), len(before), len(after), _uid(request) or body.user_id))
     conn.commit()
     new_report["edits"] = _edits_for(rid); new_report["edited_clauses"] = sorted(set(new_report.get("edited_clauses", [])) | {body.clause_id})
     _write_report(rid, new_report)
@@ -413,7 +476,7 @@ class FeedbackIn(BaseModel):
 
 
 @app.post("/api/reviews/{rid}/feedback")
-def post_feedback(rid: str, body: FeedbackIn):
+def post_feedback(rid: str, body: FeedbackIn, request: Request):
     """Reviewer's verdict on a finding (confirm / reject / wrong category), a comment, or an issue the system missed."""
     if body.verdict not in ("confirm", "reject", "wrong_category", "missed", "comment"): raise HTTPException(400, "bad verdict")
     j = JOBS.get(rid)
@@ -427,7 +490,7 @@ def post_feedback(rid: str, body: FeedbackIn):
         if clause_text is None:
             clause_text = next((" | ".join(r["cells"]) for b in report.get("document_view", []) if b.get("type") == "table" for r in b["rows"] if r["clause_id"] == body.clause_id), None)
     fid = store.add_feedback(db(), rid, body.verdict, finding=f, clause_id=body.clause_id, clause_text=clause_text,
-                             correct_category=body.correct_category, comment=body.comment, user_id=body.user_id)
+                             correct_category=body.correct_category, comment=body.comment, user_id=_uid(request) or body.user_id)
     return {"feedback_id": fid, "feedback": store.feedback_for(db(), rid)}
 
 
