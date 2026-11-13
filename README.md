@@ -207,6 +207,19 @@ Output: `data/reviews/<source>.json` (finding schema from the architecture doc) 
 separate sections. On the first linked procurement the rule tier went from 174 raw findings to 8 after scoping
 and the lexicon fixes; the brand findings there are real (Polair models without an equivalence clause).
 
+## Feedback and training loop
+
+Every check, finding, reviewer verdict (верно / ложное / другая категория), comment, missed problem and edit is stored
+(`reviews`, `review_findings`, `feedback`, `edits`, `model_registry`). The start page has a training panel with counts,
+dataset export and retraining. Retraining is gated by the gold suite: a model is promoted only if it loses no mandatory
+correction, adds no false positive and downgrades nothing that must stay an error. Details: `docs/training_loop.md`.
+
+```bash
+python collect.py training-seed-gold   # gold suite -> feedback rows
+python collect.py training-export      # data/training/<stamp>/*.jsonl
+python collect.py retrain              # train finding filter, gate, promote/reject, register
+```
+
 ## Editing loop and training data
 
 In the UI every finding has «Исправить фрагмент»: the fragment opens in an editor (table rows as cells joined by « | »).

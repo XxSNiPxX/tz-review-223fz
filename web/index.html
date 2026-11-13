@@ -57,6 +57,11 @@
   .editor textarea { width:100%; min-height:110px; font:13px/1.45 Georgia,"Times New Roman",serif; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); resize:vertical }
   .editor .row { margin-top:8px } .editor .hint { font-size:12px; color:var(--muted); margin-top:6px } .busy { opacity:.6; pointer-events:none }
   .edited { outline:2px dashed var(--ok); outline-offset:1px } .mark.OK { background:var(--ok) }
+  .fb { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:6px; font-size:12px } .fb button { padding:3px 9px; font-size:12px; font-weight:500 }
+  .fb .done { color:var(--ok); font-weight:600 } .fb select, .fb input { font:inherit; font-size:12px; padding:3px 6px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink) }
+  .plain { cursor:context-menu } .plain:hover { background:var(--tint); border-radius:4px }
+  .missed { box-shadow:inset 3px 0 0 #7c3aed; background:rgba(124,58,237,.12) }
+  .train-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:8px 0 } .train-grid div { border:1px solid var(--line); border-radius:8px; padding:8px 10px } .train-grid b { font-size:18px; display:block }
   .toast { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); background:var(--card); border:1px solid var(--line); border-left:4px solid var(--ok); border-radius:10px; padding:10px 14px; box-shadow:0 6px 24px rgba(0,0,0,.25); z-index:20; font-size:13px }
   dialog { border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); max-width:820px; width:92vw } pre { white-space:pre-wrap; font-size:12px; background:var(--bg); padding:10px; border-radius:8px; max-height:60vh; overflow:auto }
   @media (max-width: 900px) { .panes { grid-template-columns:1fr; grid-template-rows:1fr 1fr } .doc { border-right:0; border-bottom:1px solid var(--line) } }
@@ -87,6 +92,18 @@
   <div class="card">
     <h2 style="font-size:15px;margin:0 0 8px">Последние проверки</h2>
     <table class="jobs"><thead><tr><th>Документ</th><th>Статус</th><th>Итог</th><th></th></tr></thead><tbody id="jobs"></tbody></table>
+  </div>
+  <div class="card">
+    <h2 style="font-size:15px;margin:0 0 4px">Обучение на обратной связи</h2>
+    <div class="muted" style="font-size:12px">Каждая проверка, каждое замечание, оценка эксперта («верно / ложное / не та категория»), комментарий, пропущенная проблема и правка сохраняются в базе. Из них собираются датасеты; фильтр замечаний переобучается и включается, только если не ухудшает результат на эталонных документах.</div>
+    <div class="train-grid" id="tstats"></div>
+    <div class="row">
+      <button class="secondary" onclick="trainExport()">Выгрузить датасеты</button>
+      <button onclick="trainRun(false)">Переобучить</button>
+      <button class="ghost" onclick="trainRun(true)" title="Добавить разметку из эталонных документов кейса">Переобучить + эталоны</button>
+      <span class="muted" id="tstatus" style="font-size:12px"></span>
+    </div>
+    <div id="tmodels" style="margin-top:8px;font-size:12px"></div>
   </div>
 </section>
 
@@ -184,8 +201,10 @@ function visible(f){ return (!filter.sev || f.severity===filter.sev) && (!filter
 function sevOf(fs){ return fs.reduce((m,f)=>ORDER[f.severity]<ORDER[m]?f.severity:m,'NOTE'); }
 function marks(fs){ return fs.map(f=>`<span class="mark ${f.severity}" title="${esc(CATS[f.case_category]||'')}">${f._n}</span>`).join(''); }
 const edited = () => new Set(R.edited_clauses||[]);
+const missedSet = () => new Set((R.feedback||[]).filter(x=>x.verdict==='missed').map(x=>x.clause_id));
 function wrap(id, text){ const fs = byClause[id]; const ed = edited().has(id);
-  if(!fs) return ed ? `<span class="hl edited" id="c_${id}">${esc(text)}<span class="mark OK" title="исправлено, замечаний нет">✓</span></span>` : esc(text);
+  if(!fs) { if (ed) return `<span class="hl edited" id="c_${id}">${esc(text)}<span class="mark OK" title="исправлено, замечаний нет">✓</span></span>`;
+    return `<span class="plain ${missedSet().has(id)?'missed':''}" id="c_${id}" title="Система ничего не нашла здесь. Щёлкните, чтобы сообщить о пропущенной проблеме." onclick="reportMissed('${id}')">${esc(text)}</span>`; }
   return `<span class="hl ${sevOf(fs)} ${ed?'edited':''}" id="c_${id}" onclick="select_(${fs[0]._n})">${esc(text)}${marks(fs)}</span>`; }
 
 function renderDoc(){ const view = R.document_view || [];
@@ -206,6 +225,7 @@ function renderList(){ const fs = R.findings.filter(visible);
     <div class="expl">${esc(f.explanation)}</div>
     ${f.proposed_text?`<div class="prop"><b>Предложение:</b> ${esc(f.proposed_text)}</div>`:''}
     ${f.clause_id?`<div class="row" style="margin-top:6px"><button class="secondary" onclick="event.stopPropagation();openEditor(${f._n})">Исправить фрагмент</button></div>`:''}
+    <div class="fb" onclick="event.stopPropagation()">${fbBlock(f)}</div>
     <div id="ed_${f._n}"></div>
     ${ev.length?`<details><summary>Основание (${ev.length})</summary><div class="ev">${ev.map(o=>`<a onclick='event.stopPropagation();ev(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${esc(o.id)}</a>`).join('')}</div></details>`:'<div class="ev">Основание: правило проверки по структуре документа</div>'}
   </div>`; }).join('') || '<div class="muted">Нет замечаний в этом фильтре</div>'; }
@@ -258,12 +278,46 @@ async function applyEdit(n, how){ const f = R.findings.find(x=>x._n===n); const 
   }catch(e){ ed.classList.remove('busy'); const h=$('#hint_'+n); if(h) h.innerHTML = '<b style="color:var(--err)">Не применено:</b> '+esc(e.message); toast('Правка не применена: '+e.message, true); } }
 function dlEdited(){ if(RID) window.open(`/api/reviews/${RID}/edited.docx`, '_blank'); }
 function toast(msg, warn){ const t=document.createElement('div'); t.className='toast'; if(warn) t.style.borderLeftColor='var(--risk)'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), warn?10000:6000); }
+function fbFor(f){ return (R.feedback||[]).filter(x=>x.finding_id===f.finding_id); }
+function fbBlock(f){ const fb = fbFor(f); const last = fb.filter(x=>x.verdict!=='comment').slice(-1)[0];
+  const lbl = {confirm:'отмечено: верно', reject:'отмечено: ложное', wrong_category:'отмечено: другая категория'};
+  const comments = fb.filter(x=>x.comment && x.source!=='gold_suite').map(x=>`<div class="muted">💬 ${esc(x.comment)}</div>`).join('');
+  return `${last?`<span class="done">✓ ${lbl[last.verdict]||last.verdict}${last.correct_category?' → '+esc(CATS[last.correct_category]||last.correct_category):''}</span>`:'<span class="muted">Оценка эксперта:</span>'}
+    <button class="ghost" onclick="sendFb(${f._n},'confirm')">Верно</button>
+    <button class="ghost" onclick="sendFb(${f._n},'reject')">Ложное</button>
+    <select onchange="if(this.value) sendFb(${f._n},'wrong_category',this.value)"><option value="">Другая категория…</option>${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+    <input placeholder="комментарий…" onkeydown="if(event.key==='Enter'&&this.value.trim()) sendFb(${f._n},'comment',null,this.value)">
+    <div style="width:100%">${comments}</div>`; }
+async function sendFb(n, verdict, cat, comment){ const f = R.findings.find(x=>x._n===n); if(!f) return;
+  const r = await fetch(`/api/reviews/${RID}/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({verdict, finding_id:f.finding_id, correct_category:cat||null, comment:comment||null})});
+  const j = await r.json(); if(!r.ok){ toast('Не сохранено: '+(j.detail||''), true); return; }
+  R.feedback = j.feedback; const card = $('#f_'+n); if(card){ const box = card.querySelector('.fb'); if(box) box.innerHTML = fbBlock(f); }
+  toast(verdict==='comment'?'Комментарий сохранён':'Оценка сохранена в базу обучения'); }
+function reportMissed(id){ document.querySelectorAll('.editor').forEach(e=>e.remove());
+  const el = document.getElementById('c_'+id); if(!el) return; const box = document.createElement('div'); box.className='editor'; box.onclick=e=>e.stopPropagation();
+  box.innerHTML = `<div style="font-weight:600;margin-bottom:4px">Система пропустила проблему в этом фрагменте?</div>
+    <div class="row"><select id="mcat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+    <input type="text" id="mcom" placeholder="что не так (необязательно)" style="flex:1"></div>
+    <div class="row"><button onclick="sendMissed('${id}')">Сохранить</button><button class="ghost" onclick="this.closest('.editor').remove()">Отмена</button></div>`;
+  (el.closest('p')||el.closest('tr')||el).insertAdjacentElement('afterend', box); }
+async function sendMissed(id){ const r = await fetch(`/api/reviews/${RID}/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({verdict:'missed', clause_id:id, correct_category:$('#mcat').value, comment:$('#mcom').value||null})});
+  const j = await r.json(); if(!r.ok){ toast('Не сохранено: '+(j.detail||''), true); return; } R.feedback=j.feedback; document.querySelectorAll('.editor').forEach(e=>e.remove());
+  const el=document.getElementById('c_'+id); if(el) el.classList.add('missed'); toast('Пропущенная проблема сохранена в базу обучения'); }
+async function trainStats(){ try{ const s = await (await fetch('/api/training/stats')).json(); const v=s.by_verdict||{};
+  $('#tstats').innerHTML = [['Проверок',s.reviews],['Замечаний показано',s.findings_shown],['Оценок «верно»',v.confirm||0],['Оценок «ложное»',v.reject||0],['Другая категория',v.wrong_category||0],['Пропущено',v.missed||0],['Комментариев',v.comment||0],['Правок',s.edits]].map(([l,n])=>`<div><b>${n??0}</b>${l}</div>`).join('');
+  $('#tmodels').innerHTML = (s.models||[]).length ? '<b>Модели:</b> '+s.models.map(m=>`${esc(m.model_id)} — <span class="pill ${m.status==='promoted'?'ok':''}">${esc(m.status)}</span> n=${m.n_train}${m.gold_must?` · эталон ${m.gold_must}, ложных ${m.gold_fp}`:''}`).join('<br>') + (s.filter_active?'<br><span class="muted">Активный фильтр замечаний включён.</span>':'') : '<span class="muted">Моделей пока нет.</span>'; }catch(e){} }
+async function trainExport(){ const j = await (await fetch('/api/training/export',{method:'POST'})).json(); const stamp = j.path.split('/').pop();
+  $('#tstatus').innerHTML = 'Выгружено: ' + j.files.map(f=>`<a href="/api/training/export/${stamp}/${f}" target="_blank">${f}</a>`).join(' · ') + ` · ${JSON.stringify(j.manifest.counts)}`; }
+async function trainRun(seed){ await fetch('/api/training/retrain'+(seed?'?seed_gold=true':''),{method:'POST'}); $('#tstatus').textContent='Обучение запущено (проверка на эталонах занимает около минуты)…';
+  for(;;){ await new Promise(r=>setTimeout(r,3000)); const s = await (await fetch('/api/training/retrain')).json();
+    if(s.status==='done'){ const r=s.result; $('#tstatus').textContent = r.status==='skipped' ? 'Недостаточно данных: '+r.reason : `Модель ${r.model_id}: ${r.status==='promoted'?'включена':'отклонена проверкой на эталонах'} · F1=${r.metrics.cv_macro_f1} · эталон до ${r.gold_before.must}/${r.gold_before.must_total}, ложных ${r.gold_before.fp} → после ${r.gold_after.must}/${r.gold_after.must_total}, ложных ${r.gold_after.fp}`; trainStats(); return; }
+    if(s.status==='error'){ $('#tstatus').textContent='Ошибка обучения: '+s.error; return; } } }
 function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.remove('sel')); const f = R.findings.find(x=>x._n===n); if(!f) return;
   const fe = $('#f_'+n); if(fe){ fe.classList.add('sel'); fe.scrollIntoView({block:'nearest', behavior:'smooth'}); }
   const ce = f.clause_id && document.getElementById('c_'+f.clause_id); if(ce){ ce.classList.add('sel'); ce.scrollIntoView({block:'center', behavior:'smooth'}); } }
 function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
 
-kb(); procs(); jobs();
+kb(); procs(); jobs(); trainStats();
 </script>
 </body>
 </html>

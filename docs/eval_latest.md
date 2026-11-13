@@ -1,4 +1,4 @@
-Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 7177.71it/s]
+Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 2457.83it/s]
 
 === lift_source.docx: 14 findings, kind=WORKS
   [OK ] must L1 CONTRADICTION          Тип лифта: таблица характеристик говорит «пассажирский», предмет закупки и специ  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
@@ -66,3 +66,4 @@
   [OK ] must I9 WARRANTY               гарантия на товар от КС-2  <- WARRANTY_BASIS_MISMATCH (FLAGGED)
 
 RECALL must: 27/27   optional: 7/7   FALSE POSITIVES on corrected docs: 0
+MUST NOT DOWNGRADED BY FILTER: 27/27
