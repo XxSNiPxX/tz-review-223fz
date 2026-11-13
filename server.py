@@ -79,6 +79,7 @@ def db():
 
 
 def indexes():
+    if os.environ.get("REVIEW_LITE") == "1": return None, None      # small servers: no embedding model in memory
     if "rules" not in _idx:
         try:
             _idx["rules"], _idx["prec"] = kb_index.Index("rules"), kb_index.Index("precedents")
@@ -484,7 +485,7 @@ def kb():
     conn = db()
     counts = {t: conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("procurements", "documents", "clauses", "legal_rules", "law_texts", "fas_cases", "fas_documents", "fas_findings")}
     r, p = indexes()
-    return {"counts": counts, "retrieval_index": bool(r), "llm_available": explain.available(), "lexicon_terms": len(checks.LEX["vague_terms"]),
+    return {"counts": counts, "retrieval_index": bool(r), "lite": os.environ.get("REVIEW_LITE") == "1", "llm_available": explain.available(), "lexicon_terms": len(checks.LEX["vague_terms"]),
             "linked_procurements": conn.execute("SELECT COUNT(DISTINCT p.procurement_id) FROM procurements p JOIN clauses c ON c.procurement_id=p.procurement_id JOIN fas_findings f ON f.procurement_notice_id=p.eis_id").fetchone()[0]}
 
 
