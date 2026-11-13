@@ -9,6 +9,27 @@ from pathlib import Path
 from .common import ROOT
 
 LEX = json.loads((ROOT / "kb" / "lexicon.json").read_text(encoding="utf-8"))
+ATTR = json.loads((ROOT / "kb" / "attribute_units.json").read_text(encoding="utf-8"))
+_COUNT = re.compile(r"(" + "|".join(ATTR["count"]) + r")", re.I)
+_DIMLESS = re.compile(r"(" + "|".join(ATTR["dimensionless"]) + r")", re.I)
+_PHYS = [(re.compile(k, re.I), v) for k, v in ATTR["physical"].items()]
+_COUNT_NOUN = re.compile(r"^\s*(?:" + "|".join(ATTR["count_nouns_after_number"]) + r")", re.I)
+
+
+def number_context(text, start, end):
+    """Classify one bare number by the nearest attribute word before it and the word right after it.
+    Returns ('count'|'dimensionless'|'physical'|'unknown', default_unit or None)."""
+    after = text[end:end + 20]
+    if _COUNT_NOUN.match(after): return "count", None
+    before = text[max(0, start - 70):start]
+    seg = re.split(r"[;•\n|]|\.\s", before)[-1].lower()           # same item / cell only
+    best = None
+    for pat, kind, unit in ([(m, "count", None) for m in _COUNT.finditer(seg)] + [(m, "dimensionless", None) for m in _DIMLESS.finditer(seg)]
+                            + [(m, "physical", v["default"]) for rx, v in _PHYS for m in rx.finditer(seg)]):
+        if best is None or pat.end() > best[0]: best = (pat.end(), kind, unit)
+    if best is None: return "unknown", None
+    # «количество X» where X itself is physical (e.g. «количество тепла») stays physical; plain counts win otherwise
+    return best[1], best[2]
 NUM = r"\d+(?:[.,]\d+)?"
 UNIT_ALT = "|".join(sorted((re.escape(u) for u in LEX["units"]), key=len, reverse=True))
 NUM_WITH_UNIT = re.compile(rf"({NUM})\s*({UNIT_ALT})(?![а-яa-z])", re.I)
@@ -74,14 +95,27 @@ def check_missing_units(clause):
     near = {m.group(2) for m in cue_re.finditer(t)}
     bare = [n for n in bare if n in near]
     if not bare: return []
+    # attribute knowledge: counts («4 остановки», «каналов не менее 4») and classes need no unit
+    kept, units = [], []
+    for n in bare:
+        for m in re.finditer(r"(?<![\d.,])" + re.escape(n) + r"(?!\d|[.,]\d)", t):
+            kind, unit = number_context(t, m.start(), m.end())
+            if kind == "physical":
+                kept.append(n); units.append(unit); break
+    bare = kept
+    if not bare: return []
     if re.search(r"класс(?:а|ом)?\s+точност|разряд|категори|класс защиты|степень защиты|ip\s*\d", tl):
         return []                                             # dimensionless class / grade numbers
     tight = re.compile(r"(" + "|".join(map(re.escape, LEX["numeric_attribute_cues"])) + r")\w*\s*(?:[:\-–—]|не менее|не более|до|от)?\s*(" + NUM + r")(?![\d%°/-]|[.,]\d)", re.I)
     confident = bool(tight.search(t)) and not with_unit
-    return [_f(clause, "COMPLETENESS", "MISSING_UNIT", "ERROR" if confident else "RISK",
+    out = [_f(clause, "COMPLETENESS", "MISSING_UNIT", "ERROR" if confident else "RISK",
                f"Числовое значение ({', '.join(bare[:3])}) указано без единицы измерения при наличии измеримой характеристики." + ("" if confident else " Требует проверки: рядом есть другие значения с единицами."),
                [{"type": "lexicon", "id": "units"}], proposed="Указать единицу измерения для каждого числового значения (например, «не менее 16 ГБ»).",
                confidence=0.7 if confident else 0.45, disposition="FLAGGED" if confident else "INSUFFICIENT_EVIDENCE", matched=bare[:5])]
+    out[0]["expected_units"] = units[:5]
+    if units and units[0] and not units[0].startswith("["):
+        out[0]["proposed_text"] = f"Указать единицу измерения: например, «{bare[0]} {units[0]}»."
+    return out
 
 
 def check_vague(clause):
