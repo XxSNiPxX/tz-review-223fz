@@ -47,6 +47,7 @@ $SSH 'swapon --show | grep -q . && echo "swap present" || (fallocate -l 2G /swap
 
 echo "== 2/6 Docker"
 $SSH 'command -v docker >/dev/null && docker compose version >/dev/null 2>&1 && echo "docker present" || (export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && (apt-get install -y -qq docker.io docker-compose-v2 || apt-get install -y -qq docker.io docker-compose-plugin) && systemctl enable --now docker && docker --version)'
+$SSH 'command -v rsync >/dev/null || (DEBIAN_FRONTEND=noninteractive apt-get install -y -qq rsync >/dev/null && echo "rsync installed")'
 $SSH "mkdir -p $DIR/data/index $DIR/models"
 
 echo "== 3/6 Code (tracked files only)"
