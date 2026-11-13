@@ -10,20 +10,24 @@ DISP = {"FLAGGED": "подтверждено правилом", "INSUFFICIENT_EV
 
 
 def document_view(doc, clauses):
-    """Ordered blocks for rendering: paragraphs and tables, each cell/paragraph carrying its clause_id."""
+    """Ordered blocks for rendering. Every paragraph gets a number «¶n» and every table row «Т<t>.<r>»; each block also
+    carries the anchor string used in findings, so the UI can turn any reference into a scroll-to link."""
+    anchors = {c["clause_id"]: c.get("anchor") for c in clauses}
     if not doc:
-        return [{"type": "p", "clause_id": c["clause_id"], "text": c["clause_text"], "anchor": c.get("anchor") or c.get("document_name")} for c in clauses]
-    blocks, emitted = [], set()
+        return [{"type": "p", "clause_id": c["clause_id"], "text": c["clause_text"], "num": f"¶{i}", "anchor": c.get("anchor")} for i, c in enumerate(clauses, 1)]
+    blocks, emitted, pn = [], set(), 0
+    tnum = {t["table_id"]: i for i, t in enumerate(doc["tables"], 1)}
     for s in doc["sections"]:
         if s["section_id"] != "S0" or s["paragraphs"]:
             blocks.append({"type": "h", "text": (s["number"] + ". " if s["number"] != "0" else "") + s["title"], "section_id": s["section_id"]})
         for p in s["paragraphs"]:
-            blocks.append({"type": "p", "clause_id": p["pid"], "text": p["text"]}); emitted.add(p["pid"])
+            pn += 1
+            blocks.append({"type": "p", "clause_id": p["pid"], "text": p["text"], "num": f"¶{pn}", "anchor": anchors.get(p["pid"])}); emitted.add(p["pid"])
         for t in doc["tables"]:
             if t["section_id"] != s["section_id"] or t["table_id"] in emitted: continue
-            emitted.add(t["table_id"])
-            blocks.append({"type": "table", "table_id": t["table_id"], "caption": t.get("caption"), "header": t["header"],
-                           "rows": [{"clause_id": r["row_id"], "cells": r["raw"]} for r in t["rows"]]})
+            emitted.add(t["table_id"]); k = tnum[t["table_id"]]
+            blocks.append({"type": "table", "table_id": t["table_id"], "num": f"Т{k}", "caption": t.get("caption"), "header": t["header"], "anchor": t.get("anchor"),
+                           "rows": [{"clause_id": r["row_id"], "cells": r["raw"], "num": f"Т{k}.{i}", "anchor": anchors.get(r["row_id"])} for i, r in enumerate(t["rows"], 1)]})
     return blocks
 
 
