@@ -47,7 +47,19 @@
   .llmline { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px }
   .panes { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(340px,.9fr); min-height:0 }
   .doc { overflow:auto; padding:22px 30px; background:var(--card); border-right:1px solid var(--line); font:14.5px/1.65 Georgia,"Times New Roman",serif }
-  .doc h4 { font:600 14px system-ui,sans-serif; margin:18px 0 6px } .doc p { margin:0 0 8px }
+  .doc h4 { font:600 14px system-ui,sans-serif; margin:18px 0 6px } .doc p { margin:0 0 8px; position:relative; padding-left:44px }
+  .ln { position:absolute; left:0; top:2px; width:38px; text-align:right; font:500 11px/1.4 system-ui,sans-serif; color:var(--muted); user-select:none; cursor:pointer }
+  .ln:hover { color:var(--accent2) } td.ln { position:static; width:auto; padding:3px 6px; background:var(--tint); white-space:nowrap }
+  .doc table { margin-left:0 } .flash { animation:flash 1.6s ease-out } @keyframes flash { 0%,30% { box-shadow:0 0 0 3px var(--accent2) } 100% { box-shadow:0 0 0 0 transparent } }
+  .ref { display:inline-block; font:600 11.5px/1.6 system-ui,sans-serif; padding:0 7px; border-radius:6px; background:var(--tint); color:var(--accent2); border:1px solid var(--line); cursor:pointer; margin:0 3px 3px 0; text-decoration:none; white-space:nowrap }
+  .ref:hover { border-color:var(--accent2) } .ref.main { background:var(--accent2); color:#fff; border-color:var(--accent2) }
+  .doc del { background:var(--errbg); color:var(--err); text-decoration:line-through } .doc ins { background:var(--okbg); color:var(--ok); text-decoration:none; font-weight:600 }
+  .gh { border:1px solid var(--line); border-radius:10px; overflow:hidden; margin:0 0 8px; background:var(--card); cursor:pointer }
+  .gh .gh-h { display:flex; gap:8px; align-items:center; padding:7px 10px; background:var(--tint); font-size:12.5px } .gh .gh-h .sp { flex:1 }
+  .gh .line { font:12.5px/1.5 ui-monospace,"Fira Mono",Menlo,monospace; padding:4px 10px 4px 26px; position:relative; white-space:pre-wrap; word-break:break-word }
+  .gh .line::before { position:absolute; left:9px; font-weight:700 } .gh .minus { background:var(--errbg) } .gh .minus::before { content:"−"; color:var(--err) }
+  .gh .plus { background:var(--okbg) } .gh .plus::before { content:"+"; color:var(--ok) } .gh .line del { background:rgba(180,35,24,.25); text-decoration:none } .gh .line ins { background:rgba(6,118,71,.25); text-decoration:none }
+  .tag { font-size:11px; padding:0 7px; border-radius:999px; background:var(--okbg); color:var(--ok) } .tag.no { background:var(--riskbg); color:var(--risk) }
   .doc table { border-collapse:collapse; width:100%; margin:6px 0 14px; font-size:13px } .doc td, .doc th { border:1px solid var(--line); padding:3px 7px; vertical-align:top } .doc th { background:var(--tint); text-align:left }
   .doc caption { text-align:left; font-style:italic; color:var(--muted); padding-bottom:4px }
   .frag { cursor:pointer; border-radius:3px } .frag.ERROR { background:var(--errbg); box-shadow:inset 0 -2px 0 var(--err) } .frag.RISK { background:var(--riskbg); box-shadow:inset 0 -2px 0 var(--risk) }
@@ -130,7 +142,8 @@
   <div class="panes">
     <div class="doc" id="doc"></div>
     <div class="side">
-      <div class="filter"><span class="muted" style="font-size:13px">Категория:</span><select id="catf" onchange="renderList()"></select><span class="muted" id="fcount" style="font-size:12px"></span></div>
+      <div class="filter"><span class="muted" style="font-size:13px">Категория:</span><select id="catf" onchange="renderList()"></select><span class="muted" id="fcount" style="font-size:12px"></span>
+        <label class="muted" style="font-size:12px;margin-left:auto" title="Показывать в документе, что было изменено"><input type="checkbox" id="showdiff" checked onchange="renderDoc()"> правки в тексте</label></div>
       <div id="flist"></div>
     </div>
   </div>
@@ -197,7 +210,8 @@ async function openReview(rid, keepClause){ const j = await (await fetch('/api/r
   const c = R.conclusion||{}; $('#docname').textContent = R.source; $('#docname').title = R.source;
   const n = g => R.findings.filter(f=>grp(f)===g).length;
   const v = $('#verdict'); v.textContent = n('ERROR') ? 'Требует доработки' : 'Существенных ошибок нет'; v.className = 'verdict' + (n('ERROR')?' bad':'');
-  $('#counts').innerHTML = `<span class="c-err"><b>${n('ERROR')}</b> ошибок</span><span class="c-risk"><b>${n('RISK')}</b> рисков</span><span class="c-check"><b>${n('CHECK')}</b> проверить</span>`;
+  const nfix = new Set((R.edits||[]).map(e=>e.clause_id)).size;
+  $('#counts').innerHTML = `<span class="c-err"><b>${n('ERROR')}</b> ошибок</span><span class="c-risk"><b>${n('RISK')}</b> рисков</span><span class="c-check"><b>${n('CHECK')}</b> проверить</span>` + (nfix?`<span style="color:var(--ok)"><b>${nfix}</b> исправлено</span>`:'');
   $('#dl-edited').style.display = (j.upload_is_docx && (R.edits||[]).length) ? 'block' : 'none'; $('#dl-annot').style.display = j.upload_is_docx ? 'block' : 'none';
   const cats = [...new Set(R.findings.map(f=>f.case_category))]; const cur = $('#catf').value;
   $('#catf').innerHTML = '<option value="">все</option>' + cats.map(k=>`<option value="${k}">${CATS[k]||k}</option>`).join(''); if (cats.includes(cur)) $('#catf').value = cur;
@@ -211,39 +225,75 @@ function llmStatus(j){ clearTimeout(poll); const st = j.llm_status, done = j.llm
   else { $('#prog').style.display='none'; $('#llmline').innerHTML = st==='done' ? '✓ пояснения модели готовы' : ''; } }
 
 const fixed = () => new Set(R.edited_clauses||[]);
+let ANCH = {}, NUM = {};
+function indexView(){ ANCH = {}; NUM = {}; let pn = 0, tn = 0;
+  (R.document_view||[]).forEach(b=>{ if (b.type==='p') b.num ||= '¶'+(++pn); if (b.type==='table'){ tn++; b.num ||= 'Т'+tn; b.rows.forEach((r,i)=>{ r.num ||= 'Т'+tn+'.'+(i+1); }); } });
+  (R.document_view||[]).forEach(b=>{ if (b.type==='p'){ NUM[b.clause_id]=b.num; if (b.anchor) ANCH[b.anchor]=b.clause_id; }
+    if (b.type==='table') b.rows.forEach(r=>{ NUM[r.clause_id]=r.num; if (r.anchor) ANCH[r.anchor]=r.clause_id; }); }); }
+function cidOf(anchor){ if (ANCH[anchor]) return ANCH[anchor]; const k = Object.keys(ANCH).find(a=>anchor.startsWith(a) || a.startsWith(anchor)); return k && ANCH[k]; }
+/* edits per clause: first original, last applied text */
+function editsBy(){ const m = {}; (R.edits||[]).forEach(e=>{ const x = m[e.clause_id]; if (!x) m[e.clause_id] = {first:e.original_text||'', last:e.new_text||'', n:1, items:[e]}; else { x.last = e.new_text||''; x.n++; x.items.push(e); } }); return m; }
 function byClause(){ const m = {}; R.findings.forEach(f=>{ if(f.clause_id) (m[f.clause_id] ||= []).push(f); }); return m; }
 function worst(fs){ for (const g of ['ERROR','RISK','CHECK','NOTE']) if (fs.some(f=>grp(f)===g)) return g; return 'NOTE'; }
 function marks(fs){ return fs.map(f=>`<span class="num ${grp(f)}">${f._n}</span>`).join(''); }
+function body(id, text){ const e = editsBy()[id]; if (!e || !$('#showdiff').checked) return esc(text); const d = diff(e.first, text); return d.was === esc(e.first) && d.now === esc(text) ? esc(text) : inline(e.first, text); }
+function inline(a, b){ const A = a.split(/(\s+)/), B = b.split(/(\s+)/); const n=A.length, m=B.length; const L = Array.from({length:n+1},()=>new Int16Array(m+1));
+  for (let i=n-1;i>=0;i--) for (let j=m-1;j>=0;j--) L[i][j] = A[i]===B[j] ? L[i+1][j+1]+1 : Math.max(L[i+1][j], L[i][j+1]);
+  let i=0,j=0,o=''; while(i<n||j<m){ if(i<n&&j<m&&A[i]===B[j]){ o+=esc(A[i]); i++; j++; } else if(j<m&&(i>=n||L[i][j+1]>=L[i+1][j])){ o+=`<ins>${esc(B[j])}</ins>`; j++; } else { o+=`<del>${esc(A[i])}</del>`; i++; } } return o; }
 function fragP(id, text){ const fs = byClause()[id];
-  if (fs) return `<span class="frag ${worst(fs)}" id="c_${id}" onclick="select(${fs[0]._n})">${esc(text)}${marks(fs)}</span>`;
-  if (fixed().has(id)) return `<span class="frag FIXED" id="c_${id}">${esc(text)}<span class="num FIXED">✓</span></span>`;
+  if (fs) return `<span class="frag ${worst(fs)}" id="c_${id}" onclick="select(${fs[0]._n})">${body(id, text)}${marks(fs)}</span>`;
+  if (fixed().has(id)) return `<span class="frag FIXED" id="c_${id}" onclick="showFix('${id}')">${body(id, text)}<span class="num FIXED">✓</span></span>`;
   return `<span class="plain" id="c_${id}" onclick="missed('${id}')" title="Щёлкните, если здесь есть проблема, которую система пропустила">${esc(text)}</span>`; }
-function renderDoc(){ const m = byClause();
+function renderDoc(){ const m = byClause(); indexView(); const E = editsBy();
   $('#doc').innerHTML = (R.document_view||[]).map(b=>{
     if (b.type==='h') return `<h4>${esc(b.text)}</h4>`;
-    if (b.type==='p') return `<p>${fragP(b.clause_id, b.text)}</p>`;
-    if (b.type==='table') return `<table>${b.caption?`<caption>${esc(b.caption)}</caption>`:''}<tr>${b.header.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>${b.rows.map(r=>{ const fs = m[r.clause_id];
+    if (b.type==='p') return `<p id="b_${b.clause_id}"><span class="ln" title="${esc(b.anchor||'')}" onclick="copyRef('${b.num}')">${esc(b.num||'')}</span>${fragP(b.clause_id, b.text)}</p>`;
+    if (b.type==='table') return `<table>${b.caption?`<caption>${esc(b.num||'')} · ${esc(b.caption)}</caption>`:`<caption>${esc(b.num||'')}</caption>`}<tr><th></th>${b.header.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>${b.rows.map(r=>{ const fs = m[r.clause_id];
         const cls = fs ? `frag ${worst(fs)}` : fixed().has(r.clause_id) ? 'frag FIXED' : '';
         const mk = fs ? marks(fs) : fixed().has(r.clause_id) ? '<span class="num FIXED">✓</span>' : '';
-        return `<tr class="${cls}" id="c_${r.clause_id}" ${fs?`onclick="select(${fs[0]._n})"`:''}>${r.cells.map((c,i)=>`<td>${esc(c)}${i===r.cells.length-1?mk:''}</td>`).join('')}</tr>`; }).join('')}</table>`;
+        const old = E[r.clause_id] && $('#showdiff').checked ? E[r.clause_id].first.split(' | ') : null;
+        const onclk = fs ? `select(${fs[0]._n})` : fixed().has(r.clause_id) ? `showFix('${r.clause_id}')` : '';
+        return `<tr class="${cls}" id="c_${r.clause_id}" ${onclk?`onclick="${onclk}"`:''}><td class="ln" title="${esc(r.anchor||'')}">${esc(r.num||'')}</td>${r.cells.map((c,i)=>`<td>${old && old[i]!==undefined && old[i].trim()!==c.trim() ? inline(old[i].trim(), c) : esc(c)}${i===r.cells.length-1?mk:''}</td>`).join('')}</tr>`; }).join('')}</table>`;
     return ''; }).join('') || '<p class="muted">Текст документа недоступен.</p>'; }
+
+/* scroll to a numbered place in the document and flash it */
+function goTo(cid){ const el = document.getElementById('c_'+cid) || document.getElementById('b_'+cid); if (!el) return;
+  el.scrollIntoView({block:'center', behavior:'smooth'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+function copyRef(num){ try{ navigator.clipboard.writeText(num); toast('Ссылка '+num+' скопирована'); }catch(e){} }
+/* every anchor string inside a text becomes a chip with the paragraph / row number */
+function linkify(html){ const keys = Object.keys(ANCH).sort((a,b)=>b.length-a.length); for (const a of keys){ const e = esc(a); if (!html.includes(e)) continue; const cid = ANCH[a];
+    html = html.split(e).join(`<a class="ref" onclick="event.stopPropagation();goTo('${cid}')" title="${e}">${esc(NUM[cid]||'')}</a>`); } return html; }
+function refs(f){ const ids = []; if (f.clause_id) ids.push(f.clause_id); (f.anchors||[]).forEach(a=>{ const c = cidOf(a); if (c && !ids.includes(c)) ids.push(c); });
+  return ids.map((c,i)=>`<a class="ref ${i===0?'main':''}" onclick="event.stopPropagation();goTo('${c}')" title="Показать в документе">${esc(NUM[c]||c)}</a>`).join(''); }
+
+/* ---------- GitHub-style list of applied changes ---------- */
+function ghCard(cid){ const e = editsBy()[cid]; if (!e) return ''; const last = e.items[e.items.length-1]; const d = diffLines(e.first, e.last);
+  const how = {manual:'вручную', suggestion:'автоисправление', llm:'LLM', llm_edited:'LLM + правка'}[last.method] || last.method;
+  const cats = [...new Set(e.items.flatMap(x=>{ try{ return JSON.parse(x.categories||'[]'); }catch(_){ return []; } }))].filter(Boolean).map(k=>CATS[k]||k).join(', ');
+  return `<div class="gh" onclick="goTo('${cid}')"><div class="gh-h"><a class="ref main">${esc(NUM[cid]||cid)}</a><b>${esc(cats||'Правка')}</b><span class="sp"></span>
+    <span class="tag ${last.resolved?'':'no'}">${last.resolved?'замечание снято':'осталось замечание'}</span><span class="muted">${esc(how)}${e.n>1?` · ${e.n} правки`:''} · ${esc((last.created_at||'').slice(11,16))}</span></div>
+    <div class="line minus">${d.was}</div><div class="line plus">${d.now || '<i>фрагмент удалён</i>'}</div></div>`; }
+function diffLines(a, b){ if (b==='') return {was:esc(a), now:''}; const d = diff(a, b); return d; }
+function showFix(cid){ const g = document.getElementById('fixed_group'); if (g){ g.open = true; } const el = document.getElementById('gh_'+cid); if (el){ el.scrollIntoView({block:'nearest',behavior:'smooth'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
 
 function renderList(){ const cat = $('#catf').value; const fs = R.findings.filter(f=>!cat || f.case_category===cat);
   $('#fcount').textContent = `${fs.length} замечаний`;
-  $('#flist').innerHTML = GROUPS.map(([g,title])=>{ const items = fs.filter(f=>grp(f)===g); if(!items.length) return '';
+  const E = editsBy(); const ids = Object.keys(E);
+  const fixedHtml = ids.length ? `<details class="group" id="fixed_group" open><summary>Исправлено <span class="n">${ids.length}</span></summary>${ids.map(c=>`<div id="gh_${c}">${ghCard(c)}</div>`).join('')}</details>` : '';
+  $('#flist').innerHTML = (GROUPS.map(([g,title])=>{ const items = fs.filter(f=>grp(f)===g); if(!items.length) return '';
     return `<details class="group" ${g!=='NOTE'?'open':''}><summary>${title} <span class="n">${items.length}</span></summary>${items.map(card).join('')}</details>`; }).join('')
-    || `<div class="muted" style="padding:20px;text-align:center">${R.findings.length ? 'Нет замечаний в этой категории' : '✓ Замечаний нет'}</div>`; }
+    || `<div class="muted" style="padding:20px;text-align:center">${R.findings.length ? 'Нет замечаний в этой категории' : '✓ Замечаний нет'}</div>`) + fixedHtml; }
 
 function short(s){ return (s||'').replace(/\s*\[По истории.*$/,''); }
 function card(f){ const ev = (f.evidence_objects||[]).filter(o=>o.type!=='lexicon'); const fb = (R.feedback||[]).filter(x=>x.finding_id===f.finding_id && x.verdict!=='comment').slice(-1)[0];
   const llmPending = (window._job.llm_status==='pending'||window._job.llm_status==='running') && !(f.method||'').includes('LLM') && ['ERROR','RISK'].includes(f.severity);
   return `<div class="f ${grp(f)} ${sel===f._n?'sel':''}" id="f_${f._n}" onclick="select(${f._n})">
-    <div class="h"><span class="num ${grp(f)}">${f._n}</span><b>${esc(CATS[f.case_category]||f.case_category)}</b><span class="sp"></span>${(f.method||'').includes('LLM')?'<span class="muted" style="font-size:11px">пояснение модели</span>':''}</div>
+    <div class="h"><span class="num ${grp(f)}">${f._n}</span><b>${esc(CATS[f.case_category]||f.case_category)}</b><span class="muted" style="font-size:12px">${esc(f.clause_id && NUM[f.clause_id] || '')}</span><span class="sp"></span>${(f.method||'').includes('LLM')?'<span class="muted" style="font-size:11px">пояснение модели</span>':''}</div>
     <div class="short">${esc(short(f.explanation))}</div>
     <div class="body" onclick="event.stopPropagation()">
-      ${f.anchors&&f.anchors.length?`<div class="where">📍 ${esc(f.anchors[0])}</div>`:''}
+      <div class="where">📍 ${refs(f) || '—'}</div>
       ${llmPending?'<div class="llmwait"><span class="spin mini"></span> модель готовит пояснение…</div>':''}
-      <p class="expl">${esc(short(f.explanation))}</p>
+      <p class="expl">${linkify(esc(short(f.explanation)))}</p>
       ${f.proposed_text && !/^[«…]/.test(f.proposed_text)?`<div class="hint">💡 ${esc(f.proposed_text)}</div>`:''}
       <div id="fx_${f._n}"></div>
       <div class="acts">
