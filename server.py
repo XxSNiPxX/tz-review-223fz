@@ -23,7 +23,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from procdata.common import load_config, open_db, ROOT, log
-from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed, store, training, auth
+from procdata import checks, explain, index as kb_index, ingest, report as rep, annotate, edits as ed, store, training, auth, autofix
 import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -143,6 +143,27 @@ def _load_jobs():
 
 
 _load_jobs()
+
+
+def _auto_retrain_loop():
+    """Every 30 min: if at least 10 new reviewer verdicts arrived since the last training run, retrain behind the gold gate."""
+    import time
+    while True:
+        time.sleep(1800)
+        try:
+            conn = db()
+            n = conn.execute("SELECT COUNT(*) FROM feedback WHERE verdict IN ('confirm','reject','wrong_category') AND COALESCE(source,'') NOT IN ('test','gold_suite')").fetchone()[0]
+            last = conn.execute("SELECT COALESCE(MAX(n_train),0) FROM model_registry").fetchone()[0]
+            gold = conn.execute("SELECT COUNT(*) FROM feedback WHERE source='gold_suite'").fetchone()[0]
+            if n + gold - last >= 10:
+                if not gold: training.seed_gold(conn)
+                log.info("auto-retrain: %s", training.retrain(conn).get("status"))
+        except Exception as ex:  # noqa
+            log.warning("auto-retrain failed: %s", ex)
+
+
+if os.environ.get("REVIEW_AUTO_RETRAIN", "1") == "1":
+    threading.Thread(target=_auto_retrain_loop, daemon=True).start()
 _idx = {}
 
 
@@ -234,7 +255,7 @@ def start(clauses, source, use_llm, doc=None):
 
 
 @app.post("/api/reviews")
-async def create_review(file: UploadFile = File(...), use_llm: bool = Form(False)):
+async def create_review(file: UploadFile = File(...), use_llm: bool = Form(True)):
     dest = UPLOADS / (uuid.uuid4().hex[:8] + "_" + re.sub(r"[^\w.\-]", "_", file.filename or "upload")[:120])
     with open(dest, "wb") as f: shutil.copyfileobj(file.file, f)
     try:
@@ -426,29 +447,19 @@ class SuggestIn(BaseModel):
 
 @app.post("/api/reviews/{rid}/suggest")
 def suggest(rid: str, body: SuggestIn):
-    """Ask the local LLM for a corrected wording of one fragment (evidence-only, guarded). Falls back to the rule proposal."""
+    """Automatic correction for one finding: verified rule rewrite / ОКПД2 suggestion / local LLM fallback."""
     j = JOBS.get(rid)
     if not j or j["status"] != "done": raise HTTPException(404, "review not ready")
     report = json.loads(Path(j["report_path"]).read_text(encoding="utf-8"))
     fs = [f for f in report["findings"] if f.get("clause_id") == body.clause_id]
     if body.finding_id: fs = [f for f in fs if f["finding_id"] == body.finding_id] or fs
     if not fs: raise HTTPException(404, "no finding for this clause")
-    f = dict(fs[0]); f["clause_text"] = next((c["clause_text"] for c in (_load_doc(rid)[1] or []) if c["clause_id"] == body.clause_id), f["clause_text"])
-    if not explain.available():
-        return {"proposed_text": f.get("proposed_text"), "explanation": f["explanation"], "method": "rule", "llm": False}
-    f2 = explain.explain(f, f.get("evidence_objects", []))
-    prop = f2.get("proposed_text")
-    # pre-check: would the proposed wording still trigger the same clause-level check?
-    would = None
-    if prop and "LLM" in (f2.get("method") or ""):
-        probe = [{"clause_id": "probe", "clause_text": prop, "document_name": j["source"], "position_start": 0, "position_end": len(prop)}]
-        try:
-            left = [x["label"] for x in checks.run_checks(probe) if x["label"] == f["label"] and x["disposition"] == "FLAGGED"]
-            would = not left
-        except Exception:  # noqa
-            would = None
-    return {"proposed_text": prop, "explanation": f2.get("explanation"), "method": f2.get("method"),
-            "llm": "LLM" in (f2.get("method") or ""), "rejected": f2.get("llm_rejected"), "would_resolve": would}
+    doc, clauses = _load_doc(rid)
+    text = next((c["clause_text"] for c in (clauses or []) if c["clause_id"] == body.clause_id), fs[0]["clause_text"])
+    p = autofix.propose(fs[0], text, doc, fs[0].get("evidence_objects"), allow_llm=explain.available())
+    if not p:
+        return {"proposed_text": None, "original": text, "message": "Автоматически это не исправить: нужны сведения, которых нет в документе. " + (fs[0].get("proposed_text") or "")}
+    return {"proposed_text": p["new_text"], "original": text, "method": p["method"], "would_resolve": p["would_resolve"], "note": p["note"], "options": p.get("options")}
 
 
 @app.get("/api/reviews/{rid}/edited.docx")
@@ -550,6 +561,29 @@ def training_retrain(seed_gold: bool = False):
 @app.get("/api/training/retrain")
 def training_retrain_status():
     return TRAIN_STATE
+
+
+SAMPLES = ROOT / "data" / "samples"
+CASE = ROOT / "data" / "case"
+SAMPLE_FILES = [("lift_source.docx", "Замена грузового лифта (работы)", CASE), ("metrology_source.docx", "Метрологическое оборудование (поставка)", CASE),
+                ("it_hardware_tz.docx", "Вычислительная техника (поставка)", SAMPLES), ("synthetic_cleaning.pdf", "Клининговые услуги (PDF)", SAMPLES)]
+
+
+@app.get("/api/samples")
+def samples():
+    return [{"name": n, "title": tl} for n, tl, d in SAMPLE_FILES if (d / n).exists()]
+
+
+@app.post("/api/samples/{name}")
+def review_sample(name: str):
+    src = next((d / n for n, tl, d in SAMPLE_FILES if n == name and (d / n).exists()), None)
+    if not src: raise HTTPException(404, "sample not found")
+    dest = UPLOADS / (uuid.uuid4().hex[:8] + "_" + name); shutil.copy(src, dest)
+    path = rv.prepare_file(dest); doc = ingest.parse(path)
+    for c in doc["clauses"]: c["document_name"] = name
+    rid = start(doc["clauses"], name, explain.available(), doc)
+    with LOCK: JOBS[rid]["upload_path"] = str(path); JOBS[rid]["upload_is_docx"] = path.suffix.lower() == ".docx"
+    return {"review_id": rid, "status": "running"}
 
 
 @app.get("/api/kb")
