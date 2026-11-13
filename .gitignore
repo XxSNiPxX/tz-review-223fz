@@ -9,3 +9,5 @@ kb_release_*.tar.gz*
 .env
 *.gguf
 *.safetensors
+tz-review-*.tar.gz
+tz-review.sha256

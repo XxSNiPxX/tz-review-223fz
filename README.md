@@ -107,29 +107,56 @@ flowchart LR
 | Код ОКПД2, подобранный по наименованию, совпал с выбором эксперта | плита поверочная 26.51.33.142, измеритель момента 26.51.66.113 |
 | Время проверки документа (без LLM) | 1–3 с |
 
-## Быстрый старт
+## Быстрый старт: полный экземпляр на своей машине
+
+Требуется: Linux / macOS / WSL2, Docker, Python 3.10+ (только для `setup.sh`), ~8 ГБ на диске.
+Для локальной LLM — ≥ 10 ГБ RAM; без неё хватит 2 ГБ.
 
 ```bash
-git clone <repo> tz-review && cd tz-review
-tar xzf kb_release_YYYYMMDD.tar.gz          # база знаний: data/procurement.sqlite, data/index/, kb/
-docker compose up --build -d                # http://localhost:8000
+git clone https://github.com/XxSNiPxX/tz-review-223fz.git && cd tz-review-223fz
+./setup.sh                      # база знаний + модели (~5,5 ГБ); ./setup.sh --no-llm — без LLM (~0,6 ГБ)
+docker compose up --build -d    # http://localhost:8000
+```
+
+`setup.sh` скачивает:
+
+| Что | Откуда | Размер | Куда |
+|---|---|---|---|
+| База знаний: нормы 223-ФЗ/44-ФЗ, решения ФАС, закупки ЕИС, ОКПД2, поисковый индекс, примеры и эталоны (без пользовательских данных) | [релиз v1.0](https://github.com/XxSNiPxX/tz-review-223fz/releases/tag/v1.0) `tz-review-kb.tar.gz` | 31 МБ | `data/` |
+| Дообученный RuBERT-tiny2 (роль пункта), базовые классификаторы | релиз v1.0 `tz-review-models.tar.gz` | 104 МБ | `models/` |
+| multilingual-e5-small (эмбеддинги) | Hugging Face `intfloat/multilingual-e5-small` | 470 МБ | `models/multilingual-e5-small/` |
+| Qwen2.5-7B-Instruct Q4_K_M (LLM) | Hugging Face `bartowski/Qwen2.5-7B-Instruct-GGUF` | 4,7 ГБ | `models/` |
+
+Контрольные суммы архивов проверяются. После установки сеть не нужна: проверка документов не делает внешних запросов.
+Первая сборка Docker-образа занимает 5–15 минут (компиляция llama.cpp).
+
+Слабая машина (< 4 ГБ RAM) — облегчённый образ без PyTorch и LLM, качество на эталонах то же:
+
+```bash
+./setup.sh --no-llm
+docker build --build-arg LITE=1 --build-arg WITH_LLM=0 -t tz-review:latest . && docker compose up -d
 ```
 
 Без Docker:
 
 ```bash
-python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt scikit-learn joblib sentence-transformers llama-cpp-python
+./setup.sh
 uvicorn server:app --port 8000
 python review.py data/case/lift_source.docx --no-llm     # проверка из командной строки
+python eval_case.py                                       # воспроизвести метрики на эталонах
 ```
 
-Публичный сервер (VPS, HTTPS, вход):
+Публичный сервер с HTTPS и входом (VPS):
 
 ```bash
 ssh-copy-id root@HOST && ./deploy/deploy.sh root@HOST    # серверы < 2 ГБ RAM получают облегчённый режим автоматически
 ```
 
-Остановка: `docker compose down`.
+Остановка: `docker compose down`. Пересобрать базу знаний с нуля из открытых источников (необязательно, часы):
+см. [docs/collectors_and_internals.md](docs/collectors_and_internals.md) (`python collect.py …`). Дообучить классификатор
+роли пункта: `python collect.py finetune` (база `cointegrated/rubert-tiny2` скачивается в `models/rubert-tiny2/`).
 
 ### Переменные окружения
 
