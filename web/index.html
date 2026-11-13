@@ -319,7 +319,8 @@ function select_(n){ document.querySelectorAll('.sel').forEach(e=>e.classList.re
 function ev(o){ $('#dlgbody').innerHTML = `<h3 style="margin:0 0 6px">${esc(o.id)} <span class="pill">${esc(o.type)}</span>${o.score?` <span class="muted">сходство ${o.score}</span>`:''}</h3><pre>${esc(o.text)}</pre>`; dlg.showModal(); }
 
 async function whoami(){ try{ const j = await (await fetch('/api/me')).json(); const u = j.user;
-  $('#who').innerHTML = u ? `${esc(u.name||u.email)} <span class="muted">(${u.provider==='yandex'?'Яндекс':'Google'})</span> · <a href="/logout" style="color:var(--accent2)">выйти</a>` : (j.required ? '<a href="/login">войти</a>' : ''); }catch(e){} }
+  const prov = {yandex:'Яндекс', google:'Google', demo:'<span class="pill" style="background:rgba(132,172,255,.15);color:#a7c2ff;border-color:#2a3d66">демо</span>'};
+  $('#who').innerHTML = u ? `${esc(u.name||u.email)} ${u.provider==='demo'?prov.demo:`<span class="muted">(${prov[u.provider]||u.provider})</span>`} · <a href="/logout" style="color:var(--accent2)">выйти</a>` : (j.required ? '<a href="/login">войти</a>' : ''); }catch(e){} }
 // session expired while the page was open: any 401 from the API sends the user to the login page
 const _fetch = window.fetch; window.fetch = async (...a) => { const r = await _fetch(...a); if (r.status === 401 && String(a[0]).startsWith('/api/')) location.href = '/login'; return r; };
 kb(); procs(); jobs(); trainStats(); whoami();
