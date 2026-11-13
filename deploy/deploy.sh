@@ -10,6 +10,7 @@ set -euo pipefail
 TARGET="${1:?usage: deploy.sh user@host}"
 HOST="${TARGET#*@}"
 WITH_LLM="${WITH_LLM:-0}"
+LITE="${LITE:-auto}"                      # auto: lite when the server has < 2 GB RAM
 DIR=/opt/tz-review
 cd "$(dirname "$0")/.."
 SSH="ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new $TARGET"
@@ -38,6 +39,12 @@ $SSH "mkdir -p $DIR; LOG=$DIR/stopped_services.txt; date >> \$LOG
   done
   sleep 2; echo '--- listeners after:'; ss -ltnp | grep -E ':(80|443|8000)\\b' || echo none"
 
+RAM_MB=$($SSH "free -m | awk '/Mem/{print \$2}'")
+if [ "$LITE" = "auto" ]; then LITE=$([ "$RAM_MB" -lt 2000 ] && echo 1 || echo 0); fi
+echo "   RAM ${RAM_MB} MB -> LITE=$LITE"
+echo "== 1c Swap (2 GB) if none"
+$SSH 'swapon --show | grep -q . && echo "swap present" || (fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile && grep -q "^/swapfile" /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab; swapon --show)'
+
 echo "== 2/6 Docker"
 $SSH 'command -v docker >/dev/null && docker compose version >/dev/null 2>&1 && echo "docker present" || (export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && (apt-get install -y -qq docker.io docker-compose-v2 || apt-get install -y -qq docker.io docker-compose-plugin) && systemctl enable --now docker && docker --version)'
 $SSH "mkdir -p $DIR/data/index $DIR/models"
@@ -52,14 +59,14 @@ rsync -az data/index/ "$TARGET:$DIR/data/index/"
 [ -d data/case ] && rsync -az data/case/ "$TARGET:$DIR/data/case/"
 [ -d data/samples ] && rsync -az data/samples/ "$TARGET:$DIR/data/samples/"
 E5=models/multilingual-e5-small
-rsync -az --relative "$E5/./config.json" "$E5/./model.safetensors" "$E5/./modules.json" "$E5/./sentence_bert_config.json" \
+if [ "$LITE" != "1" ]; then rsync -az --relative "$E5/./config.json" "$E5/./model.safetensors" "$E5/./modules.json" "$E5/./sentence_bert_config.json" \
       "$E5/./tokenizer.json" "$E5/./tokenizer_config.json" "$E5/./special_tokens_map.json" "$E5/./sentencepiece.bpe.model" "$E5/./1_Pooling" \
       "$TARGET:$DIR/models/multilingual-e5-small/" 2>/dev/null || rsync -az --exclude onnx --exclude openvino --exclude pytorch_model.bin --exclude .eval_results "$E5/" "$TARGET:$DIR/$E5/"
-[ -d models/clause-role ] && rsync -az models/clause-role/ "$TARGET:$DIR/models/clause-role/"
+[ -d models/clause-role ] && rsync -az models/clause-role/ "$TARGET:$DIR/models/clause-role/"; fi
 if [ "$WITH_LLM" = "1" ]; then rsync -az --info=progress2 models/Qwen2.5-7B-Instruct-Q4_K_M.gguf "$TARGET:$DIR/models/"; fi
 
 echo "== 5/6 Build and start (first build 5-10 min)"
-$SSH "cd $DIR && printf 'WITH_LLM=%s\nREVIEW_BASIC_AUTH=%s\n' '$WITH_LLM' '${REVIEW_BASIC_AUTH:-}' > deploy/.env && \
+$SSH "cd $DIR && printf 'WITH_LLM=%s\nLITE=%s\nREVIEW_BASIC_AUTH=%s\n' '$WITH_LLM' '$LITE' '${REVIEW_BASIC_AUTH:-}' > deploy/.env && \
       docker compose --env-file deploy/.env -f deploy/docker-compose.vps.yml up -d --build && \
       (command -v ufw >/dev/null && ufw status | grep -q active && ufw allow 80/tcp || true)"
 

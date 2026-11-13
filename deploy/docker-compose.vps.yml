@@ -6,6 +6,7 @@ services:
       context: ..
       args:
         WITH_LLM: "${WITH_LLM:-0}"        # 1 = compile llama.cpp and allow the Qwen model (needs ~10 GB RAM)
+        LITE: "${LITE:-0}"                # 1 = no PyTorch models (servers with <2 GB RAM)
     image: tz-review:vps
     container_name: tz-review
     ports: ["80:8000"]
@@ -13,6 +14,7 @@ services:
       - REVIEW_HOST=0.0.0.0
       - REVIEW_PORT=8000
       - REVIEW_USE_LLM=${WITH_LLM:-0}
+      - REVIEW_LITE=${LITE:-0}
       - REVIEW_BASIC_AUTH=${REVIEW_BASIC_AUTH:-}     # "user:password" to protect the page; empty = open to everyone
     volumes:
       - ../data:/app/data

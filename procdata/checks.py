@@ -224,6 +224,8 @@ def _scope_all(clauses, min_conf=0.8):
     global _role_model
     for c in clauses: c["scope"] = clause_scope(c); c["scope_method"] = "heuristic"
     try:
+        import os
+        if os.environ.get("REVIEW_LITE") == "1": _role_model = False
         from . import finetune
         if _role_model is None and finetune.available(): _role_model = finetune.ClauseRole()
     except Exception as ex:  # noqa  transformers missing or weights broken: heuristics only

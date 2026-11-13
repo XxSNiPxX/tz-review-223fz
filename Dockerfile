@@ -2,6 +2,7 @@
 FROM python:3.10-slim
 
 ARG WITH_LLM=1
+ARG LITE=0
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libreoffice-writer libreoffice-calc p7zip-full file \
         $( [ "$WITH_LLM" = "1" ] && echo build-essential cmake ) \
@@ -10,10 +11,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY requirements.txt .
 # CPU-only PyTorch (the default wheel ships ~3 GB of CUDA libraries that a CPU server never uses)
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir scikit-learn sentence-transformers transformers huggingface_hub numpy joblib \
-    && if [ "$WITH_LLM" = "1" ]; then pip install --no-cache-dir llama-cpp-python; fi
+# LITE=1: no PyTorch at all (rules + knowledge base; for servers with <2 GB RAM)
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir scikit-learn numpy joblib \
+    && if [ "$LITE" != "1" ]; then pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+         && pip install --no-cache-dir sentence-transformers transformers; fi \
+    && if [ "$WITH_LLM" = "1" ] && [ "$LITE" != "1" ]; then pip install --no-cache-dir llama-cpp-python; fi
+ENV REVIEW_LITE=${LITE}
 
 COPY procdata ./procdata
 COPY web ./web
