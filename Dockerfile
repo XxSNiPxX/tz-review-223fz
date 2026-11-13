@@ -1,14 +1,19 @@
 # Review engine + web server. CPU only. Models and the knowledge base are mounted as volumes (see docker-compose.yml).
 FROM python:3.10-slim
 
+ARG WITH_LLM=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        libreoffice-writer libreoffice-calc p7zip-full file build-essential cmake \
+        libreoffice-writer libreoffice-calc p7zip-full file \
+        $( [ "$WITH_LLM" = "1" ] && echo build-essential cmake ) \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir scikit-learn sentence-transformers huggingface_hub numpy llama-cpp-python
+# CPU-only PyTorch (the default wheel ships ~3 GB of CUDA libraries that a CPU server never uses)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir scikit-learn sentence-transformers transformers huggingface_hub numpy joblib \
+    && if [ "$WITH_LLM" = "1" ]; then pip install --no-cache-dir llama-cpp-python; fi
 
 COPY procdata ./procdata
 COPY web ./web
