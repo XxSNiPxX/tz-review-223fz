@@ -247,6 +247,14 @@ editing and feedback loop; no precedent retrieval, no clause classifier, no LLM)
 (27/27, 7/7, 0 FP). Deployed 2026-11-13 on a 1 vCPU / 709 MB VPS: image 1.6 GB, container ~120 MB RAM, review of the lift
 ТЗ in 2 s.
 
+## Login (Yandex ID, Google)
+
+`procdata/auth.py`, page `web/login.html`. Enabled as soon as one provider's keys are set; then every page requires login
+and each verdict / edit is stored with the reviewer's email. Keys live only in `/opt/tz-review/deploy/.env` on the server
+(see `deploy/.env.example`); `deploy.sh` preserves them. Redirect URIs:
+`https://<ip-with-dashes>.sslip.io/auth/yandex/callback`, `.../auth/google/callback`. Optional `AUTH_ALLOWED_DOMAINS`
+(e.g. `phystech.edu`) and `AUTH_ALLOWED_EMAILS`. HTTPS is terminated by Caddy with a Let's Encrypt certificate.
+
 ## Server
 
 ```bash
