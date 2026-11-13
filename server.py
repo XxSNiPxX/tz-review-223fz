@@ -26,6 +26,24 @@ import review as rv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 app = FastAPI(title="223-ФЗ ТЗ review", version="0.1")
+
+_BASIC = os.environ.get("REVIEW_BASIC_AUTH", "").strip()
+if _BASIC:
+    import base64, secrets
+    from starlette.responses import Response
+    _EXPECTED = "Basic " + base64.b64encode(_BASIC.encode()).decode()
+
+    @app.middleware("http")
+    async def _basic_auth(request, call_next):
+        got = request.headers.get("authorization", "")
+        if request.url.path != "/api/health" and not secrets.compare_digest(got, _EXPECTED):
+            return Response(status_code=401, headers={"WWW-Authenticate": 'Basic realm="TZ review"'})
+        return await call_next(request)
+
+
+@app.get("/api/health")
+def health():
+    return {"ok": True}
 CFG = load_config()
 UPLOADS = ROOT / "data" / "uploads"; UPLOADS.mkdir(parents=True, exist_ok=True)
 REVIEWS = ROOT / "data" / "reviews"; REVIEWS.mkdir(parents=True, exist_ok=True)
