@@ -1,6 +1,6 @@
-Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 2457.83it/s]
+Loading weights:   0%|          | 0/57 [00:00<?, ?it/s]Loading weights: 100%|██████████| 57/57 [00:00<00:00, 8988.47it/s]
 
-=== lift_source.docx: 14 findings, kind=WORKS
+=== lift_source.docx: 13 findings, kind=WORKS
   [OK ] must L1 CONTRADICTION          Тип лифта: таблица характеристик говорит «пассажирский», предмет закупки и специ  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
   [OK ] must L2 CONTRADICTION          Грузоподъемность: 300 кг в таблице характеристик против 500 кг в спецификации ра  <- CONTRADICTORY_REQUIREMENTS (FLAGGED)
   [OK ] must L3 CONTRADICTION          Проем двери: 850х2100 в таблице против 850х2000 в спецификации  <- DIMENSION_MISMATCH (INSUFFICIENT_EVIDENCE)
@@ -18,16 +18,15 @@
   [OK ] must M5 OUT_OF_SCOPE_PROVISION Фраза о применении национального режима не относится к ТЗ и может противоречить   <- NATIONAL_REGIME_STATEMENT (INSUFFICIENT_EVIDENCE)
   [OK ] opt  M6 COMPETITION_RESTRICTION Проверка позиций на соответствие перечню закупок у СМП  <- SME_LIST_CHECK (INSUFFICIENT_EVIDENCE)
 
-=== lift_final.docx: 4 findings, kind=WORKS
+=== lift_final.docx: 3 findings, kind=WORKS
   [ok ] INCORRECT_CHARACTERISTIC VAGUE_REQUIREMENT            NOTE  INSUFFICIENT_EVIDENCE Оценочная формулировка (по согласованию с заказчиком) в общих условиях
   [ok ] STANDARDS              INCOMPLETE_STANDARD_REFERENCE NOTE  INSUFFICIENT_EVIDENCE Общая отсылка к действующим ГОСТ/СНиП без конкретных обозначений: допу
-  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4) указано без единицы измерения при наличии измери
   [ok ] COMPLETENESS           OPEN_ENUMERATION             NOTE  INSUFFICIENT_EVIDENCE Открытый перечень (и др.) в требованиях к предмету закупки: участник н
 
 === metrology_final.docx: 15 findings, kind=GOODS
-  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (4, 25) указано без единицы измерения при наличии из
+  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (25) указано без единицы измерения при наличии измер
   [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (1000) указано без единицы измерения при наличии изм
-  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (8, 50) указано без единицы измерения при наличии из
+  [ok ] INCORRECT_CHARACTERISTIC MISSING_UNIT                 RISK  INSUFFICIENT_EVIDENCE Числовое значение (50) указано без единицы измерения при наличии измер
   [ok ] COMPLETENESS           OPEN_ENUMERATION             NOTE  INSUFFICIENT_EVIDENCE Открытый перечень (и т.п.) в требованиях к предмету закупки: участник 
   [ok ] STANDARDS              INCOMPLETE_STANDARD_REFERENCE NOTE  INSUFFICIENT_EVIDENCE Стандарт «ГОСТ Р ИСО 4287.» указан без года принятия; проверить актуал
   [ok ] STANDARDS              INCOMPLETE_STANDARD_REFERENCE NOTE  INSUFFICIENT_EVIDENCE Стандарт «ГОСТ 9013.» указан без года принятия; проверить актуальность
