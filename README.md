@@ -233,6 +233,20 @@ proposal, applied text, method manual/suggestion/llm/llm_edited, whether the re-
 `GET /api/edits` returns them, `GET /api/edits?format=jsonl` exports a JSONL file: the supervised dataset for a correction
 model (flagged fragment + category → accepted rewrite).
 
+## Public deployment (VPS)
+
+```bash
+ssh-copy-id root@HOST                 # once, by the owner
+./deploy/deploy.sh root@HOST          # stops other services on 80/443/8000 (logged), adds swap, installs Docker,
+                                      # uploads ~1 GB, builds, serves on http://HOST/
+REVIEW_BASIC_AUTH=jury:secret ./deploy/deploy.sh root@HOST   # same, behind a login
+```
+
+Servers with < 2 GB RAM get **lite mode** automatically (no PyTorch: rules, knowledge base, document view, reports,
+editing and feedback loop; no precedent retrieval, no clause classifier, no LLM). Gold suite in lite mode is identical
+(27/27, 7/7, 0 FP). Deployed 2026-11-13 on a 1 vCPU / 709 MB VPS: image 1.6 GB, container ~120 MB RAM, review of the lift
+ТЗ in 2 s.
+
 ## Server
 
 ```bash
