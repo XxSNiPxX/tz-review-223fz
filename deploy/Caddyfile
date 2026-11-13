@@ -1,0 +1,11 @@
+# HTTPS in front of the review server. SITE_DOMAIN defaults to <ip-with-dashes>.sslip.io (public DNS that resolves to the IP),
+# so a free Let's Encrypt certificate can be issued without owning a domain. Google OAuth requires HTTPS and a domain name.
+{$SITE_DOMAIN} {
+	encode gzip
+	reverse_proxy review:8000
+}
+
+# visitors who type the bare IP are sent to the HTTPS name
+http://{$HOST_IP} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
