@@ -50,10 +50,10 @@
     \node[anchor=east,text=miptgrey] at ([xshift=-0.8cm,yshift=-0.62cm]current page.north east) {\small Хакатон МФТИ · Задача 1};
     \node[anchor=north west, text=miptblue, font=\bfseries\fontsize{30}{34}\selectfont] at ([xshift=0.8cm,yshift=-2.0cm]current page.north west) {Проверка ТЗ · 223-ФЗ};
     \node[anchor=north west, text width=12.8cm, font=\Large] at ([xshift=0.8cm,yshift=-3.3cm]current page.north west) {Подсвечивает проблемы в ТЗ на закупку, показывает основание и предлагает исправление. Работает на своём сервере, без внешних API};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.5cm]current page.north west) {10/10};
-    \node[anchor=north west, text=miptgrey, text width=4.6cm, font=\footnotesize] at ([xshift=0.8cm,yshift=-6.6cm]current page.north west) {правок эксперта организаторов отмечено: 4 ошибкой, 6 «требует проверки»};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.5cm]current page.north west) {9};
+    \node[anchor=north west, text=miptgrey, text width=4.6cm, font=\footnotesize] at ([xshift=0.8cm,yshift=-6.6cm]current page.north west) {категорий проблем из задания};
     \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=5.8cm,yshift=-5.5cm]current page.north west) {0};
-    \node[anchor=north west, text=miptgrey, text width=4.5cm, font=\footnotesize] at ([xshift=5.8cm,yshift=-6.6cm]current page.north west) {подтверждённых ошибок на исправленных экспертом версиях};
+    \node[anchor=north west, text=miptgrey, text width=4.5cm, font=\footnotesize] at ([xshift=5.8cm,yshift=-6.6cm]current page.north west) {внешних API: документ не покидает сервер};
     \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=10.8cm,yshift=-5.5cm]current page.north west) {1–3 с};
     \node[anchor=north west, text=miptgrey, text width=4.0cm, font=\small] at ([xshift=10.8cm,yshift=-6.6cm]current page.north west) {на документ (без LLM)};
     \node[anchor=north west, text=miptmid, font=\ttfamily\small] at ([xshift=0.8cm,yshift=-8.25cm]current page.north west) {185-17-3-218.sslip.io \quad github.com/XxSNiPxX/tz-review-223fz};
@@ -87,7 +87,7 @@
 % ================================================================ 3 · 40 с (лучше — живое демо)
 \begin{frame}{Как это выглядит}
   \centering
-  \includegraphics[width=0.72\textwidth]{../img/review_final.jpg}\\[2pt]
+  \includegraphics[width=0.70\textwidth]{../img/review_final.jpg}\\[2pt]
   \muted{\small Документ пронумерован (¶, Т): клик по ссылке прокручивает к фрагменту $\cdot$ «Исправить»: было / станет $\to$ перепроверка $\to$ раздел «Исправлено» как diff в GitHub}
 \end{frame}
 
@@ -114,27 +114,26 @@
 \end{frame}
 
 % ================================================================ 5 · 35 с
-\begin{frame}{Результаты на эталонах организаторов}
+\begin{frame}[shrink=4]{Пример: ТЗ организаторов на замену лифта}
   \begin{columns}[T]
-    \column{0.55\textwidth}
+    \column{0.56\textwidth}
     \small
-    \footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}ccc@{}}
-      \toprule
-      \textbf{Документ} & \textbf{отмечено} & \textbf{ошибка} & \textbf{проверка}\\ \midrule
-      Лифт, работы & 6/6 & 4 & 2\\
-      Метрология, поставка & 4/4 & 0 & 4\\ \midrule
-      \textbf{Итого} & \textbf{10/10} & \textbf{4} & \textbf{6}\\ \bottomrule
-    \end{tabular}\\[6pt]
-    \textbf{Частично:} код работ лифта (.120$\to$.110) не замечен; из 5 кодов ОКПД2 метрологии найдены 3.\\[4pt]
-    \textbf{Исправленные версии:} 0 подтверждённых ошибок, остаются пометки «требует проверки» (3 и 15).\\[4pt]
-    \muted{Контроль переобучения: два наших ТЗ из других областей~— 17/17.}
-    \column{0.38\textwidth}
+    \textbf{Что показывает система}
+    \begin{itemize}
+      \item тип лифта: «пассажирский» в таблице, «грузовой» в предмете закупки
+      \item грузоподъёмность: 300 кг в таблице, 500 кг в спецификации
+      \item гарантия на работы от товарной накладной, а для подряда основание~— КС-2/КС-3
+      \item поставка лифта без отдельной позиции с кодом товара
+      \item ГОСТ 53782-2010 без «Р»~— \muted{«требует проверки»}
+    \end{itemize}
+    \muted{Каждое~— с фрагментом, основанием и вариантом исправления.}
+    \column{0.40\textwidth}
     \small
     \textbf{Учится на экспертах}
     \begin{itemize}
       \item оценки, смена категории, пропущенное, каждая правка $\to$ датасет
       \item переобучение фильтра в фоне
-      \item \textbf{шлюз}: новая версия включается, только если на эталонах не хуже
+      \item \textbf{шлюз}: новая версия включается, только если на контрольных документах не хуже
       \item в тесте с намеренно вредными отзывами шлюз модель \textcolor{mipterr}{отклонил}
     \end{itemize}
   \end{columns}
@@ -152,7 +151,7 @@
     \column{0.3\textwidth}\centering\bignum{0}\\\muted{внешних API при проверке}
   \end{columns}
   \vspace{14pt}
-  \small\muted{Эталон пока мал (2 документа организаторов). Дальше: разметка реальных жалоб ФАС для оценки, Положения о закупке заказчиков, проверка «существующего, но не лучшего» кода ОКПД2}\\[10pt]
+  \small\muted{Дальше: оценка на размеченных жалобах ФАС, Положения о закупке заказчиков, дообучение LLM на правках экспертов}\\[10pt]
   {\Large\color{miptmid}\ttfamily 185-17-3-218.sslip.io\par}
   \muted{\small «Войти в демо-режиме» $\to$ пример документа $\to$ «Исправить автоматически»}
 \end{frame}
@@ -187,38 +186,14 @@
     гарантия с даты \textcolor{mipterr}{товарной накладной} & с даты \textcolor{miptok}{актов КС-2 и КС-3}\\
     температура воды не менее 40 & не менее 40 \textcolor{miptok}{°C}\\
     Lenovo ThinkPad T14 Gen 4 & Lenovo ThinkPad T14 Gen 4 \textcolor{miptok}{или эквивалент}\\
-    плита поверочная, 26.51.33.\textcolor{mipterr}{190} & 26.51.33.\textcolor{miptok}{142}~— совпало с экспертом\\ \bottomrule
+    плита поверочная, 26.51.33.\textcolor{mipterr}{190} & 26.51.33.\textcolor{miptok}{142}\\ \bottomrule
   \end{tabular}
   \vspace{8pt}
   \begin{itemize}
     \item правило по виду замечания; код ОКПД2~— по наименованию из 21\,081 кода; LLM~— запасной путь
-    \item на 4 эталонных ТЗ: для \textbf{32 из 47} замечаний предложено исправление; все 32 прошли повторную проверку, новых замечаний 0
+    \item исправление предлагается, только если повторная проверка его принимает; после применения документ перепроверяется целиком
     \item \muted{перепроверка~— нашими же правилами; качество формулировок эксперт не оценивал. Комплектность и состав комплектов не исправляются автоматически}
   \end{itemize}
-\end{frame}
-
-\begin{frame}[shrink=4]{Как мерили и где слабые места}
-  \begin{columns}[T]
-    \column{0.52\textwidth}
-    \small
-    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.5\linewidth}cc@{}}
-      \toprule
-      \textbf{Документ} & \textbf{обяз.} & \textbf{доп.}\\ \midrule
-      Лифт (организаторы) & 6/6 & 2/2\\
-      Метрология (организаторы) & 4/4 & 2/2\\
-      Клининг (наш) & 9/9 & 2/2\\
-      ИТ-техника (наш) & 8/8 & 1/1\\ \bottomrule
-    \end{tabular}\\[6pt]
-    Наши ТЗ мы писали сами и знали ошибки в них~— это контроль переобучения, а не независимая оценка.
-    \column{0.44\textwidth}
-    \small
-    \begin{itemize}
-      \item правки эксперта (исходное $\to$ итоговое) переведены в эталонные пункты
-      \item «отмечено» = есть замечание той же категории на этом фрагменте, включая «требует проверки»
-      \item ложные = подтверждённые ошибки/риски на исправленной версии
-      \item воспроизводится: \texttt{eval\_case.py}
-    \end{itemize}
-  \end{columns}
 \end{frame}
 
 \begin{frame}{Данные и модели}
@@ -241,7 +216,7 @@
     \end{itemize}
   \end{columns}
   \vspace{6pt}
-  \muted{\small Почему не «просто LLM»: первая же 7B-модель переписала «не менее 7» в «ровно 7» и придумала марку стали.}
+  \muted{\small Почему не «просто LLM»: в нашем тесте 7B-модель без опоры на базу переписала «не менее 7» в «ровно 7».}
 \end{frame}
 
 \begin{frame}{Учится на работе экспертов}
@@ -249,7 +224,7 @@
     \item каждое замечание: \textbf{«верно» / «ложное»}, «другая категория», комментарий; клик по тексту — «система пропустила проблему»
     \item каждая правка: исходный текст, предложение системы, итоговый текст, сняло ли замечание
     \item датасеты собираются автоматически; фильтр переобучается в фоне
-    \item \textbf{ворота качества}: новая модель включается, только если на эталонах не теряет ни одной обязательной правки и не добавляет ложных
+    \item \textbf{шлюз}: новая модель включается, только если на контрольных документах не теряет найденного и не добавляет ложных
   \end{itemize}
   \vspace{6pt}
   \small
@@ -257,7 +232,7 @@
     \toprule
     Проверка ворот & Отзывы & Решение\\ \midrule
     полезные отзывы & эксперты отклоняют замечания об оформлении & \textcolor{miptok}{включена}\\
-    вредные отзывы (тест) & «отклоняют» настоящие противоречия & \textcolor{mipterr}{отклонена} (27 $\to$ 17)\\ \bottomrule
+    вредные отзывы (тест) & «отклоняют» настоящие противоречия & \textcolor{mipterr}{отклонена}\\ \bottomrule
   \end{tabular}
 \end{frame}
 
