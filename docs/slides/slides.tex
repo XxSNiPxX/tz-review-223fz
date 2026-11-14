@@ -49,19 +49,19 @@
     \node[anchor=west] at ([xshift=0.8cm,yshift=-0.62cm]current page.north west) {\includegraphics[height=0.75cm]{logo.pdf}};
     \node[anchor=east,text=miptgrey] at ([xshift=-0.8cm,yshift=-0.62cm]current page.north east) {\small Хакатон МФТИ · Задача 1};
     \node[anchor=north west, text=miptblue, font=\bfseries\fontsize{30}{34}\selectfont] at ([xshift=0.8cm,yshift=-2.0cm]current page.north west) {Проверка ТЗ · 223-ФЗ};
-    \node[anchor=north west, text width=12.8cm, font=\Large] at ([xshift=0.8cm,yshift=-3.3cm]current page.north west) {Подсвечивает проблемы в ТЗ на закупку, показывает основание и предлагает исправление. Работает на своём сервере, без внешних API};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.5cm]current page.north west) {9};
-    \node[anchor=north west, text=miptgrey, text width=4.6cm, font=\footnotesize] at ([xshift=0.8cm,yshift=-6.6cm]current page.north west) {категорий проблем из задания};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=5.8cm,yshift=-5.5cm]current page.north west) {0};
-    \node[anchor=north west, text=miptgrey, text width=4.5cm, font=\footnotesize] at ([xshift=5.8cm,yshift=-6.6cm]current page.north west) {внешних API: документ не покидает сервер};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=10.8cm,yshift=-5.5cm]current page.north west) {1–3 с};
-    \node[anchor=north west, text=miptgrey, text width=4.0cm, font=\small] at ([xshift=10.8cm,yshift=-6.6cm]current page.north west) {на документ (без LLM)};
-    \node[anchor=north west, text=miptmid, font=\ttfamily\small] at ([xshift=0.8cm,yshift=-8.25cm]current page.north west) {185-17-3-218.sslip.io \quad github.com/XxSNiPxX/tz-review-223fz};
+    \node[anchor=north west, text width=13cm, font=\Large] at ([xshift=0.8cm,yshift=-3.3cm]current page.north west) {Находит проблемы в ТЗ на закупку, объясняет их со ссылкой на закон и практику ФАС и исправляет~— \textbf{локальной LLM и своими моделями}};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.4cm]current page.north west) {0};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\footnotesize] at ([xshift=0.8cm,yshift=-6.5cm]current page.north west) {внешних API: ни ChatGPT, ни облака~— документ не покидает сервер};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=5.8cm,yshift=-5.4cm]current page.north west) {3 + 2};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\footnotesize] at ([xshift=5.8cm,yshift=-6.5cm]current page.north west) {3 модели обучили сами + 2 открытые: LLM Qwen2.5-7B и e5};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=10.8cm,yshift=-5.4cm]current page.north west) {4};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\footnotesize] at ([xshift=10.8cm,yshift=-6.5cm]current page.north west) {открытых источника: законы, решения ФАС, ЕИС, ОКПД2};
+    \node[anchor=north west, text=miptmid, font=\ttfamily\small] at ([xshift=0.8cm,yshift=-8.25cm]current page.north west) {github.com/XxSNiPxX/tz-review-223fz};
   \end{tikzpicture}
 \end{frame}
 
 % ================================================================ 2 · 30 с
-\begin{frame}{Почему не «вставить ТЗ в чат-бот»}
+\begin{frame}{Почему не «вставить ТЗ в ChatGPT»}
   \begin{columns}[T]
     \column{0.47\textwidth}
     \textbf{\color{mipterr}Облачный чат-бот}
@@ -74,14 +74,14 @@
     \column{0.49\textwidth}
     \textbf{\color{miptok}Наш подход}
     \begin{itemize}
-      \item проверка на своём сервере, без внешних запросов
-      \item основания~— из собранной базы: 223-ФЗ по частям, 420 доводов из решений ФАС, ОКПД2
-      \item детерминированные проверки: одинаковый результат на один файл
+      \item \textbf{своя LLM} (Qwen2.5-7B) на своём сервере, без внешних запросов
+      \item LLM опирается на \textbf{собранную базу}: 223-ФЗ по частям, решения ФАС, ОКПД2
+      \item находят проблему детерминированные проверки: один файл~— один результат
       \item замечание привязано к пронумерованному фрагменту
     \end{itemize}
   \end{columns}
   \vspace{10pt}
-  \muted{\small В нашем тесте 7B-модель без опоры на базу переписала «не менее 7» в «ровно 7»~— поэтому LLM у нас только поясняет.}
+  \muted{\small В нашем тесте 7B-модель без опоры на базу переписала «не менее 7» в «ровно 7»~— поэтому её ответ сверяется с базой и текстом.}
 \end{frame}
 
 % ================================================================ 3 · 40 с (лучше — живое демо)
@@ -92,7 +92,7 @@
 \end{frame}
 
 % ================================================================ 4 · 30 с
-\begin{frame}{Как устроено: правила впереди, LLM позади}
+\begin{frame}[shrink=4]{Как устроено: правила, база знаний и локальная LLM}
   \centering
   \begin{tikzpicture}[node distance=12mm and 6mm, box/.style={draw=miptmid, rounded corners=4pt, fill=mipttint, minimum height=13mm, text width=27mm, align=center, font=\small},
                       ar/.style={-{Stealth[length=2.4mm]}, thick, miptmid}]
@@ -108,9 +108,38 @@
   \end{tikzpicture}
   \vspace{6pt}
   \begin{itemize}
-    \item \textbf{Правила} находят дефект, \textbf{база} даёт основание, \textbf{LLM} только поясняет; ответ со ссылкой на норму вне базы отбрасывается
+    \item \textbf{Правила} находят дефект, \textbf{база} даёт основание, \textbf{LLM} объясняет замечание и предлагает правку, где правил не хватает
+    \item ответ LLM со ссылкой на норму вне базы или с новыми числами отбрасывается
     \item нет данных для вывода $\Rightarrow$ «требует проверки», а не «нарушение»
   \end{itemize}
+\end{frame}
+
+\begin{frame}[shrink=12]{Модели и открытые данные}
+  \begin{columns}[T]
+    \column{0.52\textwidth}
+    \small
+    \textbf{Обучили сами}
+    \begin{itemize}
+      \item \textbf{RuBERT-tiny2}, дообучен на 46\,752 пунктах реальных ТЗ из ЕИС: роль пункта (требование / условие договора / ссылка на право)
+      \item \textbf{подбор ОКПД2}: модель по 21\,081 коду классификатора, код по наименованию позиции
+      \item \textbf{фильтр замечаний}: учится на оценках экспертов, включается только через «шлюз»
+    \end{itemize}
+    \textbf{Открытые, работают локально}
+    \begin{itemize}
+      \item \textbf{Qwen2.5-7B} (llama.cpp, CPU): пояснения и правки
+      \item \textbf{multilingual-e5}: поиск похожих норм и решений ФАС
+    \end{itemize}
+    \column{0.44\textwidth}
+    \small
+    \textbf{Открытые данные~— собрали своими сборщиками}
+    \begin{itemize}
+      \item \textbf{законы}: 223-ФЗ и 44-ФЗ по частям (1\,623 нормы), 76 изменяющих законов~— КонсультантПлюс, Гарант, RusLawOD
+      \item \textbf{ФАС}: 437 дел, 420 доводов жалоб
+      \item \textbf{ЕИС}: 321 закупка, 46\,752 пункта ТЗ
+      \item \textbf{ОКПД2}: 21\,081 код, реестр ГОСТ
+    \end{itemize}
+    \muted{Собирается один раз; при проверке сеть не нужна.}
+  \end{columns}
 \end{frame}
 
 % ================================================================ 5 · 35 с
@@ -146,14 +175,14 @@
   {\color{miptblue}\bfseries\huge Попробуйте и разверните у себя\par}
   \vspace{14pt}
   \begin{columns}[T]
-    \column{0.3\textwidth}\centering\bignum{3}\\\muted{команды~— свой экземпляр из GitHub}
-    \column{0.3\textwidth}\centering\bignum{709\,МБ}\\\muted{RAM: облегчённый режим (без LLM) на демо-сервере}
-    \column{0.3\textwidth}\centering\bignum{0}\\\muted{внешних API при проверке}
+    \column{0.3\textwidth}\centering\bignum{3}\\\muted{команды~— свой экземпляр с моделями и базой из GitHub}
+    \column{0.3\textwidth}\centering\bignum{CPU}\\\muted{GPU не нужен; LLM~— от 10\,ГБ RAM}
+    \column{0.3\textwidth}\centering\bignum{0}\\\muted{внешних API}
   \end{columns}
   \vspace{14pt}
-  \small\muted{Дальше: оценка на размеченных жалобах ФАС, Положения о закупке заказчиков, дообучение LLM на правках экспертов}\\[10pt]
-  {\Large\color{miptmid}\ttfamily 185-17-3-218.sslip.io\par}
-  \muted{\small «Войти в демо-режиме» $\to$ пример документа $\to$ «Исправить автоматически»}
+  \small\muted{Дальше: оценка на размеченных жалобах ФАС, Положения о закупке заказчиков, дообучение LLM на правках экспертов (LoRA)}\\[10pt]
+  {\Large\color{miptmid}\ttfamily github.com/XxSNiPxX/tz-review-223fz\par}
+  \muted{\small Демо-сервер (облегчённый режим, без LLM): 185-17-3-218.sslip.io}
 \end{frame}
 
 % ================================================================ запасные слайды для вопросов
@@ -194,29 +223,6 @@
     \item исправление предлагается, только если повторная проверка его принимает; после применения документ перепроверяется целиком
     \item \muted{перепроверка~— нашими же правилами; качество формулировок эксперт не оценивал. Комплектность и состав комплектов не исправляются автоматически}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Данные и модели}
-  \begin{columns}[T]
-    \column{0.48\textwidth}
-    \small\textbf{Собрали сами}
-    \begin{itemize}
-      \item ЕИС: 321 закупка, 2\,778 вложений, 46\,752 пункта ТЗ
-      \item ФАС: 437 дел, 692 решения, 420 доводов
-      \item 223-ФЗ и 44-ФЗ: 1\,623 нормы по частям, 76 изменяющих законов
-      \item ОКПД2: 21\,081 код
-    \end{itemize}
-    \column{0.48\textwidth}
-    \small\textbf{Модели (все локальные)}
-    \begin{itemize}
-      \item RuBERT-tiny2, дообучен: роль пункта (29\,M параметров, 7 мин на CPU)
-      \item multilingual-e5-small: поиск норм и решений ФАС
-      \item Qwen2.5-7B, 4 бит: пояснения; ответ проверяется на выдуманные нормы и числа
-      \item фильтр замечаний, обучаемый на отзывах экспертов
-    \end{itemize}
-  \end{columns}
-  \vspace{6pt}
-  \muted{\small Почему не «просто LLM»: в нашем тесте 7B-модель без опоры на базу переписала «не менее 7» в «ровно 7».}
 \end{frame}
 
 \begin{frame}{Учится на работе экспертов}
