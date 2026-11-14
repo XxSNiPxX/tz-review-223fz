@@ -202,8 +202,8 @@ async function waitDone(rid){ overlay(true, 1);
     if (i===1) overlay(true, 2); await new Promise(r=>setTimeout(r,700)); } }
 
 /* ---------- review ---------- */
-function goHome(){ clearTimeout(poll); $('#review').classList.remove('on'); $('#start').style.display='grid'; jobs(); }
-async function openReview(rid, keepClause){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; window._job = j;
+function goHome(){ history.replaceState(null, '', location.pathname); clearTimeout(poll); $('#review').classList.remove('on'); $('#start').style.display='grid'; jobs(); }
+async function openReview(rid, keepClause){ const j = await (await fetch('/api/reviews/'+rid)).json(); R = j.report; RID = rid; window._job = j; history.replaceState(null, '', '#'+rid);
   $('#start').style.display='none'; $('#review').classList.add('on');
   R.findings.sort((a,b)=> GROUPS.findIndex(g=>g[0]===grp(a)) - GROUPS.findIndex(g=>g[0]===grp(b)));
   R.findings.forEach((f,i)=>f._n=i+1);
@@ -362,6 +362,8 @@ function dl(kind){ $('#dl').classList.remove('open'); if(!RID) return;
 document.addEventListener('click', e=>{ if(!e.target.closest('#dl')) $('#dl').classList.remove('open'); });
 
 whoami(); samples(); jobs();
+/* direct link to a review: /#R0123456789 */
+if (/^#R[0-9a-f]{10}$/.test(location.hash)) openReview(location.hash.slice(1));
 </script>
 </body>
 </html>

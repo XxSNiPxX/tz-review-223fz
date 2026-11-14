@@ -11,6 +11,7 @@
 \setdefaultlanguage{russian}
 \setotherlanguage{english}
 \usepackage{booktabs,tikz,graphicx,array}
+\usepackage{appendixnumberbeamer}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds}
 
 % ---- MIPT palette (measured on mipt.ru) ----
@@ -41,74 +42,127 @@
 
 \begin{document}
 
-% ---------------------------------------------------------------- 1
+% ================================================================ 1 · 20 с
 \begin{frame}[plain]
   \begin{tikzpicture}[remember picture,overlay]
-    \fill[white] (current page.north west) rectangle ([yshift=-1.25cm]current page.north east);
     \fill[miptblue] ([yshift=-1.25cm]current page.north west) rectangle ([yshift=-1.35cm]current page.north east);
     \node[anchor=west] at ([xshift=0.8cm,yshift=-0.62cm]current page.north west) {\includegraphics[height=0.75cm]{logo.pdf}};
     \node[anchor=east,text=miptgrey] at ([xshift=-0.8cm,yshift=-0.62cm]current page.north east) {\small Хакатон МФТИ · Задача 1};
     \node[anchor=north west, text=miptblue, font=\bfseries\fontsize{30}{34}\selectfont] at ([xshift=0.8cm,yshift=-2.0cm]current page.north west) {Проверка ТЗ · 223-ФЗ};
-    \node[anchor=north west, text width=11cm, font=\Large] at ([xshift=0.8cm,yshift=-3.4cm]current page.north west) {находим, объясняем и исправляем ошибки в технических заданиях на закупку};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.3cm]current page.north west) {27/27};
-    \node[anchor=north west, text=miptgrey, text width=4.4cm, align=left, font=\small] at ([xshift=0.8cm,yshift=-6.4cm]current page.north west) {правок эксперта найдено};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=5.6cm,yshift=-5.3cm]current page.north west) {0};
-    \node[anchor=north west, text=miptgrey, text width=4.4cm, align=left, font=\small] at ([xshift=5.6cm,yshift=-6.4cm]current page.north west) {ложных ошибок на исправленных ТЗ};
-    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=10.4cm,yshift=-5.3cm]current page.north west) {32/32};
-    \node[anchor=north west, text=miptgrey, text width=4.4cm, align=left, font=\small] at ([xshift=10.4cm,yshift=-6.4cm]current page.north west) {автоисправлений снимают замечание};
-    \node[anchor=north west, text=miptmid, font=\ttfamily] at ([xshift=0.8cm,yshift=-7.7cm]current page.north west) {https://185-17-3-218.sslip.io};
+    \node[anchor=north west, text width=12.5cm, font=\Large] at ([xshift=0.8cm,yshift=-3.3cm]current page.north west) {Находит ошибки в техническом задании, обосновывает нормой и практикой ФАС, исправляет~— \textbf{полностью локально, без сторонних LLM}};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=0.8cm,yshift=-5.5cm]current page.north west) {27/27};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\small] at ([xshift=0.8cm,yshift=-6.6cm]current page.north west) {правок эксперта найдено};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=5.6cm,yshift=-5.5cm]current page.north west) {0};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\small] at ([xshift=5.6cm,yshift=-6.6cm]current page.north west) {ложных ошибок на исправленных ТЗ};
+    \node[anchor=north west, text=miptblue, font=\bfseries\Huge] at ([xshift=10.4cm,yshift=-5.5cm]current page.north west) {1–3 с};
+    \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\small] at ([xshift=10.4cm,yshift=-6.6cm]current page.north west) {на документ};
+    \node[anchor=north west, text=miptmid, font=\ttfamily\small] at ([xshift=0.8cm,yshift=-7.8cm]current page.north west) {185-17-3-218.sslip.io \quad github.com/XxSNiPxX/tz-review-223fz};
   \end{tikzpicture}
 \end{frame}
 
-% ---------------------------------------------------------------- 2
-\begin{frame}{Задача}
+% ================================================================ 2 · 30 с
+\begin{frame}{Почему не «вставить ТЗ в ChatGPT»}
   \begin{columns}[T]
-    \column{0.52\textwidth}
-    На вход — техническое задание. На выход — результат, с которым сотрудник закупок может доработать документ:
+    \column{0.47\textwidth}
+    \textbf{\color{mipterr}Обычный путь}
     \begin{itemize}
-      \item проблема и \textbf{конкретный фрагмент} ТЗ
-      \item категория, \textbf{объяснение}, \textbf{исправление}
-      \item ссылка на \textbf{норму}, без выдуманных оснований
-      \item итоговое заключение
+      \item документ заказчика уходит в чужое облако
+      \item нормы «по памяти»~— ссылки бывают выдуманы
+      \item ответ каждый раз разный, место ошибки неточное
+      \item исправление никто не перепроверяет
     \end{itemize}
-    \vspace{6pt}
-    \muted{Ограничение: наружу — только открытые данные.\\ Наше решение работает полностью локально.}
-    \column{0.45\textwidth}
-    \small
-    \begin{tabular}{@{}l@{}}
-      \toprule
-      \textbf{Категории из брифа}\\ \midrule
-      противоречие\\ некорректная характеристика\\ код ОКПД 2\\ гарантийные условия\\ стандарты\\ комплектность\\ ограничение конкуренции\\ \bottomrule
-    \end{tabular}
+    \column{0.49\textwidth}
+    \textbf{\color{miptok}Наше решение}
+    \begin{itemize}
+      \item \textbf{всё на своём сервере} (МФТИ или заказчика), ни одного внешнего запроса
+      \item каждое замечание опирается на \textbf{нашу базу}: 223-ФЗ по частям, 420 доводов ФАС, ОКПД2
+      \item замечание привязано к \textbf{пронумерованному фрагменту}
+      \item исправление \textbf{перепроверяется}, прежде чем его предложить
+    \end{itemize}
   \end{columns}
+  \vspace{10pt}
+  \muted{\small Проверено на практике: 7B-модель без опоры на базу переписала «не менее 7» в «ровно 7» и придумала марку стали.}
 \end{frame}
 
-% ---------------------------------------------------------------- 3
-\begin{frame}{Главный принцип: доказательства, а не мнение модели}
+% ================================================================ 3 · 40 с (лучше — живое демо)
+\begin{frame}{Как это выглядит}
   \centering
-  \begin{tikzpicture}[node distance=14mm and 6mm, box/.style={draw=miptmid, rounded corners=4pt, fill=mipttint, minimum height=13mm, text width=27mm, align=center, font=\small},
+  \includegraphics[width=0.76\textwidth]{../img/review_final.jpg}\\[2pt]
+  \muted{\small Документ пронумерован (¶, Т): клик по ссылке прокручивает к фрагменту $\cdot$ «Исправить»: было / станет $\to$ перепроверка $\to$ раздел «Исправлено» как diff в GitHub}
+\end{frame}
+
+% ================================================================ 4 · 30 с
+\begin{frame}{Как устроено: правила впереди, LLM позади}
+  \centering
+  \begin{tikzpicture}[node distance=12mm and 6mm, box/.style={draw=miptmid, rounded corners=4pt, fill=mipttint, minimum height=13mm, text width=27mm, align=center, font=\small},
                       ar/.style={-{Stealth[length=2.4mm]}, thick, miptmid}]
-    \node[box] (in) {ТЗ\\\scriptsize DOCX · PDF · DOC};
-    \node[box, right=of in] (p) {Разбор\\\scriptsize разделы, таблицы, позиции};
-    \node[box, right=of p] (c) {Проверки\\\scriptsize около 30 видов};
-    \node[box, right=of c] (r) {Отчёт\\\scriptsize фрагмент, категория, норма};
-    \node[box, below=of p, fill=miptblue!8, draw=miptblue] (k) {База знаний\\\scriptsize 223-ФЗ, ФАС, ОКПД2, ГОСТ};
-    \node[box, below=of c, fill=white] (fb) {Отзывы\\\scriptsize обучение с проверкой};
-    \node[box, below=of r, fill=miptok!10, draw=miptok] (f) {Автоисправление\\\scriptsize правило, ОКПД2, LLM};
+    \node[box] (in) {ТЗ\\\scriptsize DOCX · PDF};
+    \node[box, right=of in] (p) {Разбор\\\scriptsize разделы, таблицы, нумерация};
+    \node[box, right=of p] (c) {$\sim$30 проверок\\\scriptsize + RuBERT: роль пункта};
+    \node[box, right=of c] (r) {Замечание\\\scriptsize фрагмент · норма · ФАС};
+    \node[box, below=of p, fill=miptblue!8, draw=miptblue] (k) {База знаний\\\scriptsize открытые данные + e5-поиск};
+    \node[box, below=of c, fill=white] (fb) {Правки экспертов\\\scriptsize дообучение со «шлюзом»};
+    \node[box, below=of r, fill=miptok!10, draw=miptok] (f) {Исправление\\\scriptsize правило · ОКПД2 · Qwen-7B\\ + перепроверка};
     \draw[ar] (in) -- (p); \draw[ar] (p) -- (c); \draw[ar] (c) -- (r); \draw[ar] (r) -- (f);
-    \draw[ar] (k) -- (c); \draw[ar] (fb) -- (c);
-    \draw[ar] (f) -- (fb);
+    \draw[ar] (k) -- (c); \draw[ar] (fb) -- (c); \draw[ar] (f) -- (fb);
   \end{tikzpicture}
-  \vspace{8pt}
+  \vspace{6pt}
   \begin{itemize}
-    \item \textbf{Правила} находят дефект, \textbf{база знаний} даёт основание, \textbf{LLM} только формулирует — и её ответ проверяется
-    \item Каждое исправление снова проходит проверки; отзывы и правки экспертов обучают систему
-    \item Нет данных для вывода $\Rightarrow$ «требует проверки», а не «нарушение»
+    \item \textbf{Правила} находят дефект, \textbf{база} даёт основание, \textbf{LLM} только формулирует~— и проверяется на выдуманные нормы
+    \item нет данных для вывода $\Rightarrow$ «требует проверки», а не «нарушение»
   \end{itemize}
 \end{frame}
 
-% ---------------------------------------------------------------- 4
-\begin{frame}{Что проверяем}
+% ================================================================ 5 · 35 с
+\begin{frame}{Результаты и обучение на экспертах}
+  \begin{columns}[T]
+    \column{0.5\textwidth}
+    \small
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.55\linewidth}cc@{}}
+      \toprule
+      \textbf{Документ} & \textbf{обяз.} & \textbf{доп.}\\ \midrule
+      Лифт, работы (организаторы) & 6/6 & 2/2\\
+      Метрология (организаторы) & 4/4 & 2/2\\
+      Клининг, услуги (наш) & 9/9 & 2/2\\
+      ИТ-техника (наш) & 8/8 & 1/1\\ \midrule
+      \textbf{Итого} & \textbf{27/27} & \textbf{7/7}\\ \bottomrule
+    \end{tabular}\\[6pt]
+    \textbf{0} ложных ошибок на версиях эксперта\\
+    \textbf{32/32} автоисправления снимают замечание, \textbf{0} новых
+    \column{0.46\textwidth}
+    \small
+    \textbf{Учится безопасно}
+    \begin{itemize}
+      \item оценки «верно / ложно», «другая категория», пропущенное, каждая правка $\to$ датасет
+      \item фоновое переобучение раз в 30 минут
+      \item \textbf{шлюз}: новая модель включается, только если на эталонах не хуже
+      \item тест: «вредные» отзывы срезали бы 27$\to$17~— модель \textcolor{mipterr}{отклонена}
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+% ================================================================ 6 · 25 с
+\begin{frame}[plain]
+  \centering
+  \vspace{0.9cm}
+  {\color{miptblue}\bfseries\Huge Готово к работе сегодня\par}
+  \vspace{14pt}
+  \begin{columns}[T]
+    \column{0.3\textwidth}\centering\bignum{3}\\\muted{команды~— свой экземпляр из GitHub}
+    \column{0.3\textwidth}\centering\bignum{709\,МБ}\\\muted{RAM хватает облегчённому режиму}
+    \column{0.3\textwidth}\centering\bignum{0}\\\muted{внешних API при проверке}
+  \end{columns}
+  \vspace{16pt}
+  \muted{Дальше: Положения о закупке заказчиков из ЕИС $\cdot$ дообучение LLM на правках (LoRA) $\cdot$ рыночные каталоги}\\[10pt]
+  {\Large\color{miptmid}\ttfamily 185-17-3-218.sslip.io\par}
+  \muted{\small «Войти в демо-режиме» $\to$ пример документа $\to$ «Исправить автоматически»}
+\end{frame}
+
+% ================================================================ запасные слайды для вопросов
+\appendix
+\begin{frame}[plain]\centering\vspace{3cm}{\color{miptgrey}\Large Запасные слайды для вопросов}\end{frame}
+
+\begin{frame}[shrink=6]{Что проверяем}
   \small
   \begin{tabular}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
     \toprule
@@ -124,15 +178,7 @@
   \end{tabular}
 \end{frame}
 
-% ---------------------------------------------------------------- 5
-\begin{frame}{Как это выглядит}
-  \centering
-  \includegraphics[width=0.92\textwidth]{../img/review_light.jpg}\\[3pt]
-  \muted{\small Слева — документ с подсветкой, справа — замечания по группам. «Исправить автоматически»: было / станет, затем перепроверка.}
-\end{frame}
-
-% ---------------------------------------------------------------- 6
-\begin{frame}{Автоисправление, которое проверяет само себя}
+\begin{frame}[shrink=5]{Автоисправление, которое проверяет само себя}
   \small
   \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.45\textwidth}>{\raggedright\arraybackslash}p{0.45\textwidth}@{}}
     \toprule
@@ -158,7 +204,6 @@
   \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- 7
 \begin{frame}{Качество на эталонах}
   \begin{columns}[T]
     \column{0.56\textwidth}
@@ -186,7 +231,6 @@
   \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- 8
 \begin{frame}{Данные и модели}
   \begin{columns}[T]
     \column{0.48\textwidth}
@@ -210,7 +254,6 @@
   \muted{\small Почему не «просто LLM»: первая же 7B-модель переписала «не менее 7» в «ровно 7» и придумала марку стали.}
 \end{frame}
 
-% ---------------------------------------------------------------- 9
 \begin{frame}{Учится на работе экспертов}
   \begin{itemize}
     \item каждое замечание: \textbf{«верно» / «ложное»}, «другая категория», комментарий; клик по тексту — «система пропустила проблему»
@@ -228,7 +271,6 @@
   \end{tabular}
 \end{frame}
 
-% ---------------------------------------------------------------- 10
 \begin{frame}{Развёртывание}
   \begin{columns}[T]
     \column{0.5\textwidth}
@@ -246,7 +288,6 @@
   \end{columns}
 \end{frame}
 
-% ---------------------------------------------------------------- 11
 \begin{frame}{Ограничения и план}
   \begin{columns}[T]
     \column{0.48\textwidth}
@@ -266,24 +307,6 @@
       \item один класс товаров с каталогом рынка $\to$ проверка избыточности по данным
       \item исправления экспертов $\to$ дообучение LLM (LoRA)
     \end{itemize}
-  \end{columns}
-\end{frame}
-
-% ---------------------------------------------------------------- 12
-\begin{frame}[plain]
-  \centering
-  \vspace{1.4cm}
-  {\color{miptblue}\bfseries\Huge Попробуйте сами\par}
-  \vspace{10pt}
-  {\Large\color{miptmid}\ttfamily https://185-17-3-218.sslip.io\par}
-  \vspace{6pt}
-  \muted{«Войти в демо-режиме» $\to$ любой пример документа $\to$ «Исправить автоматически»}
-  \vspace{20pt}
-
-  \begin{columns}[T]
-    \column{0.3\textwidth}\centering\bignum{27/27}\\\muted{правок эксперта}
-    \column{0.3\textwidth}\centering\bignum{0}\\\muted{ложных ошибок}
-    \column{0.3\textwidth}\centering\bignum{1–3 с}\\\muted{на документ}
   \end{columns}
 \end{frame}
 
