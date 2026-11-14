@@ -31,7 +31,7 @@ Deck: `docs/presentation.pdf`. Slides 1–7 are the pitch. Everything after "З�
 | 3 + 2 models | trained by us: RuBERT-tiny2 clause-role classifier, ОКПД2 matcher, feedback filter. Open, used as is: Qwen2.5-7B, multilingual-e5-small |
 | 4 open data sources | laws (КонсультантПлюс, Гарант, RusLawOD), FAS decisions, ЕИС, ОКПД2 |
 | 420 FAS arguments, 21,081 ОКПД2 codes, 46,752 ЕИС clauses, 1,623 law norms | size of the collected knowledge base |
-| ~1 min per LLM explanation | on CPU; the checks themselves take 1–3 s per document |
+| ~1 min per LLM explanation | on CPU; explanations appear one by one after the checks |
 | ≥ 10 GB RAM | needed for the LLM; the 709 MB demo server runs without it |
 
 **Don't volunteer scores.** If asked "how did you evaluate?", see question 3.
@@ -122,7 +122,7 @@ Not measured: there are no expert labels for real ЕИС documents yet. We won't
 ### About practicality
 
 **13. Speed and deployment?**
-- 1–3 s per document without the LLM.
+- The checks take a few seconds; each LLM explanation takes about a minute on CPU.
 - `./setup.sh` plus `docker compose up`.
 - Lite mode fits in under 1 GB RAM.
 - Login via Yandex ID or Google, and access can be restricted to a domain.
