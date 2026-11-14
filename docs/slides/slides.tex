@@ -11,7 +11,6 @@
 \setdefaultlanguage{russian}
 \setotherlanguage{english}
 \usepackage{booktabs,tikz,graphicx,array}
-\usepackage{appendixnumberbeamer}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds}
 
 % ---- MIPT palette (measured on mipt.ru) ----
@@ -58,6 +57,27 @@
     \node[anchor=north west, text=miptgrey, text width=4.4cm, font=\footnotesize] at ([xshift=10.8cm,yshift=-6.5cm]current page.north west) {открытых источника: законы, решения ФАС, ЕИС, ОКПД2};
     \node[anchor=north west, text=miptmid, font=\ttfamily\small] at ([xshift=0.8cm,yshift=-8.25cm]current page.north west) {github.com/XxSNiPxX/tz-review-223fz};
   \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Проблема}
+  \begin{columns}[T]
+    \column{0.55\textwidth}
+    \textbf{Ошибка в ТЗ дорого обходится заказчику}
+    \begin{itemize}
+      \item участник подаёт жалобу в ФАС $\to$ предписание изменить документацию или отменить закупку
+      \item закупка откладывается на недели, работа повторяется
+      \item типичные ошибки банальны: противоречия между таблицей и текстом, марка без «или эквивалент», неверный код ОКПД2, гарантия «не от того» документа
+    \end{itemize}
+    \column{0.41\textwidth}
+    \textbf{Сейчас проверяют вручную}
+    \begin{itemize}
+      \item десятки страниц, таблицы характеристик, спецификации
+      \item нужно помнить 223-ФЗ, классификатор и практику ФАС
+      \item документы заказчика не всегда можно отправлять в облачный чат-бот
+    \end{itemize}
+    \vspace{6pt}
+    \muted{\small В собранной базе~— 420 доводов жалоб из 437 дел ФАС: что именно оспаривают в ТЗ.}
+  \end{columns}
 \end{frame}
 
 % ================================================================ 2 · 30 с
@@ -183,102 +203,6 @@
   \small\muted{Дальше: оценка на размеченных жалобах ФАС, Положения о закупке заказчиков, дообучение LLM на правках экспертов (LoRA)}\\[10pt]
   {\Large\color{miptmid}\ttfamily github.com/XxSNiPxX/tz-review-223fz\par}
   \muted{\small Демо-сервер (облегчённый режим, без LLM): 185-17-3-218.sslip.io}
-\end{frame}
-
-% ================================================================ запасные слайды для вопросов
-\appendix
-\begin{frame}[plain]\centering\vspace{3cm}{\color{miptgrey}\Large Запасные слайды для вопросов}\end{frame}
-
-\begin{frame}[shrink=6]{Что проверяем}
-  \small
-  \begin{tabular}{@{}p{0.27\textwidth}p{0.68\textwidth}@{}}
-    \toprule
-    \textbf{Противоречия} & значение характеристики в таблице против предмета закупки и спецификации (тип лифта, грузоподъёмность, ОЗУ, площадь)\\
-    \textbf{Характеристики} & число без единицы — с учётом смысла: «4 остановки» и «класс точности 0» единиц не требуют; оценочные слова\\
-    \textbf{ОКПД 2} & несуществующий код, слишком общий «…190», код работ у товара, поставка без позиции с кодом товара\\
-    \textbf{Гарантия} & основание начала срока против вида договора: товар — накладная, работы — КС-2/КС-3, услуги — акт\\
-    \textbf{Стандарты} & «ГОСТ 53782-2010» без «Р» (реестр из 46\,752 пунктов реальных ТЗ)\\
-    \textbf{Комплектность} & комплект без состава, разнородный комплект под одним кодом, позиция без характеристик\\
-    \textbf{Конкуренция} & марка без «или эквивалент», запрет эквивалента, количественные требования к опыту\\
-    \textbf{Вне ТЗ} & положения о национальном режиме и т.\,п., которым место в документации\\
-    \bottomrule
-  \end{tabular}
-\end{frame}
-
-\begin{frame}[shrink=5]{Автоисправление с перепроверкой}
-  \small
-  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.45\textwidth}>{\raggedright\arraybackslash}p{0.45\textwidth}@{}}
-    \toprule
-    \textbf{Было} & \textbf{Станет}\\ \midrule
-    Тип лифта: \textcolor{mipterr}{пассажирский} & Тип лифта: \textcolor{miptok}{грузовой}\\
-    ГОСТ 53782-2010 & ГОСТ \textcolor{miptok}{Р} 53782-2010\\
-    гарантия с даты \textcolor{mipterr}{товарной накладной} & с даты \textcolor{miptok}{актов КС-2 и КС-3}\\
-    температура воды не менее 40 & не менее 40 \textcolor{miptok}{°C}\\
-    Lenovo ThinkPad T14 Gen 4 & Lenovo ThinkPad T14 Gen 4 \textcolor{miptok}{или эквивалент}\\
-    плита поверочная, 26.51.33.\textcolor{mipterr}{190} & 26.51.33.\textcolor{miptok}{142}\\ \bottomrule
-  \end{tabular}
-  \vspace{8pt}
-  \begin{itemize}
-    \item правило по виду замечания; код ОКПД2~— по наименованию из 21\,081 кода; LLM~— запасной путь
-    \item исправление предлагается, только если повторная проверка его принимает; после применения документ перепроверяется целиком
-    \item \muted{перепроверка~— нашими же правилами; качество формулировок эксперт не оценивал. Комплектность и состав комплектов не исправляются автоматически}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Учится на работе экспертов}
-  \begin{itemize}
-    \item каждое замечание: \textbf{«верно» / «ложное»}, «другая категория», комментарий; клик по тексту — «система пропустила проблему»
-    \item каждая правка: исходный текст, предложение системы, итоговый текст, сняло ли замечание
-    \item датасеты собираются автоматически; фильтр переобучается в фоне
-    \item \textbf{шлюз}: новая модель включается, только если на контрольных документах не теряет найденного и не добавляет ложных
-  \end{itemize}
-  \vspace{6pt}
-  \small
-  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.5\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}@{}}
-    \toprule
-    Проверка ворот & Отзывы & Решение\\ \midrule
-    полезные отзывы & эксперты отклоняют замечания об оформлении & \textcolor{miptok}{включена}\\
-    вредные отзывы (тест) & «отклоняют» настоящие противоречия & \textcolor{mipterr}{отклонена}\\ \bottomrule
-  \end{tabular}
-\end{frame}
-
-\begin{frame}{Развёртывание}
-  \begin{columns}[T]
-    \column{0.5\textwidth}
-    \small
-    \begin{itemize}
-      \item Docker + Docker Compose; один скрипт для VPS: Docker, HTTPS (Let's Encrypt), вход
-      \item облегчённый режим для слабых серверов: 1 vCPU, 709 МБ RAM, 120 МБ на приложение
-      \item вход: демо-режим, Яндекс ID, Google; доступ можно ограничить доменом \texttt{phystech.edu}
-      \item никаких внешних API при проверке
-    \end{itemize}
-    \vspace{4pt}
-    {\ttfamily\scriptsize ./deploy/deploy.sh root@HOST}
-    \column{0.46\textwidth}
-    \includegraphics[width=\textwidth]{../img/login.jpg}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Ограничения и план}
-  \begin{columns}[T]
-    \column{0.48\textwidth}
-    \textbf{Честно о границах}
-    \small
-    \begin{itemize}
-      \item нет Положений о закупке заказчиков и перечня СМП — такие места помечены «требует проверки»
-      \item нет рыночных каталогов: избыточность параметров — по признакам
-      \item LLM на CPU медленная; на слабом сервере работает без неё
-    \end{itemize}
-    \column{0.48\textwidth}
-    \textbf{Дальше}
-    \small
-    \begin{itemize}
-      \item Положения о закупке из ЕИС $\to$ проверка по внутренним регламентам
-      \item разметка 100 решений ФАС экспертами $\to$ обученные классификаторы вместо правил
-      \item один класс товаров с каталогом рынка $\to$ проверка избыточности по данным
-      \item исправления экспертов $\to$ дообучение LLM (LoRA)
-    \end{itemize}
-  \end{columns}
 \end{frame}
 
 \end{document}
