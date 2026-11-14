@@ -2,18 +2,34 @@
 
 Deck: `docs/presentation.pdf`. Slides 1–6 are the pitch. Everything after "Запасные слайды" is backup, opened only when a question needs it.
 
+**Rule for every number:** say exactly what was measured, and don't round it up. Every figure below comes from `eval_case.py` / `eval_autofix.py` and can be shown live.
+
 ## 3-minute script (≈ 30 s per slide)
 
 | # | Time | Say (RU) | Meaning (EN) |
 |---|---|---|---|
-| 1 | 0:00–0:20 | «Мы сделали систему, которая проверяет ТЗ на закупку по 223-ФЗ: находит ошибки, обосновывает их нормой и практикой ФАС и исправляет. Работает полностью локально, без сторонних LLM. На эталонах — все 27 правок эксперта и ни одной ложной ошибки.» | What it is plus the headline numbers |
-| 2 | 0:20–0:50 | «Обычно ТЗ вставляют в ChatGPT. Документ уходит в чужое облако, нормы модель берёт по памяти и выдумывает. Мы сделали наоборот: каждое замечание опирается на нашу базу — 223-ФЗ по частям, 420 доводов ФАС, ОКПД2 — и привязано к конкретному фрагменту. 7B-модель без базы у нас переписала "не менее 7" в "ровно 7" — поэтому LLM у нас только формулирует.» | Why not ChatGPT |
-| 3 | 0:50–1:30 | **Live demo if possible** (see below). Otherwise: «Документ пронумерован, каждая проблема подсвечена. Клик по ссылке ¶6 прокручивает к фрагменту. "Исправить" показывает было/станет, после подтверждения документ перепроверяется, а правка попадает в раздел "Исправлено", как diff в GitHub.» | What the user sees |
-| 4 | 1:30–2:00 | «Около 30 детерминированных проверок плюс модели: RuBERT определяет роль пункта, e5 ищет нормы и решения ФАС, Qwen-7B формулирует пояснения. Если данных для вывода нет — пишем "требует проверки", а не "нарушение".» | Architecture |
-| 5 | 2:00–2:35 | «Эталоны: два документа организаторов и два наших из других областей — 27 из 27 обязательных правок, 0 ложных. 32 автоисправления — все снимают замечание. Система учится на оценках и правках экспертов, но новая модель включается, только если на эталонах она не хуже: "вредные" отзывы мы отклонили автоматически.» | Results and learning |
-| 6 | 2:35–3:00 | «Всё открыто: три команды — и у вас свой экземпляр. Работает даже на сервере с 709 МБ памяти. Попробуйте: демо-вход, пример документа, "Исправить автоматически". Спасибо!» | Close |
+| 1 | 0:00–0:20 | «Мы сделали систему, которая подсвечивает проблемы в ТЗ на закупку по 223-ФЗ, показывает основание и предлагает исправление. Работает на своём сервере, без внешних API. На документах организаторов система отметила все 10 правок эксперта: 4 — как ошибку, 6 — как "требует проверки".» | What it is; the headline number with its breakdown |
+| 2 | 0:20–0:50 | «Облачный чат-бот получает документ заказчика, а ссылки на нормы берёт по памяти — их надо перепроверять. У нас основания берутся из собранной базы: 223-ФЗ по частям, доводы из решений ФАС, ОКПД2. Проверки детерминированные, а LLM только поясняет: в нашем тесте 7B-модель без базы переписала "не менее 7" в "ровно 7".» | Why not a chatbot |
+| 3 | 0:50–1:30 | **Live demo if possible** (see below). Otherwise: «Документ пронумерован, проблемы подсвечены. Ссылка ¶6 прокручивает к фрагменту. "Исправить" показывает было/станет, после подтверждения документ перепроверяется, правка попадает в раздел "Исправлено".» | What the user sees |
+| 4 | 1:30–2:00 | «Около 30 проверок, база знаний и модели: RuBERT — роль пункта, e5 — поиск норм и решений ФАС, Qwen-7B — пояснения. Если данных не хватает, система пишет "требует проверки", а не "нарушение".» | Architecture |
+| 5 | 2:00–2:35 | «Честно о результатах. Лифт: 6 из 6 отмечены, 4 как ошибка. Метрология: 4 из 4, все — "требует проверки". Два пункта покрыты частично: один код работ и 2 из 5 кодов ОКПД2 мы не замечаем. На исправленных экспертом версиях нет подтверждённых ошибок. Два своих ТЗ из других областей мы сделали как контроль переобучения. Система учится на правках экспертов, но новая версия включается, только если на эталонах она не хуже.» | Results, honest |
+| 6 | 2:35–3:00 | «Всё открыто: три команды — и у вас свой экземпляр; демо работает на сервере с 709 МБ памяти. Эталон пока маленький, следующий шаг — разметка реальных жалоб ФАС. Попробуйте: демо-вход, пример, "Исправить автоматически". Спасибо!» | Close, plus the limitation and next step |
 
-**Live demo (40 s, rehearse it):** https://185-17-3-218.sslip.io → «Войти в демо-режиме» → sample «Вычислительная техника» → click finding 4 (Lenovo, no equivalent) → «Исправить автоматически» → show was/becomes → apply → show «Исправлено». Keep slide 3 open in a second tab in case the network fails.
+**Live demo (40 s, rehearse it):** https://185-17-3-218.sslip.io → «Войти в демо-режиме» → sample «Вычислительная техника» → finding 4 (Lenovo, no equivalent) → «Исправить автоматически» → was/becomes → apply → «Исправлено». Keep slide 3 open as a fallback in case the network fails.
+
+## Exact numbers (know them by heart)
+
+| Claim | Exact meaning |
+|---|---|
+| 10/10 | 10 required expert corrections in the organisers' 2 documents. Each has a finding of the same category on that fragment: 4 confirmed as an error, 6 marked "требует проверки" |
+| Lift 6/6 | confirmed errors: lift type, load capacity, warranty basis, missing goods line. "Требует проверки": door opening, ГОСТ without «Р» |
+| Metrology 4/4 | all four marked "требует проверки": kits to split, ОКПД2 codes, missing characteristics, national-regime phrase |
+| Partly covered | lift: the works code .120→.110 is not detected (only the missing goods line is). Metrology: 3 of 5 code problems found (two generic «…190» codes and one code missing from the classifier). Missed: штангенрейсмас .110→.122 and динамометр 26.51.62.120→26.51.66.111, which are valid codes, just not the best fit |
+| 0 | no *confirmed* errors or risks on the expert-corrected versions. "Требует проверки" remarks remain: 3 (lift) and 15 (metrology) |
+| 17/17 | our own two ТЗ (cleaning, IT hardware). We wrote them ourselves, so this is an overfitting check, not an independent score |
+| 32 of 47 | on the 4 test documents, 32 of 47 findings got an automatic fix. All 32 passed our re-check with no new findings. Re-checked by our own rules, not by an expert |
+| 1–3 s | one document, without the LLM |
+| 709 MB | RAM of the demo server (lite mode, **no LLM**) |
 
 ## Likely questions and answers
 
@@ -21,116 +37,106 @@ Deck: `docs/presentation.pdf`. Slides 1–6 are the pitch. Everything after "З�
 
 **1. Why not just use an LLM (GigaChat / YandexGPT / ChatGPT)?**
 Three reasons:
-- customer documents can't leave the organisation;
-- an LLM invents legal references and quietly changes numbers ("не менее 7" became "ровно 7" in our test);
+- customer documents shouldn't leave the organisation;
+- an LLM's legal references come from memory and must be re-checked, and in our test it changed "не менее 7" into "ровно 7";
 - the result isn't reproducible.
 
-Rules plus a knowledge base give the same answer every time, and every finding has a source. The LLM is only used to word explanations, and its answer is discarded if it cites a norm that isn't in our base or adds numbers that aren't in the text.
-RU: «LLM у нас не принимает решений — только формулирует, и её ответ проверяется.»
+So rules plus the knowledge base decide, and the LLM only words explanations. An answer that cites a norm outside our base is discarded.
 
-**2. Where exactly does the LLM run in the demo?**
-Honest answer: the public demo runs on a small VPS (1 vCPU, 709 MB RAM) in **lite mode, without the LLM**. There, explanations come from rule templates plus the knowledge base. Detection quality on the gold set is the same, because the LLM doesn't detect anything.
+**2. Where is the LLM in the demo?**
+The public demo runs on a small VPS (1 vCPU, 709 MB RAM) in **lite mode, without the LLM**. Explanations there come from templates plus the knowledge base. Detection is the same, because the LLM doesn't detect anything. The full mode (Qwen2.5-7B, 4-bit) needs about 10 GB RAM and takes about a minute per explanation on CPU. It runs on our machine.
 
-The full mode (Qwen2.5-7B, 4-bit, llama.cpp) needs about 10 GB RAM. It runs on our machine and would run on an MIPT server. On CPU it takes about a minute per explanation.
+**3. "10/10", but 6 of them are only "требует проверки". Isn't that cheating?**
+"Требует проверки" means the system found the spot and the problem type but doesn't have enough data to state a violation (e.g. it can't be sure a kit's contents are missing rather than described elsewhere). For a procurement specialist, a highlighted spot with an explanation is the useful part. We show the split openly: 4 confirmed, 6 to check.
 
-**3. How do you know a finding is correct? How do you avoid false positives?**
-- Every finding has evidence: a law part, FAS decisions, or the ОКПД2 classifier.
-- When there isn't enough data, the status is «требует проверки», not «нарушение».
-- We measure false positives on the expert-corrected versions of the documents: 0.
+**4. What do you miss?**
+- The lift's wrong works code (.120 instead of .110).
+- In metrology, 2 of 5 code corrections where the code exists but isn't the best one. We only detect codes that are too generic or don't exist. A "valid but better code exists" check is next.
+- Customers' own procurement regulations and the SME list are not in the base yet.
 
-**4. How do you understand context, e.g. "4 остановки" needs no unit?**
-An attribute dictionary (`kb/attribute_units.json`) classifies each characteristic as:
-- a count (stops, pieces);
-- dimensionless (accuracy class);
-- a physical quantity (mass, temperature).
+**5. "0 false errors" — but the corrected metrology document still shows 15 remarks?**
+Yes. The "0" counts only *confirmed* errors and risks. The 15 remarks are "требует проверки": generic «…190» codes the expert left in place, numbers without units, standards without a year. Arguably some of them are real.
 
-Only physical quantities without a unit are flagged, and the system suggests the expected unit.
+**6. How does it understand context, e.g. "4 остановки" needs no unit?**
+An attribute dictionary classifies each characteristic as a count, dimensionless, or a physical quantity. Only physical quantities without a unit are flagged, and the expected unit is suggested.
 
-**5. How does the auto-fix work, and can it break something?**
-- There is a rewrite rule for each kind of problem. The ОКПД2 code is picked by item name from all 21,081 codes (TF-IDF). The LLM is only a fallback.
+**7. How does the auto-fix work, and can it break something?**
+- There is a rewrite rule per problem type. ОКПД2 codes are picked by item name from 21,081 codes. The LLM is a fallback.
 - Before a fix is offered, the checks are re-run on the new text. If the problem would remain, the fix isn't offered.
 - After the user confirms, the whole document is re-checked.
 
-On the gold set: 32 of 32 proposed fixes cleared their finding, and 0 created new problems.
+On the test set, 32 of 47 findings got a fix and all 32 passed the re-check. That re-check uses our own rules; an expert didn't grade the wording. Kits and contents aren't fixed automatically.
 
-**6. What are the models? Did you train anything yourselves?**
+**8. What models? Did you train anything?**
 
 | Model | Role | Trained by us? |
 |---|---|---|
-| RuBERT-tiny2 (29M) | clause role (requirement / contract term / legal reference) | yes, fine-tuned on 46,752 clauses from real ЕИС documents, about 7 min on CPU |
-| multilingual-e5-small | search for similar norms and FAS cases | used as is |
+| RuBERT-tiny2 (29M) | clause role (requirement / contract term / legal reference) | fine-tuned on 46,752 clauses from ЕИС documents, about 7 min on CPU |
+| multilingual-e5-small | search for norms and FAS cases | used as is |
 | Qwen2.5-7B-Instruct Q4 | explanations, fallback fixes | used as is |
-| finding filter (TF-IDF + logistic regression) | retrained on expert feedback | yes, automatically |
+| finding filter (TF-IDF + logistic regression) | learns from expert feedback | yes, automatically |
 
-Be ready for this one: the RuBERT labels are *weak* (generated by rules), so its accuracy of 0.68 / macro-F1 0.72 is measured against those labels. It's a helper signal, not the main detector.
+RuBERT is trained on *weak* labels produced by rules: accuracy 0.68 / macro-F1 0.72 against those labels. It's a helper signal, not the main detector.
 
-**7. How does it learn, and what stops bad feedback from making it worse?**
-- Every vote, category correction, "missed problem" report and edit (before text, after text, method, whether it cleared the finding) is stored in SQLite and exported as JSONL.
-- Every 30 minutes, if there are at least 10 new verdicts, the filter is retrained.
-- The new model passes a **gate**: on the gold set it must keep all mandatory findings, add no false positives, and downgrade nothing.
+**9. How does it learn, and what protects it from bad feedback?**
+- Votes, category corrections, "missed" reports and edits are stored in SQLite and exported as JSONL.
+- The filter is retrained in the background: every 30 minutes, if there are at least 10 new verdicts.
+- A new version is switched on only if, on the gold set, it keeps all required findings, adds no false errors, and downgrades nothing.
 
-We tested this with "harmful" feedback that rejected real contradictions. The candidate would have dropped from 27 to 17 kept findings, so the gate rejected it automatically.
+In a test with deliberately harmful feedback, the candidate would have kept only 17 of 27 findings, and the gate rejected it.
 
-**8. Where does your data come from? Is it legal?**
-All of it is public:
-- ЕИС (zakupki.gov.ru): 321 procurements, 46,752 ТЗ clauses;
-- the FAS decisions base: 437 cases, 420 complaint arguments;
+**10. Where is the data from? Is it legal?**
+All public:
+- ЕИС: 321 procurements, 46,752 clauses;
+- FAS decisions: 437 cases, 420 complaint arguments;
 - law texts from КонсультантПлюс, Гарант and RusLawOD;
-- the ОКПД2 classifier.
+- ОКПД2: 21,081 codes.
 
-Laws are in the public domain. RusLawOD is CC BY-NC, which suits a non-commercial hackathon. The data is collected once with our own collectors; reviewing a document makes no network calls.
+Laws are public domain; RusLawOD is CC BY-NC (non-commercial). Collected once; reviewing a document makes no network calls.
 
-### About the evaluation (judges will push here)
+### About the evaluation
 
-**9. 27/27 on 4 documents isn't much. Isn't this overfitted to the examples?**
-Agree that the set is small, and say so openly.
-- The organisers gave 2 document pairs. We added 2 of our own documents from different areas (cleaning services, IT hardware) specifically to check that the logic isn't tuned to the lift and metrology examples.
-- The checks are general rules (units, ОКПД2, warranty basis by contract type, brand without equivalent), not string matches on the sample text.
-- The next step is a larger labelled set from real FAS complaints.
+**11. Two documents is a tiny test set.**
+Agreed. That's why:
+- we report the organisers' documents separately;
+- our own two ТЗ are labelled as an overfitting check, not a score;
+- the next step is labelling real FAS complaints so we can measure on documents we didn't write.
 
-RU: «Да, эталон маленький — поэтому мы и добавили документы из других областей и сделали дообучение на реальных правках экспертов.»
+The feedback loop also produces labelled data as experts use it.
 
-**10. What is recall/precision on real documents, not your gold set?**
-We don't have expert labels for real ЕИС documents yet, so we can't claim a number. That's exactly what the feedback loop is for: every expert verdict becomes a labelled example.
-
-**11. What does the system miss? What can't it do?**
-- It doesn't have each customer's own procurement regulations (Положения о закупке) or the SME list (ПП 1352), so those places get «требует проверки».
-- There are no market catalogues, so "excessive requirements" are judged by signs, not by real market data.
-- The LLM is slow on CPU.
-
-These are on the "next" slide.
+**12. Precision/recall on real documents?**
+Not measured: we have no expert labels for real ЕИС documents yet. We won't claim a number we don't have.
 
 ### About practicality
 
-**12. How fast is it? Can it run at our organisation?**
-- A check takes 1–3 s per document without the LLM.
-- Setup is one Docker command plus `./setup.sh`.
-- Lite mode runs in under 1 GB RAM.
-- Login works through Yandex ID or Google, and access can be restricted to a domain (e.g. phystech.edu).
+**13. Speed and deployment?**
+- 1–3 s per document without the LLM.
+- `./setup.sh` plus `docker compose up`.
+- Lite mode fits in under 1 GB RAM.
+- Login via Yandex ID or Google, and access can be restricted to a domain.
 
-**13. Which formats are supported?**
-DOCX, DOC, RTF, ODT, PDF (text-based) and XLSX. Scanned PDFs without a text layer aren't supported (no OCR yet).
+**14. Formats?**
+DOCX, DOC, RTF, ODT, text PDF and XLSX. Scanned PDFs aren't supported (no OCR).
 
-**14. What does the user get at the end?**
+**15. Output?**
 - the corrected DOCX;
 - a DOCX with highlights and Word comments;
 - a conclusion as DOCX/HTML;
-- JSON for integration.
+- JSON.
 
-**15. Why 223-ФЗ and not 44-ФЗ? Can it be extended?**
-The task was about 223-ФЗ, but the knowledge base already contains 44-ФЗ by part. Most checks (units, ОКПД2, brand without equivalent, standards) apply to both laws; only the legal references and some rules change.
+**16. 44-ФЗ?**
+The base already has 44-ФЗ by part, and most checks don't depend on which law applies. It hasn't been tested on 44-ФЗ documents.
 
-**16. What's next if you get support?**
-1. Customers' procurement regulations from ЕИС, to check against internal rules.
-2. Expert labelling of about 100 FAS decisions, so trained classifiers can replace some rules.
-3. A market catalogue for one product class, to check excessive requirements with data.
-4. LoRA fine-tuning of the LLM on the stored expert edits.
+**17. Next steps?**
+1. Label real FAS complaints to build an independent test set.
+2. A check for "valid but not the best" ОКПД2 codes.
+3. Customers' procurement regulations from ЕИС.
+4. LoRA fine-tuning of the LLM on stored expert edits.
 
-**17. What did each team member do?**
-*Prepare your own answer:* who built data collection, the checks, the UI and the deploy. Judges like a clear split.
+**18. Who did what?**
+*Prepare your own answer:* who built data collection, the checks, the UI and the deploy.
 
-### Traps to avoid
-- Don't say "AI finds violations." Say: "rules find, the base justifies, the LLM explains."
-- Don't claim the demo server uses the LLM. It runs in lite mode.
-- Don't claim the system runs on an MIPT server today. It runs on our own VPS and is *ready to be deployed* on an MIPT or customer server.
-- If you don't know an answer: «Хороший вопрос — это мы не измеряли, но вот как бы мы это проверили…»
+### Phrases to avoid
+- "finds all errors", "0 false positives", "AI detects violations", "runs on MIPT's server"
+- Say instead: "отметила 10 из 10 (4 ошибкой, 6 "требует проверки")", "0 подтверждённых ошибок на исправленных версиях", "правила находят, база обосновывает, LLM поясняет", "разворачивается на своём сервере"
+- If you don't know: «Это мы не измеряли — вот как бы мы это проверили…»
